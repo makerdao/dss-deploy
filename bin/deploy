@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+set -ex
+
+export SOLC_FLAGS=${SOLC_FLAGS:-"--optimize"}
+export ETH_GAS=${ETH_GAS:-"4500000"}
+export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
+
+dapp build
+
+test -z $DAI_DGX && $DAI_DGX = $(dapp create DSToken $(seth --from-ascii "DGX"))
+test -z $DAI_MKR && $DAI_MKR = $(dapp create DSToken $(seth --from-ascii "MKR"))
+
+$DAI_VAT = $(dapp create Vat)
+$DAI_PIT = $(dapp create Pit $DAI_VAT)
+$DAI_PIE = $(dapp create Dai20 $DAI_VAT)
+$DAI_VOW = $(dapp create Vow)
+$DAI_CAT = $(dapp create Cat $DAI_VAT $DAI_PIT $DAI_VOW)
+$DAI_FLAP = $(dapp create Flapper $DAI_PIE $DAI_MKR)
+$DAI_FLOP = $(dapp create Flopper $DAI_PIE $DAI_MKR)
+
+seth send $DAI_VOW "file(bytes32,address)" "vat" $DAI_VAT
+seth send $DAI_VOW "file(bytes32,address)" "flap" $DAI_FLAP
+seth send $DAI_VOW "file(bytes32,address)" "flop" $DAI_FLOP
+
+$DAI_FLIP_ETH = $(dapp create Flipper $DAI_VAT "ETH")
+seth send $DAI_CAT "fuss(bytes32,address)" "ETH" $DAI_FLIP_ETH
+
+$DAI_FLIP_DGX = $(dapp create Flipper $DAI_VAT "DGX")
+seth send $DAI_CAT "fuss(bytes32,address)" "DGX" $DAI_FLIP_DGX
+
+$DAI_APT_ETH = $(dapp create AdapterETH $DAI_VAT "ETH")
+$DAI_APT_DGX = $(dapp create Adapter $DAI_VAT "DGX" $DAI_DGX)
+
+cat > load-env-$(seth chain) << EOF
+#!/bin/bash
+
+# dai deployment on $(seth chain) from $(git rev-parse HEAD)
+# $(date)
+
+export DAI_VAT=$DAI_VAT
+export DAI_PIT=$DAI_PIT
+export DAI_PIE=$DAI_PIE
+export DAI_VOW=$DAI_VOW
+export DAI_CAT=$DAI_CAT
+export DAI_FLAP=$DAI_FLAP
+export DAI_FLOP=$DAI_FLOP
+export DAI_FLIP_ETH=$DAI_FLIP_ETH
+export DAI_FLIP_DGX=$DAI_FLIP_DGX
+export DAI_APT_ETH=$DAI_APT_ETH
+export DAI_APT_DGX=$DAI_APT_DGX
+EOF

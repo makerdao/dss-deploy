@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -ex
+
+export SOLC_FLAGS=${SOLC_FLAGS:-"--optimize"}
+export ETH_GAS=${ETH_GAS:-"3500000"}
+export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
+
+# dapp build
+
+VAT_FAB=$(dapp create VatFab)
+PIT_FAB=$(dapp create PitFab)
+PIE_FAB=$(dapp create PieFab)
+VOW_FAB=$(dapp create VowFab)
+CAT_FAB=$(dapp create CatFab)
+FLAP_FAB=$(dapp create FlapFab)
+FLOP_FAB=$(dapp create FlopFab)
+FLIP_FAB=$(dapp create FlipFab)
+PRICE_FAB=$(dapp create PriceFab)
+
+cat > load-fab-$(seth chain) << EOF
+#!/bin/bash
+
+# fab deployment on $(seth chain) from $(git rev-parse HEAD)
+# $(date)
+
+export VAT_FAB=$VAT_FAB
+export PIT_FAB=$PIT_FAB
+export PIE_FAB=$PIE_FAB
+export VOW_FAB=$VOW_FAB
+export CAT_FAB=$CAT_FAB
+export FLAP_FAB=$FLAP_FAB
+export FLOP_FAB=$FLOP_FAB
+export FLIP_FAB=$FLIP_FAB
+export PRICE_FAB=$PRICE_FAB
+EOF

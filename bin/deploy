@@ -5,47 +5,70 @@ export SOLC_FLAGS=${SOLC_FLAGS:-"--optimize"}
 export ETH_GAS=${ETH_GAS:-"4500000"}
 export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
 
-dapp build
+# dapp build
 
-test -z $DAI_DGX && $DAI_DGX = $(dapp create DSToken $(seth --from-ascii "DGX"))
-test -z $DAI_MKR && $DAI_MKR = $(dapp create DSToken $(seth --from-ascii "MKR"))
+(test -z $VAT_FAB || test -z $PIT_FAB || test -z $PIE_FAB || test -z $VOW_FAB  || test -z $CAT_FAB || test -z $FLAP_FAB || test -z $FLOP_FAB || test -z $FLIP_FAB || test -z $PRICE_FAB) && exit 1
 
-$DAI_VAT = $(dapp create Vat)
-$DAI_PIT = $(dapp create Pit $DAI_VAT)
-$DAI_PIE = $(dapp create Dai20 $DAI_VAT)
-$DAI_VOW = $(dapp create Vow)
-$DAI_CAT = $(dapp create Cat $DAI_VAT $DAI_PIT $DAI_VOW)
-$DAI_FLAP = $(dapp create Flapper $DAI_PIE $DAI_MKR)
-$DAI_FLOP = $(dapp create Flopper $DAI_PIE $DAI_MKR)
+test -z $DAI_GOV && DAI_GOV=$(dapp create DSToken $(seth --to-bytes32 $(seth --from-ascii "MKR")))
+# test -z $DAI_PIP && DAI_PIP=$(dapp create DSValue)
 
-seth send $DAI_VOW "file(bytes32,address)" "vat" $DAI_VAT
-seth send $DAI_VOW "file(bytes32,address)" "flap" $DAI_FLAP
-seth send $DAI_VOW "file(bytes32,address)" "flop" $DAI_FLOP
+DAI_DEPLOY=$(dapp create DssDeploy $VAT_FAB $PIT_FAB $PIE_FAB $VOW_FAB $CAT_FAB $FLAP_FAB $FLOP_FAB $FLIP_FAB $PRICE_FAB)
 
-$DAI_FLIP_ETH = $(dapp create Flipper $DAI_VAT "ETH")
-seth send $DAI_CAT "fuss(bytes32,address)" "ETH" $DAI_FLIP_ETH
+# if [ -z $DAI_ADM ]
+# then
+#     DAI_ADM=$(dapp create DSRoles)
+#     seth send $DAI_ADM 'setRootUser(address,bool)' $ETH_FROM true
+# fi
 
-$DAI_FLIP_DGX = $(dapp create Flipper $DAI_VAT "DGX")
-seth send $DAI_CAT "fuss(bytes32,address)" "DGX" $DAI_FLIP_DGX
+# Deploy contracts
+seth send $DAI_DEPLOY "deployContracts(address)" $DAI_GOV
 
-$DAI_APT_ETH = $(dapp create AdapterETH $DAI_VAT "ETH")
-$DAI_APT_DGX = $(dapp create Adapter $DAI_VAT "DGX" $DAI_DGX)
+# Get Vat address
+DAI_VAT=0x$(seth call $DAI_DEPLOY "vat()(address)")
+
+# Deploy ETH ilk
+test -z $PIP_ETH && PIP_ETH=$(dapp create DSValue)
+DAI_APT_ETH=$(dapp create AdapterETH $DAI_VAT $(seth --to-bytes32 $(seth --from-ascii "ETH")))
+seth send $DAI_DEPLOY "deployIlk(bytes32,address,address,uint256)" $(seth --to-bytes32 $(seth --from-ascii "ETH")) $DAI_APT_ETH $PIP_ETH $(seth --to-uint256 $(seth --to-wei 1.5 ETH))
+ilk=(`echo $(seth call $DAI_DEPLOY "ilks(bytes32)(address,address,address)" $(seth --to-bytes32 $(seth --from-ascii "ETH")))`)
+DAI_FLIP_ETH=0x${ilk[0]}
+DAI_PRICE_ETH=0x${ilk[2]}
+
+# Deploy DGX ilk
+test -z $DGX && DGX=$(dapp create DSToken $(seth --to-bytes32 $(seth --from-ascii "DGX")))
+test -z $PIP_DGX && PIP_DGX=$(dapp create DSValue)
+DAI_APT_DGX=$(dapp create Adapter $DAI_VAT $(seth --to-bytes32 $(seth --from-ascii "DGX")) $DGX)
+seth send $DAI_DEPLOY "deployIlk(bytes32,address,address,uint256)" $(seth --to-bytes32 $(seth --from-ascii "DGX")) $DAI_APT_DGX $PIP_DGX $(seth --to-uint256 $(seth --to-wei 1.1 ETH))
+ilk=(`echo $(seth call $DAI_DEPLOY "ilks(bytes32)(address,address,address)" $(seth --to-bytes32 $(seth --from-ascii "DGX")))`)
+DAI_FLIP_DGX=0x${ilk[0]}
+DAI_PRICE_DGX=0x${ilk[2]}
+
+# Config and verify params
+seth send $DAI_DEPLOY "configParams()"
+seth send $DAI_DEPLOY "verifyParams()"
+
+# Config auth
+# seth send $DAI_FAB "configAuth(address)" $DAI_ADM
 
 cat > load-env-$(seth chain) << EOF
 #!/bin/bash
 
-# dai deployment on $(seth chain) from $(git rev-parse HEAD)
+# sai deployment on $(seth chain) from $(git rev-parse HEAD)
 # $(date)
 
+export DAI_DEPLOY=$DAI_DEPLOY
+export DAI_GOV=$DAI_GOV
 export DAI_VAT=$DAI_VAT
-export DAI_PIT=$DAI_PIT
-export DAI_PIE=$DAI_PIE
-export DAI_VOW=$DAI_VOW
-export DAI_CAT=$DAI_CAT
-export DAI_FLAP=$DAI_FLAP
-export DAI_FLOP=$DAI_FLOP
-export DAI_FLIP_ETH=$DAI_FLIP_ETH
-export DAI_FLIP_DGX=$DAI_FLIP_DGX
+export DAI_PIT=0x$(seth call $DAI_DEPLOY "pit()(address)")
+export DAI_PIE=0x$(seth call $DAI_DEPLOY "pie()(address)")
+export DAI_VOW=0x$(seth call $DAI_DEPLOY "vow()(address)")
+export DAI_CAT=0x$(seth call $DAI_DEPLOY "cat()(address)")
+export DAI_FLAP=0x$(seth call $DAI_DEPLOY "flap()(address)")
+export DAI_FLOP=0x$(seth call $DAI_DEPLOY "flop()(address)")
 export DAI_APT_ETH=$DAI_APT_ETH
+export DAI_FLIP_ETH=$DAI_FLIP_ETH
+export DAI_PRICE_ETH=$DAI_PRICE_ETH
 export DAI_APT_DGX=$DAI_APT_DGX
+export DAI_FLIP_DGX=$DAI_FLIP_DGX
+export DAI_PRICE_DGX=$DAI_PRICE_DGX
 EOF

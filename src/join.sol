@@ -12,11 +12,11 @@ contract AdapterETH {
     }
     function join() payable public {
         require(msg.value >= 0);
-        vat.slip(ilk, msg.sender, int(msg.value));
+        vat.slip(ilk, bytes32(msg.sender), int(msg.value));
     }
     function exit(uint wad) public {
         require(int(wad) >= 0);
-        vat.slip(ilk, msg.sender, -int(wad));
+        vat.slip(ilk, bytes32(msg.sender), -int(wad));
         address(msg.sender).transfer(wad);
     }
 }

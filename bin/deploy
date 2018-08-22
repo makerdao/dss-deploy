@@ -56,6 +56,8 @@ cat > load-env-$(seth chain) << EOF
 # sai deployment on $(seth chain) from $(git rev-parse HEAD)
 # $(date)
 
+export PIP_ETH=$PIP_ETH
+export PIP_DGX=$PIP_DGX
 export DAI_DEPLOY=$DAI_DEPLOY
 export DAI_GOV=$DAI_GOV
 export DAI_VAT=$DAI_VAT

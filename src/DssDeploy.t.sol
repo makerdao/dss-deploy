@@ -4,7 +4,6 @@ import "ds-test/test.sol";
 
 import "dss/join.sol";
 
-
 import "ds-value/value.sol";
 
 import "./DssDeploy.sol";
@@ -59,14 +58,14 @@ contract DssDeployTest is DSTest {
 
         startGas = gasleft();
         AdapterETH adapterETH = new AdapterETH(dssDeploy.vat(), "ETH");
-        dssDeploy.deployIlk("ETH", adapterETH, pipETH, 1.5 ether);
+        dssDeploy.deployIlk("ETH", adapterETH, pipETH, 1.5 * 10 ** 27);
         endGas = gasleft();
         emit log_named_uint("Make Vox Tub", startGas - endGas);
 
         startGas = gasleft();
         DSToken dgx = new DSToken("DGX");
         Adapter adapterDGX = new Adapter(dssDeploy.vat(), "DGX", dgx);
-        dssDeploy.deployIlk("DGX", adapterDGX, pipDGX, 1.1 ether);
+        dssDeploy.deployIlk("DGX", adapterDGX, pipDGX, 1.1 * 10 ** 27);
         endGas = gasleft();
         emit log_named_uint("Make Vox Tub", startGas - endGas);
 

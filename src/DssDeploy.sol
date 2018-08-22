@@ -139,7 +139,9 @@ contract DssDeploy /*is DSAuth*/ {
         ilks[ilk].price = priceFab.newPrice(pit, ilk);
         ilks[ilk].price.setPip(pip);
         ilks[ilk].price.setMat(mat);
+        ilks[ilk].price.poke();
         cat.fuss(ilk, ilks[ilk].flip);
+        vat.init(ilk);
     }
 
     function configParams() public /*auth */{

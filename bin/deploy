@@ -2,7 +2,7 @@
 set -ex
 
 export SOLC_FLAGS=${SOLC_FLAGS:-"--optimize"}
-export ETH_GAS=${ETH_GAS:-"4500000"}
+export ETH_GAS=${ETH_GAS:-"6000000"}
 export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
 
 # dapp build
@@ -29,7 +29,7 @@ DAI_VAT=0x$(seth call $DAI_DEPLOY "vat()(address)")
 # Deploy ETH ilk
 test -z $PIP_ETH && PIP_ETH=$(dapp create DSValue)
 DAI_APT_ETH=$(dapp create AdapterETH $DAI_VAT $(seth --to-bytes32 $(seth --from-ascii "ETH")))
-seth send $DAI_DEPLOY "deployIlk(bytes32,address,address,uint256)" $(seth --to-bytes32 $(seth --from-ascii "ETH")) $DAI_APT_ETH $PIP_ETH $(seth --to-uint256 $(seth --to-wei 1.5 ETH))
+seth send $DAI_DEPLOY "deployIlk(bytes32,address,address,uint256)" $(seth --to-bytes32 $(seth --from-ascii "ETH")) $DAI_APT_ETH $PIP_ETH $(seth --to-uint256 $(seth --to-wei 1500000000 ETH))
 ilk=(`echo $(seth call $DAI_DEPLOY "ilks(bytes32)(address,address,address)" $(seth --to-bytes32 $(seth --from-ascii "ETH")))`)
 DAI_FLIP_ETH=0x${ilk[0]}
 DAI_PRICE_ETH=0x${ilk[2]}
@@ -38,7 +38,7 @@ DAI_PRICE_ETH=0x${ilk[2]}
 test -z $DGX && DGX=$(dapp create DSToken $(seth --to-bytes32 $(seth --from-ascii "DGX")))
 test -z $PIP_DGX && PIP_DGX=$(dapp create DSValue)
 DAI_APT_DGX=$(dapp create Adapter $DAI_VAT $(seth --to-bytes32 $(seth --from-ascii "DGX")) $DGX)
-seth send $DAI_DEPLOY "deployIlk(bytes32,address,address,uint256)" $(seth --to-bytes32 $(seth --from-ascii "DGX")) $DAI_APT_DGX $PIP_DGX $(seth --to-uint256 $(seth --to-wei 1.1 ETH))
+seth send $DAI_DEPLOY "deployIlk(bytes32,address,address,uint256)" $(seth --to-bytes32 $(seth --from-ascii "DGX")) $DAI_APT_DGX $PIP_DGX $(seth --to-uint256 $(seth --to-wei 1100000000 ETH))
 ilk=(`echo $(seth call $DAI_DEPLOY "ilks(bytes32)(address,address,address)" $(seth --to-bytes32 $(seth --from-ascii "DGX")))`)
 DAI_FLIP_DGX=0x${ilk[0]}
 DAI_PRICE_DGX=0x${ilk[2]}

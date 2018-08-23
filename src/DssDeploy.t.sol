@@ -60,14 +60,14 @@ contract DssDeployTest is DSTest {
 
         startGas = gasleft();
         AdapterETH adapterETH = new AdapterETH(dssDeploy.vat(), "ETH");
-        dssDeploy.deployIlk("ETH", adapterETH, pipETH, 1.5 * 10 ** 27);
+        dssDeploy.deployIlk("ETH", adapterETH, pipETH);
         endGas = gasleft();
         emit log_named_uint("Make Vox Tub", startGas - endGas);
 
         startGas = gasleft();
         DSToken dgx = new DSToken("DGX");
         Adapter adapterDGX = new Adapter(dssDeploy.vat(), "DGX", dgx);
-        dssDeploy.deployIlk("DGX", adapterDGX, pipDGX, 1.1 * 10 ** 27);
+        dssDeploy.deployIlk("DGX", adapterDGX, pipDGX);
         endGas = gasleft();
         emit log_named_uint("Make Vox Tub", startGas - endGas);
 

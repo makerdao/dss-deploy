@@ -106,6 +106,8 @@ contract DssDeploy /*is DSAuth*/ {
 
     uint8 public step = 0;
 
+    uint256 constant ONE = 10 ** 27;
+
     struct Ilk {
         Flipper flip;
         address adapter;
@@ -142,16 +144,18 @@ contract DssDeploy /*is DSAuth*/ {
         step += 1;
     }
 
-    function deployIlk(bytes32 ilk, address adapter, address pip, uint mat) public /*auth */{
+    function deployIlk(bytes32 ilk, address adapter, address pip) public /*auth */{
         require(step > 0);
         ilks[ilk].flip = flipFab.newFlip(vat, ilk);
         ilks[ilk].adapter = adapter;
         ilks[ilk].price = priceFab.newPrice(pit, ilk);
         ilks[ilk].price.setPip(pip);
-        ilks[ilk].price.setMat(mat);
+        ilks[ilk].price.setMat(ONE);
         ilks[ilk].price.poke();
         cat.fuss(ilk, ilks[ilk].flip);
+        cat.file(ilk, "chop", ONE);
         vat.init(ilk);
+        // drip.file(ilk, bytes32(address(vow)), ONE);
     }
 
     function configParams() public /*auth */{

@@ -2,17 +2,17 @@
 set -ex
 
 export SOLC_FLAGS=${SOLC_FLAGS:-"--optimize"}
-export ETH_GAS=${ETH_GAS:-"6000000"}
+export ETH_GAS=${ETH_GAS:-"5000000"}
 export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
 
-# dapp build
+dapp build
 
-(test -z $VAT_FAB || test -z $PIT_FAB || test -z $PIE_FAB || test -z $VOW_FAB  || test -z $CAT_FAB || test -z $FLAP_FAB || test -z $FLOP_FAB || test -z $FLIP_FAB || test -z $PRICE_FAB) && exit 1
+(test -z $VAT_FAB || test -z $PIT_FAB || test -z $PIE_FAB || test -z $DRIP_FAB || test -z $VOW_FAB  || test -z $CAT_FAB || test -z $FLAP_FAB || test -z $FLOP_FAB || test -z $FLIP_FAB || test -z $PRICE_FAB) && exit 1
 
 test -z $DAI_GOV && DAI_GOV=$(dapp create DSToken $(seth --to-bytes32 $(seth --from-ascii "MKR")))
 # test -z $DAI_PIP && DAI_PIP=$(dapp create DSValue)
 
-DAI_DEPLOY=$(dapp create DssDeploy $VAT_FAB $PIT_FAB $PIE_FAB $VOW_FAB $CAT_FAB $FLAP_FAB $FLOP_FAB $FLIP_FAB $PRICE_FAB)
+DAI_DEPLOY=$(dapp create DssDeploy $VAT_FAB $PIT_FAB $PIE_FAB $DRIP_FAB $VOW_FAB $CAT_FAB $FLAP_FAB $FLOP_FAB $FLIP_FAB $PRICE_FAB)
 
 # if [ -z $DAI_ADM ]
 # then
@@ -63,6 +63,7 @@ export DAI_GOV=$DAI_GOV
 export DAI_VAT=$DAI_VAT
 export DAI_PIT=0x$(seth call $DAI_DEPLOY "pit()(address)")
 export DAI_PIE=0x$(seth call $DAI_DEPLOY "pie()(address)")
+export DAI_DRIP=0x$(seth call $DAI_DEPLOY "drip()(address)")
 export DAI_VOW=0x$(seth call $DAI_DEPLOY "vow()(address)")
 export DAI_CAT=0x$(seth call $DAI_DEPLOY "cat()(address)")
 export DAI_FLAP=0x$(seth call $DAI_DEPLOY "flap()(address)")

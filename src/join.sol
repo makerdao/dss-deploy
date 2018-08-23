@@ -1,11 +1,13 @@
 pragma solidity ^0.4.24;
 
-import "dss/interfaces.sol";
+contract Fluxing {
+    function slip(bytes32,bytes32,int) public;
+}
 
 contract AdapterETH {
     Fluxing public vat;
     bytes32 public ilk;
-    GemLike public gem;
+
     constructor(address vat_, bytes32 ilk_) public {
         vat = Fluxing(vat_);
         ilk = ilk_;

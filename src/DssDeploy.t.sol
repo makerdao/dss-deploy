@@ -1,18 +1,19 @@
 pragma solidity ^0.4.24;
 
-import "ds-test/test.sol";
+import {DSTest} from "ds-test/test.sol";
+import {DSValue} from "ds-value/value.sol";
+import {DSToken} from "ds-token/token.sol";
 
-import "dss/join.sol";
-
-import "ds-value/value.sol";
+import {Adapter} from "dss/join.sol";
+import {AdapterETH} from "./join.sol";
 
 import "./DssDeploy.sol";
-import "./join.sol";
 
 contract DssDeployTest is DSTest {
     VatFab vatFab;
     PitFab pitFab;
     PieFab pieFab;
+    DripFab dripFab;
     VowFab vowFab;
     CatFab catFab;
     FlapFab flapFab;
@@ -32,6 +33,7 @@ contract DssDeployTest is DSTest {
         vatFab = new VatFab();
         pitFab = new PitFab();
         pieFab = new PieFab();
+        dripFab = new DripFab();
         vowFab = new VowFab();
         catFab = new CatFab();
         flapFab = new FlapFab();
@@ -40,7 +42,7 @@ contract DssDeployTest is DSTest {
         priceFab = new PriceFab();
 
         uint startGas = gasleft();
-        dssDeploy = new DssDeploy(vatFab, pitFab, pieFab, vowFab, catFab, flapFab, flopFab, flipFab, priceFab);
+        dssDeploy = new DssDeploy(vatFab, pitFab, pieFab, dripFab, vowFab, catFab, flapFab, flopFab, flipFab, priceFab);
         uint endGas = gasleft();
         emit log_named_uint("Deploy DssDeploy", startGas - endGas);
 

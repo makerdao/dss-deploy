@@ -1,17 +1,16 @@
 pragma solidity ^0.4.24;
 
-import "dss/tune.sol";
-import "dss/frob.sol";
-import "dss/transferFrom.sol";
-import "dss/bite.sol";
-import "dss/heal.sol";
-import "dss/flap.sol";
-import "dss/flop.sol";
-import "dss/flip.sol";
+import {Vat} from "dss/tune.sol";
+import {Pit} from "dss/frob.sol";
+import {Dai20} from "dss/transferFrom.sol";
+import {Drip} from "dss/drip.sol";
+import {Vow} from "dss/heal.sol";
+import {Cat} from "dss/bite.sol";
+import {Flapper} from "dss/flap.sol";
+import {Flopper} from "dss/flop.sol";
+import {Flipper} from "dss/flip.sol";
 
-import "ds-token/token.sol";
-
-import "./poke.sol";
+import {Price} from "./poke.sol";
 
 contract VatFab {
     function newVat() public returns (Vat vat) {
@@ -34,6 +33,13 @@ contract PieFab {
     }
 }
 
+contract DripFab {
+    function newDrip(Vat vat) public returns (Drip drip) {
+        drip = new Drip(vat);
+        // drip.setOwner(msg.sender);
+    }
+}
+
 contract VowFab {
     function newVow() public returns (Vow vow) {
         vow = new Vow();
@@ -49,14 +55,14 @@ contract CatFab {
 }
 
 contract FlapFab {
-    function newFlap(Dai20 pie, DSToken gov) public returns (Flapper flap) {
+    function newFlap(Dai20 pie, address gov) public returns (Flapper flap) {
         flap = new Flapper(pie, gov);
         // flap.setOwner(msg.sender);
     }
 }
 
 contract FlopFab {
-    function newFlop(Dai20 pie, DSToken gov) public returns (Flopper flop) {
+    function newFlop(Dai20 pie, address gov) public returns (Flopper flop) {
         flop = new Flopper(pie, gov);
         // flop.setOwner(msg.sender);
     }
@@ -80,6 +86,7 @@ contract DssDeploy /*is DSAuth*/ {
     VatFab public vatFab;
     PitFab public pitFab;
     PieFab public pieFab;
+    DripFab public dripFab;
     VowFab public vowFab;
     CatFab public catFab;
     FlapFab public flapFab;
@@ -90,6 +97,7 @@ contract DssDeploy /*is DSAuth*/ {
     Vat public vat;
     Pit public pit;
     Dai20 public pie;
+    Drip public drip;
     Vow public vow;
     Cat public cat;
     Flapper public flap;
@@ -104,10 +112,11 @@ contract DssDeploy /*is DSAuth*/ {
         Price price;
     }
 
-    constructor(VatFab vatFab_, PitFab pitFab_, PieFab pieFab_, VowFab vowFab_, CatFab catFab_, FlapFab flapFab_, FlopFab flopFab_, FlipFab flipFab_, PriceFab priceFab_) public {
+    constructor(VatFab vatFab_, PitFab pitFab_, PieFab pieFab_, DripFab dripFab_, VowFab vowFab_, CatFab catFab_, FlapFab flapFab_, FlopFab flopFab_, FlipFab flipFab_, PriceFab priceFab_) public {
         vatFab = vatFab_;
         pitFab = pitFab_;
         pieFab = pieFab_;
+        dripFab = dripFab_;
         vowFab = vowFab_;
         catFab = catFab_;
         flapFab = flapFab_;
@@ -116,11 +125,12 @@ contract DssDeploy /*is DSAuth*/ {
         priceFab = priceFab_;
     }
 
-    function deployContracts(DSToken gov) public /*auth */{
+    function deployContracts(address gov) public /*auth */{
         require(step == 0);
         vat = vatFab.newVat();
         pit = pitFab.newPit(vat);
         pie = pieFab.newPie(vat);
+        drip = dripFab.newDrip(vat);
         vow = vowFab.newVow();
         cat = catFab.newCat(vat, pit, vow);
         flap = flapFab.newFlap(pie, gov);

@@ -7,16 +7,36 @@ export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
 
 dapp build
 
-VAT_FAB=$(dapp create VatFab)
-PIT_FAB=$(dapp create PitFab)
-PIE_FAB=$(dapp create PieFab)
-DRIP_FAB=$(dapp create DripFab)
-VOW_FAB=$(dapp create VowFab)
-CAT_FAB=$(dapp create CatFab)
-FLAP_FAB=$(dapp create FlapFab)
-FLOP_FAB=$(dapp create FlopFab)
-FLIP_FAB=$(dapp create FlipFab)
-PRICE_FAB=$(dapp create PriceFab)
+export SETH_ASYNC=yes
+
+ETH_NONCE=$(seth nonce $ETH_FROM)
+VAT_FABtx=$(ETH_NONCE=$ETH_NONCE dapp create VatFab)
+PIT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 1)) dapp create PitFab)
+DRIP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 2)) dapp create DripFab)
+VOW_FABtx=$(ETH_NONCE=$((ETH_NONCE + 3)) dapp create VowFab)
+CAT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 4)) dapp create CatFab)
+TOKEN_FABtx=$(ETH_NONCE=$((ETH_NONCE + 5)) dapp create TokenFab)
+DAI_APT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 6)) dapp create DaiAptFab)
+FLAP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 7)) dapp create FlapFab)
+FLOP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 8)) dapp create FlopFab)
+MOM_FABtx=$(ETH_NONCE=$((ETH_NONCE + 9)) dapp create MomFab)
+FLIP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 10)) dapp create FlipFab)
+PRICE_FABtx=$(ETH_NONCE=$((ETH_NONCE + 11)) dapp create PriceFab)
+
+export SETH_ASYNC=no
+
+VAT_FAB=$(seth receipt $VAT_FABtx contractAddress)
+PIT_FAB=$(seth receipt $PIT_FABtx contractAddress)
+DRIP_FAB=$(seth receipt $DRIP_FABtx contractAddress)
+VOW_FAB=$(seth receipt $VOW_FABtx contractAddress)
+CAT_FAB=$(seth receipt $CAT_FABtx contractAddress)
+TOKEN_FAB=$(seth receipt $TOKEN_FABtx contractAddress)
+DAI_APT_FAB=$(seth receipt $DAI_APT_FABtx contractAddress)
+FLAP_FAB=$(seth receipt $FLAP_FABtx contractAddress)
+FLOP_FAB=$(seth receipt $FLOP_FABtx contractAddress)
+MOM_FAB=$(seth receipt $MOM_FABtx contractAddress)
+FLIP_FAB=$(seth receipt $FLIP_FABtx contractAddress)
+PRICE_FAB=$(seth receipt $PRICE_FABtx contractAddress)
 
 cat > load-fab-$(seth chain) << EOF
 #!/bin/bash
@@ -26,12 +46,14 @@ cat > load-fab-$(seth chain) << EOF
 
 export VAT_FAB=$VAT_FAB
 export PIT_FAB=$PIT_FAB
-export PIE_FAB=$PIE_FAB
 export DRIP_FAB=$DRIP_FAB
 export VOW_FAB=$VOW_FAB
 export CAT_FAB=$CAT_FAB
+export TOKEN_FAB=$TOKEN_FAB
+export DAI_APT_FAB=$DAI_APT_FAB
 export FLAP_FAB=$FLAP_FAB
 export FLOP_FAB=$FLOP_FAB
+export MOM_FAB=$MOM_FAB
 export FLIP_FAB=$FLIP_FAB
 export PRICE_FAB=$PRICE_FAB
 EOF

@@ -2,23 +2,26 @@
 set -ex
 
 export SOLC_FLAGS=${SOLC_FLAGS:-"--optimize"}
-export ETH_GAS=${ETH_GAS:-"5000000"}
+export ETH_GAS=${ETH_GAS:-"7000000"}
 export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
 
 dapp build
 
-(test -z $VAT_FAB || test -z $PIT_FAB || test -z $PIE_FAB || test -z $DRIP_FAB || test -z $VOW_FAB  || test -z $CAT_FAB || test -z $FLAP_FAB || test -z $FLOP_FAB || test -z $FLIP_FAB || test -z $PRICE_FAB) && exit 1
+# Check all fabs are defined
+(test -z $VAT_FAB || test -z $PIT_FAB || test -z $DRIP_FAB || test -z $VOW_FAB || test -z $CAT_FAB || test -z $TOKEN_FAB || test -z $DAI_APT_FAB || test -z $FLAP_FAB || test -z $FLOP_FAB || test -z $MOM_FAB || test -z $FLIP_FAB || test -z $PRICE_FAB) && exit 1
 
+# If there is not Governance token defined, create one
 test -z $DAI_GOV && DAI_GOV=$(dapp create DSToken $(seth --to-bytes32 $(seth --from-ascii "MKR")))
-# test -z $DAI_PIP && DAI_PIP=$(dapp create DSValue)
 
-DAI_DEPLOY=$(dapp create DssDeploy $VAT_FAB $PIT_FAB $PIE_FAB $DRIP_FAB $VOW_FAB $CAT_FAB $FLAP_FAB $FLOP_FAB $FLIP_FAB $PRICE_FAB)
+# Create deploy contract
+DAI_DEPLOY=$(dapp create DssDeploy $VAT_FAB $PIT_FAB $DRIP_FAB $VOW_FAB $CAT_FAB $TOKEN_FAB $DAI_APT_FAB $FLAP_FAB $FLOP_FAB $MOM_FAB $FLIP_FAB $PRICE_FAB)
 
-# if [ -z $DAI_ADM ]
-# then
-#     DAI_ADM=$(dapp create DSRoles)
-#     seth send $DAI_ADM 'setRootUser(address,bool)' $ETH_FROM true
-# fi
+# If there is not Authorty defined, create one
+if [ -z $DAI_ADM ]
+then
+    DAI_ADM=$(dapp create DSRoles)
+    seth send $DAI_ADM 'setRootUser(address,bool)' $ETH_FROM true
+fi
 
 # Deploy contracts
 seth send $DAI_DEPLOY "deployContracts(address)" $DAI_GOV
@@ -26,15 +29,19 @@ seth send $DAI_DEPLOY "deployContracts(address)" $DAI_GOV
 # Get Vat address
 DAI_VAT=0x$(seth call $DAI_DEPLOY "vat()(address)")
 
-# Deploy ETH ilk
+# Deploy DAI adapter
+DAI_DAI=$(dapp create DSToken $(seth --to-bytes32 $(seth --from-ascii "DAI")))
+DAI_APT_DAI=$(dapp create DaiAdapter $DAI_VAT $DAI_DAI)
+
+# Deploy ETH ilk (adapter, price, flip and init variables)
 test -z $PIP_ETH && PIP_ETH=$(dapp create DSValue)
-DAI_APT_ETH=$(dapp create AdapterETH $DAI_VAT $(seth --to-bytes32 $(seth --from-ascii "ETH")))
+DAI_APT_ETH=$(dapp create ETHAdapter $DAI_VAT $(seth --to-bytes32 $(seth --from-ascii "ETH")))
 seth send $DAI_DEPLOY "deployIlk(bytes32,address,address)" $(seth --to-bytes32 $(seth --from-ascii "ETH")) $DAI_APT_ETH $PIP_ETH
 ilk=(`echo $(seth call $DAI_DEPLOY "ilks(bytes32)(address,address,address)" $(seth --to-bytes32 $(seth --from-ascii "ETH")))`)
 DAI_FLIP_ETH=0x${ilk[0]}
 DAI_PRICE_ETH=0x${ilk[2]}
 
-# Deploy DGX ilk
+# Deploy DGX ilk (adapter, price, flip and init variables)
 test -z $DGX && DGX=$(dapp create DSToken $(seth --to-bytes32 $(seth --from-ascii "DGX")))
 test -z $PIP_DGX && PIP_DGX=$(dapp create DSValue)
 DAI_APT_DGX=$(dapp create Adapter $DAI_VAT $(seth --to-bytes32 $(seth --from-ascii "DGX")) $DGX)
@@ -48,7 +55,7 @@ seth send $DAI_DEPLOY "configParams()"
 seth send $DAI_DEPLOY "verifyParams()"
 
 # Config auth
-# seth send $DAI_FAB "configAuth(address)" $DAI_ADM
+seth send $DAI_DEPLOY "configAuth(address)" $DAI_ADM
 
 cat > load-env-$(seth chain) << EOF
 #!/bin/bash
@@ -62,12 +69,15 @@ export DAI_DEPLOY=$DAI_DEPLOY
 export DAI_GOV=$DAI_GOV
 export DAI_VAT=$DAI_VAT
 export DAI_PIT=0x$(seth call $DAI_DEPLOY "pit()(address)")
-export DAI_PIE=0x$(seth call $DAI_DEPLOY "pie()(address)")
 export DAI_DRIP=0x$(seth call $DAI_DEPLOY "drip()(address)")
 export DAI_VOW=0x$(seth call $DAI_DEPLOY "vow()(address)")
 export DAI_CAT=0x$(seth call $DAI_DEPLOY "cat()(address)")
+export DAI_DAI=0x$(seth call $DAI_DEPLOY "dai()(address)")
+export DAI_APT_DAI=0x$(seth call $DAI_DEPLOY "daiApt()(address)")
 export DAI_FLAP=0x$(seth call $DAI_DEPLOY "flap()(address)")
 export DAI_FLOP=0x$(seth call $DAI_DEPLOY "flop()(address)")
+export DAI_MOM=0x$(seth call $DAI_DEPLOY "mom()(address)")
+export DAI_APT_DAI=$DAI_APT_DAI
 export DAI_APT_ETH=$DAI_APT_ETH
 export DAI_FLIP_ETH=$DAI_FLIP_ETH
 export DAI_PRICE_ETH=$DAI_PRICE_ETH

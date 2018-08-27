@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -ex
 
-export SOLC_FLAGS=${SOLC_FLAGS:-"--optimize"}
 export ETH_GAS=${ETH_GAS:-"3500000"}
 export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
 

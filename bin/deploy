@@ -8,13 +8,13 @@ export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
 dapp build
 
 # Check all fabs are defined
-(test -z $VAT_FAB || test -z $PIT_FAB || test -z $DRIP_FAB || test -z $VOW_FAB || test -z $CAT_FAB || test -z $TOKEN_FAB || test -z $DAI_APT_FAB || test -z $FLAP_FAB || test -z $FLOP_FAB || test -z $MOM_FAB || test -z $FLIP_FAB || test -z $PRICE_FAB) && exit 1
+(test -z $VAT_FAB || test -z $PIT_FAB || test -z $DRIP_FAB || test -z $VOW_FAB || test -z $CAT_FAB || test -z $TOKEN_FAB || test -z $DAI_APT_FAB || test -z $DAI_MOVE_FAB ||test -z $FLAP_FAB || test -z $FLOP_FAB || test -z $MOM_FAB || test -z $FLIP_FAB || test -z $PRICE_FAB) && exit 1
 
 # If there is not Governance token defined, create one
 test -z $DAI_GOV && DAI_GOV=$(dapp create DSToken $(seth --to-bytes32 $(seth --from-ascii "MKR")))
 
 # Create deploy contract
-DAI_DEPLOY=$(dapp create DssDeploy $VAT_FAB $PIT_FAB $DRIP_FAB $VOW_FAB $CAT_FAB $TOKEN_FAB $DAI_APT_FAB $FLAP_FAB $FLOP_FAB $MOM_FAB $FLIP_FAB $PRICE_FAB)
+DAI_DEPLOY=$(dapp create DssDeploy $VAT_FAB $PIT_FAB $DRIP_FAB $VOW_FAB $CAT_FAB $TOKEN_FAB $DAI_APT_FAB $DAI_MOVE_FAB $FLAP_FAB $FLOP_FAB $MOM_FAB $FLIP_FAB $PRICE_FAB)
 
 # If there is not Authorty defined, create one
 if [ -z $DAI_ADM ]
@@ -48,16 +48,18 @@ DAI_VAT=0x$(seth call $DAI_DEPLOY "vat()(address)")
 # Deploy ETH ilk (adapter, price, flip and init variables)
 test -z $PIP_ETH && PIP_ETH=$(dapp create DSValue)
 DAI_APT_ETH=$(dapp create ETHAdapter $DAI_VAT $(seth --to-bytes32 $(seth --from-ascii "ETH")))
-seth send $DAI_DEPLOY "deployCollateral(bytes32,address,address)" $(seth --to-bytes32 $(seth --from-ascii "ETH")) $DAI_APT_ETH $PIP_ETH
+DAI_MOVE_ETH=$(dapp create GemMove $DAI_VAT)
+seth send $DAI_DEPLOY "deployCollateral(bytes32,address,address,address)" $(seth --to-bytes32 $(seth --from-ascii "ETH")) $DAI_APT_ETH $DAI_MOVE_ETH $PIP_ETH
 ilk=(`echo $(seth call $DAI_DEPLOY "ilks(bytes32)(address,address,address)" $(seth --to-bytes32 $(seth --from-ascii "ETH")))`)
 DAI_FLIP_ETH=0x${ilk[0]}
 DAI_PRICE_ETH=0x${ilk[2]}
 
-# Deploy DGX ilk (adapter, price, flip and init variables)
+# Deploy DGX ilk (adapter, mover, price, flip and init variables)
 test -z $DGX && DGX=$(dapp create DSToken $(seth --to-bytes32 $(seth --from-ascii "DGX")))
 test -z $PIP_DGX && PIP_DGX=$(dapp create DSValue)
 DAI_APT_DGX=$(dapp create Adapter $DAI_VAT $(seth --to-bytes32 $(seth --from-ascii "DGX")) $DGX)
-seth send $DAI_DEPLOY "deployCollateral(bytes32,address,address)" $(seth --to-bytes32 $(seth --from-ascii "DGX")) $DAI_APT_DGX $PIP_DGX
+DAI_MOVE_DGX=$(dapp create GemMove $DAI_VAT)
+seth send $DAI_DEPLOY "deployCollateral(bytes32,address,address,ddress)" $(seth --to-bytes32 $(seth --from-ascii "DGX")) $DAI_APT_DGX $DAI_MOVE_DGX $PIP_DGX
 ilk=(`echo $(seth call $DAI_DEPLOY "ilks(bytes32)(address,address,address)" $(seth --to-bytes32 $(seth --from-ascii "DGX")))`)
 DAI_FLIP_DGX=0x${ilk[0]}
 DAI_PRICE_DGX=0x${ilk[2]}
@@ -79,13 +81,16 @@ export DAI_VOW=0x$(seth call $DAI_DEPLOY "vow()(address)")
 export DAI_CAT=0x$(seth call $DAI_DEPLOY "cat()(address)")
 export DAI_DAI=0x$(seth call $DAI_DEPLOY "dai()(address)")
 export DAI_APT_DAI=0x$(seth call $DAI_DEPLOY "daiApt()(address)")
+export DAI_MOVE_DAI=0x$(seth call $DAI_DEPLOY "daiMove()(address)")
 export DAI_FLAP=0x$(seth call $DAI_DEPLOY "flap()(address)")
 export DAI_FLOP=0x$(seth call $DAI_DEPLOY "flop()(address)")
 export DAI_MOM=0x$(seth call $DAI_DEPLOY "mom()(address)")
 export DAI_APT_ETH=$DAI_APT_ETH
+export DAI_MOVE_ETH=$DAI_MOVE_ETH
 export DAI_FLIP_ETH=$DAI_FLIP_ETH
 export DAI_PRICE_ETH=$DAI_PRICE_ETH
 export DAI_APT_DGX=$DAI_APT_DGX
+export DAI_MOVE_DGX=$DAI_MOVE_DGX
 export DAI_FLIP_DGX=$DAI_FLIP_DGX
 export DAI_PRICE_DGX=$DAI_PRICE_DGX
 EOF

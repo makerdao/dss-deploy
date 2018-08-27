@@ -9,6 +9,7 @@ import {Drip} from "dss/drip.sol";
 import {Vow} from "dss/heal.sol";
 import {Cat} from "dss/bite.sol";
 import {DaiAdapter} from "dss/join.sol";
+import {DaiMove} from "dss/move.sol";
 import {Flapper} from "dss/flap.sol";
 import {Flopper} from "dss/flop.sol";
 import {Flipper} from "dss/flip.sol";
@@ -64,6 +65,12 @@ contract DaiAptFab {
     }
 }
 
+contract DaiMoveFab {
+    function newDaiMove(Vat vat) public returns (DaiMove daiMove) {
+        daiMove = new DaiMove(vat);
+    }
+}
+
 contract FlapFab {
     function newFlap(address dai, address gov) public returns (Flapper flap) {
         flap = new Flapper(dai, gov);
@@ -78,8 +85,8 @@ contract FlopFab {
 }
 
 contract FlipFab {
-    function newFlip(Vat vat, bytes32 ilk) public returns (Flipper flop) {
-        flop = new Flipper(vat, ilk);
+    function newFlip(address dai, address gem) public returns (Flipper flop) {
+        flop = new Flipper(dai, gem);
     }
 }
 
@@ -105,6 +112,7 @@ contract DssDeploy is DSAuth {
     CatFab public catFab;
     TokenFab public tokenFab;
     DaiAptFab public daiAptFab;
+    DaiMoveFab public daiMoveFab;
     FlapFab public flapFab;
     FlopFab public flopFab;
     MomFab public momFab;
@@ -118,6 +126,7 @@ contract DssDeploy is DSAuth {
     Cat public cat;
     DSToken public dai;
     DaiAdapter public daiApt;
+    DaiMove public daiMove;
     Flapper public flap;
     Flopper public flop;
     DaiMom public mom;
@@ -130,6 +139,7 @@ contract DssDeploy is DSAuth {
     struct Ilk {
         Flipper flip;
         address adapter;
+        address mover;
         Price price;
     }
 
@@ -141,6 +151,7 @@ contract DssDeploy is DSAuth {
         CatFab catFab_,
         TokenFab tokenFab_,
         DaiAptFab daiAptFab_,
+        DaiMoveFab daiMoveFab_,
         FlapFab flapFab_,
         FlopFab flopFab_,
         MomFab momFab_,
@@ -154,6 +165,7 @@ contract DssDeploy is DSAuth {
         catFab = catFab_;
         tokenFab = tokenFab_;
         daiAptFab = daiAptFab_;
+        daiMoveFab = daiMoveFab_;
         flapFab = flapFab_;
         flopFab = flopFab_;
         momFab = momFab_;
@@ -178,11 +190,13 @@ contract DssDeploy is DSAuth {
         require(vat != address(0), "Missing VAT deployment");
 
         // Deploy
-        dai = tokenFab.newToken("DAI");
-        daiApt = daiAptFab.newDaiApt(vat, dai);
+        dai     = tokenFab.newToken("DAI");
+        daiApt  = daiAptFab.newDaiApt(vat, dai);
+        daiMove = daiMoveFab.newDaiMove(vat);
 
         // Internal auth
         vat.rely(daiApt);
+        vat.rely(daiMove);
     }
 
     function deployTaxation(address gov) public auth {
@@ -193,7 +207,7 @@ contract DssDeploy is DSAuth {
         // Deploy
         vow = vowFab.newVow();
         drip = dripFab.newDrip(vat);
-        flap = flapFab.newFlap(vat, gov);
+        flap = flapFab.newFlap(daiMove, gov);
 
         // Internal references set up
         pit.file("drip", drip);
@@ -212,7 +226,7 @@ contract DssDeploy is DSAuth {
 
         // Deploy
         cat = catFab.newCat(vat, pit, vow);
-        flop = flopFab.newFlop(vat, gov);
+        flop = flopFab.newFlop(daiMove, gov);
 
         // Internal references set up
         vow.file("flop", flop);
@@ -242,16 +256,18 @@ contract DssDeploy is DSAuth {
         this.setOwner(0);
     }
 
-    function deployCollateral(bytes32 ilk, address adapter, address pip) public auth {
+    function deployCollateral(bytes32 ilk, address adapter, address mover, address pip) public auth {
         require(ilk != bytes32(""), "Missing ilk name");
         require(adapter != address(0), "Missing adapter address");
+        require(mover   != address(0), "Missing mover address");
         require(pip != address(0), "Missing PIP address");
         require(vat != address(0), "Missing VAT deployment");
         require(cat != address(0), "Missing VAT deployment");
 
         // Deploy
-        ilks[ilk].flip = flipFab.newFlip(vat, ilk);
+        ilks[ilk].flip = flipFab.newFlip(daiMove, mover);
         ilks[ilk].adapter = adapter;
+        ilks[ilk].mover = mover;
         ilks[ilk].price = priceFab.newPrice(pit, ilk);
         ilks[ilk].price.file(pip); // Set pip
         ilks[ilk].price.file(ONE); // Set mat
@@ -265,6 +281,7 @@ contract DssDeploy is DSAuth {
         // Internal auth
         vat.rely(ilks[ilk].flip);
         vat.rely(adapter);
+        vat.rely(mover);
         pit.rely(ilks[ilk].price);
         ilks[ilk].price.rely(mom);
 

@@ -5,6 +5,7 @@ import {DSValue} from "ds-value/value.sol";
 import {DSRoles} from "ds-roles/roles.sol";
 
 import {Adapter, ETHAdapter} from "dss/join.sol";
+import {GemMove} from 'dss/move.sol';
 
 import "./DssDeploy.sol";
 
@@ -16,6 +17,7 @@ contract DssDeployTest is DSTest {
     CatFab catFab;
     TokenFab tokenFab;
     DaiAptFab daiAptFab;
+    DaiMoveFab daiMoveFab;
     FlapFab flapFab;
     FlopFab flopFab;
     MomFab momFab;
@@ -38,6 +40,7 @@ contract DssDeployTest is DSTest {
         catFab = new CatFab();
         tokenFab = new TokenFab();
         daiAptFab = new DaiAptFab();
+        daiMoveFab = new DaiMoveFab();
         flapFab = new FlapFab();
         flopFab = new FlopFab();
         momFab = new MomFab();
@@ -46,7 +49,7 @@ contract DssDeployTest is DSTest {
         priceFab = new PriceFab();
 
         uint startGas = gasleft();
-        dssDeploy = new DssDeploy(vatFab, pitFab, dripFab, vowFab, catFab, tokenFab, daiAptFab, flapFab, flopFab, momFab, flipFab, priceFab);
+        dssDeploy = new DssDeploy(vatFab, pitFab, dripFab, vowFab, catFab, tokenFab, daiAptFab, daiMoveFab, flapFab, flopFab, momFab, flipFab, priceFab);
         uint endGas = gasleft();
         emit log_named_uint("Deploy DssDeploy", startGas - endGas);
 
@@ -90,14 +93,16 @@ contract DssDeployTest is DSTest {
 
         startGas = gasleft();
         ETHAdapter ethAdapter = new ETHAdapter(dssDeploy.vat(), "ETH");
-        dssDeploy.deployCollateral("ETH", ethAdapter, pipETH);
+        GemMove    ethMove = new GemMove(dssDeploy.vat(), "ETH");
+        dssDeploy.deployCollateral("ETH", ethAdapter, ethMove, pipETH);
         endGas = gasleft();
         emit log_named_uint("Deploy ETH", startGas - endGas);
 
         startGas = gasleft();
         DSToken dgx = new DSToken("DGX");
         Adapter adapterDGX = new Adapter(dssDeploy.vat(), "DGX", dgx);
-        dssDeploy.deployCollateral("DGX", adapterDGX, pipDGX);
+        GemMove moveDGX = new GemMove(dssDeploy.vat(), "DGX");
+        dssDeploy.deployCollateral("DGX", adapterDGX, moveDGX, pipDGX);
         endGas = gasleft();
         emit log_named_uint("Deploy DGX", startGas - endGas);
     }

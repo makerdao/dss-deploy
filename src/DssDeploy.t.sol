@@ -90,7 +90,7 @@ contract DssDeployTest is DSTest {
         endGas = gasleft();
         emit log_named_uint("Config Auth", startGas - endGas);
 
-        ethAdapter.join.value(10)();
+        ethAdapter.join.value(10)(bytes32(address(this)));
         assertEq(dssDeploy.vat().gem("ETH", bytes32(address(this))), 10);
     }
 

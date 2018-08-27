@@ -199,7 +199,7 @@ contract DssDeploy is DSAuth {
         ilks[ilk].price = priceFab.newPrice(pit, ilk);
         ilks[ilk].price.file(pip); // Set pip
         ilks[ilk].price.file(ONE); // Set mat
-        cat.fuss(ilk, ilks[ilk].flip);
+        cat.file(ilk, "flip", ilks[ilk].flip);
         cat.file(ilk, "chop", ONE);
         vat.init(ilk);
         drip.file(ilk, bytes32(address(vow)), ONE);

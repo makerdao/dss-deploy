@@ -47,7 +47,7 @@ DAI_VAT=0x$(seth call $DAI_DEPLOY "vat()(address)")
 # Deploy ETH ilk (adapter, price, flip and init variables)
 test -z $PIP_ETH && PIP_ETH=$(dapp create DSValue)
 DAI_APT_ETH=$(dapp create ETHAdapter $DAI_VAT $(seth --to-bytes32 $(seth --from-ascii "ETH")))
-DAI_MOVE_ETH=$(dapp create GemMove $DAI_VAT)
+DAI_MOVE_ETH=$(dapp create GemMove $DAI_VAT $(seth --to-bytes32 $(seth --from-ascii "ETH")))
 seth send $DAI_DEPLOY "deployCollateral(bytes32,address,address,address)" $(seth --to-bytes32 $(seth --from-ascii "ETH")) $DAI_APT_ETH $DAI_MOVE_ETH $PIP_ETH
 ilk=(`echo $(seth call $DAI_DEPLOY "ilks(bytes32)(address,address,address)" $(seth --to-bytes32 $(seth --from-ascii "ETH")))`)
 DAI_FLIP_ETH=0x${ilk[0]}
@@ -57,8 +57,8 @@ DAI_PRICE_ETH=0x${ilk[2]}
 test -z $DGX && DGX=$(dapp create DSToken $(seth --to-bytes32 $(seth --from-ascii "DGX")))
 test -z $PIP_DGX && PIP_DGX=$(dapp create DSValue)
 DAI_APT_DGX=$(dapp create Adapter $DAI_VAT $(seth --to-bytes32 $(seth --from-ascii "DGX")) $DGX)
-DAI_MOVE_DGX=$(dapp create GemMove $DAI_VAT)
-seth send $DAI_DEPLOY "deployCollateral(bytes32,address,address,ddress)" $(seth --to-bytes32 $(seth --from-ascii "DGX")) $DAI_APT_DGX $DAI_MOVE_DGX $PIP_DGX
+DAI_MOVE_DGX=$(dapp create GemMove $DAI_VAT $(seth --to-bytes32 $(seth --from-ascii "DGX")))
+seth send $DAI_DEPLOY "deployCollateral(bytes32,address,address,address)" $(seth --to-bytes32 $(seth --from-ascii "DGX")) $DAI_APT_DGX $DAI_MOVE_DGX $PIP_DGX
 ilk=(`echo $(seth call $DAI_DEPLOY "ilks(bytes32)(address,address,address)" $(seth --to-bytes32 $(seth --from-ascii "DGX")))`)
 DAI_FLIP_DGX=0x${ilk[0]}
 DAI_PRICE_DGX=0x${ilk[2]}

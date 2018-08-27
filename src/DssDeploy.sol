@@ -161,44 +161,102 @@ contract DssDeploy is DSAuth {
         priceFab = priceFab_;
     }
 
-    function deployContracts(address gov) public auth {
-        require(step == 0);
+    function deployVat() public auth {
+        require(vat == address(0), "VAT already deployed");
         vat = vatFab.newVat();
+    }
+
+    function deployPit() public auth {
+        require(vat != address(0), "Missing VAT deployment");
         pit = pitFab.newPit(vat);
-        drip = dripFab.newDrip(vat);
-        vow = vowFab.newVow();
-        cat = catFab.newCat(vat, pit, vow);
+
+        // Internal auth
+        vat.rely(pit);
+    }
+
+    function deployDai() public auth {
+        require(vat != address(0), "Missing VAT deployment");
+
+        // Deploy
         dai = tokenFab.newToken("DAI");
         daiApt = daiAptFab.newDaiApt(vat, dai);
-        flap = flapFab.newFlap(daiApt, gov); // TODO: Check if pass adapter or token
-        flop = flopFab.newFlop(daiApt, gov); // TODO: Check if pass adapter or token
-        mom = momFab.newMom();
 
+        // Internal auth
+        vat.rely(daiApt);
+    }
+
+    function deployTaxation(address gov) public auth {
+        require(gov != address(0), "Missing GOV address");
+        require(vat != address(0), "Missing VAT deployment");
+        require(pit != address(0), "Missing PIT deployment");
+
+        // Deploy
+        vow = vowFab.newVow();
+        drip = dripFab.newDrip(vat);
+        flap = flapFab.newFlap(vat, gov);
+
+        // Internal references set up
+        pit.file("drip", drip);
         vow.file("vat", vat);
         vow.file("flap", flap);
-        vow.file("flop", flop);
-        pit.file("drip", drip);
 
         // Internal auth
         vat.rely(drip);
-        vat.rely(pit);
-        vat.rely(cat);
-        vat.rely(daiApt);
         vat.rely(flap);
+    }
+
+    function deployLiquidation(address gov) public auth {
+        require(vat != address(0), "Missing VAT deployment");
+        require(pit != address(0), "Missing PIT deployment");
+        require(vow != address(0), "Missing VOW deployment");
+
+        // Deploy
+        cat = catFab.newCat(vat, pit, vow);
+        flop = flopFab.newFlop(vat, gov);
+
+        // Internal references set up
+        vow.file("flop", flop);
+
+        // Internal auth
+        vat.rely(cat);
         vat.rely(flop);
         vow.rely(cat);
         flop.rely(vow);
-
-        step += 1;
     }
 
-    function deployIlk(bytes32 ilk, address adapter, address pip) public auth {
-        require(step > 0);
+    function deployMom(DSAuthority authority) public auth {
+        require(pit != address(0), "Missing PIT deployment");
+        require(vow != address(0), "Missing VOW deployment");
+        require(drip != address(0), "Missing DRIP deployment");
+        require(cat != address(0), "Missing CAT deployment");
+
+        // Auth
+        mom = momFab.newMom();
+        pit.rely(mom);
+        cat.rely(mom);
+        vow.rely(mom);
+        drip.rely(mom);
+        mom.setAuthority(authority);
+        mom.setOwner(0);
+        this.setAuthority(authority);
+        this.setOwner(0);
+    }
+
+    function deployCollateral(bytes32 ilk, address adapter, address pip) public auth {
+        require(ilk != bytes32(""), "Missing ilk name");
+        require(adapter != address(0), "Missing adapter address");
+        require(pip != address(0), "Missing PIP address");
+        require(vat != address(0), "Missing VAT deployment");
+        require(cat != address(0), "Missing VAT deployment");
+
+        // Deploy
         ilks[ilk].flip = flipFab.newFlip(vat, ilk);
         ilks[ilk].adapter = adapter;
         ilks[ilk].price = priceFab.newPrice(pit, ilk);
         ilks[ilk].price.file(pip); // Set pip
         ilks[ilk].price.file(ONE); // Set mat
+
+        // Internal references set up
         cat.file(ilk, "flip", ilks[ilk].flip);
         cat.file(ilk, "chop", ONE);
         vat.init(ilk);
@@ -210,31 +268,7 @@ contract DssDeploy is DSAuth {
         pit.rely(ilks[ilk].price);
         ilks[ilk].price.rely(mom);
 
+        // Update price
         ilks[ilk].price.poke();
-    }
-
-    function configParams() public auth {
-        require(step == 1);
-        step += 1;
-    }
-
-    function verifyParams() public auth {
-        require(step == 2);
-        step += 1;
-    }
-
-    function configAuth(DSAuthority authority) public auth {
-        require(step == 3);
-        pit.rely(mom);
-        cat.rely(mom);
-        vow.rely(mom);
-        drip.rely(mom);
-
-        mom.setAuthority(authority);
-        mom.setOwner(0);
-        this.setAuthority(authority);
-        this.setOwner(0);
-
-        step += 1;
     }
 }

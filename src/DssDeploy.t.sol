@@ -59,42 +59,50 @@ contract DssDeployTest is DSTest {
 
     function testDeploy() public {
         uint startGas = gasleft();
-        dssDeploy.deployContracts(gov);
+        dssDeploy.deployVat();
         uint endGas = gasleft();
+        emit log_named_uint("Deploy VAT", startGas - endGas);
+
+        startGas = gasleft();
+        dssDeploy.deployPit();
+        endGas = gasleft();
+        emit log_named_uint("Deploy PIT", startGas - endGas);
+
+        startGas = gasleft();
+        dssDeploy.deployDai();
+        endGas = gasleft();
+        emit log_named_uint("Deploy DAI", startGas - endGas);
+
+        startGas = gasleft();
+        dssDeploy.deployTaxation(gov);
+        endGas = gasleft();
+        emit log_named_uint("Deploy Taxation", startGas - endGas);
+
+        startGas = gasleft();
+        dssDeploy.deployLiquidation(gov);
+        endGas = gasleft();
+        emit log_named_uint("Deploy Liquidation", startGas - endGas);
+
+        startGas = gasleft();
+        dssDeploy.deployMom(authority);
+        endGas = gasleft();
+        emit log_named_uint("Deploy MOM", startGas - endGas);
 
         startGas = gasleft();
         ETHAdapter ethAdapter = new ETHAdapter(dssDeploy.vat(), "ETH");
-        dssDeploy.deployIlk("ETH", ethAdapter, pipETH);
+        dssDeploy.deployCollateral("ETH", ethAdapter, pipETH);
         endGas = gasleft();
-        emit log_named_uint("Make Vox Tub", startGas - endGas);
+        emit log_named_uint("Deploy ETH", startGas - endGas);
 
         startGas = gasleft();
         DSToken dgx = new DSToken("DGX");
         Adapter adapterDGX = new Adapter(dssDeploy.vat(), "DGX", dgx);
-        dssDeploy.deployIlk("DGX", adapterDGX, pipDGX);
+        dssDeploy.deployCollateral("DGX", adapterDGX, pipDGX);
         endGas = gasleft();
-        emit log_named_uint("Make Vox Tub", startGas - endGas);
-
-        startGas = gasleft();
-        dssDeploy.configParams();
-        endGas = gasleft();
-        emit log_named_uint("Config Params", startGas - endGas);
-
-        startGas = gasleft();
-        dssDeploy.verifyParams();
-        endGas = gasleft();
-        emit log_named_uint("Verify Params", startGas - endGas);
-
-        startGas = gasleft();
-        dssDeploy.configAuth(authority);
-        endGas = gasleft();
-        emit log_named_uint("Config Auth", startGas - endGas);
-
-        ethAdapter.join.value(10)(bytes32(address(this)));
-        assertEq(dssDeploy.vat().gem("ETH", bytes32(address(this))), 10);
+        emit log_named_uint("Deploy DGX", startGas - endGas);
     }
 
     function testFailStep() public {
-        dssDeploy.configParams();
+        dssDeploy.deployPit();
     }
 }

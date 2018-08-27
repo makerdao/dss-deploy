@@ -23,20 +23,32 @@ then
     seth send $DAI_ADM 'setRootUser(address,bool)' $ETH_FROM true
 fi
 
-# Deploy contracts
-seth send $DAI_DEPLOY "deployContracts(address)" $DAI_GOV
+
+# Deploy VAT
+seth send $DAI_DEPLOY "deployVat()"
+
+# Deploy PIT
+seth send $DAI_DEPLOY "deployPit()"
+
+# Deploy DAI
+seth send $DAI_DEPLOY "deployDai()"
+
+# Deploy Taxation
+seth send $DAI_DEPLOY "deployTaxation(address)" $DAI_GOV
+
+# Deploy Liquidation
+seth send $DAI_DEPLOY "deployLiquidation(address)" $DAI_GOV
+
+# Deploy mom
+seth send $DAI_DEPLOY "deployMom(address)" $DAI_ADM
 
 # Get Vat address
 DAI_VAT=0x$(seth call $DAI_DEPLOY "vat()(address)")
 
-# Deploy DAI adapter
-DAI_DAI=$(dapp create DSToken $(seth --to-bytes32 $(seth --from-ascii "DAI")))
-DAI_APT_DAI=$(dapp create DaiAdapter $DAI_VAT $DAI_DAI)
-
 # Deploy ETH ilk (adapter, price, flip and init variables)
 test -z $PIP_ETH && PIP_ETH=$(dapp create DSValue)
 DAI_APT_ETH=$(dapp create ETHAdapter $DAI_VAT $(seth --to-bytes32 $(seth --from-ascii "ETH")))
-seth send $DAI_DEPLOY "deployIlk(bytes32,address,address)" $(seth --to-bytes32 $(seth --from-ascii "ETH")) $DAI_APT_ETH $PIP_ETH
+seth send $DAI_DEPLOY "deployCollateral(bytes32,address,address)" $(seth --to-bytes32 $(seth --from-ascii "ETH")) $DAI_APT_ETH $PIP_ETH
 ilk=(`echo $(seth call $DAI_DEPLOY "ilks(bytes32)(address,address,address)" $(seth --to-bytes32 $(seth --from-ascii "ETH")))`)
 DAI_FLIP_ETH=0x${ilk[0]}
 DAI_PRICE_ETH=0x${ilk[2]}
@@ -45,17 +57,10 @@ DAI_PRICE_ETH=0x${ilk[2]}
 test -z $DGX && DGX=$(dapp create DSToken $(seth --to-bytes32 $(seth --from-ascii "DGX")))
 test -z $PIP_DGX && PIP_DGX=$(dapp create DSValue)
 DAI_APT_DGX=$(dapp create Adapter $DAI_VAT $(seth --to-bytes32 $(seth --from-ascii "DGX")) $DGX)
-seth send $DAI_DEPLOY "deployIlk(bytes32,address,address)" $(seth --to-bytes32 $(seth --from-ascii "DGX")) $DAI_APT_DGX $PIP_DGX
+seth send $DAI_DEPLOY "deployCollateral(bytes32,address,address)" $(seth --to-bytes32 $(seth --from-ascii "DGX")) $DAI_APT_DGX $PIP_DGX
 ilk=(`echo $(seth call $DAI_DEPLOY "ilks(bytes32)(address,address,address)" $(seth --to-bytes32 $(seth --from-ascii "DGX")))`)
 DAI_FLIP_DGX=0x${ilk[0]}
 DAI_PRICE_DGX=0x${ilk[2]}
-
-# Config and verify params
-seth send $DAI_DEPLOY "configParams()"
-seth send $DAI_DEPLOY "verifyParams()"
-
-# Config auth
-seth send $DAI_DEPLOY "configAuth(address)" $DAI_ADM
 
 cat > load-env-$(seth chain) << EOF
 #!/bin/bash
@@ -77,7 +82,6 @@ export DAI_APT_DAI=0x$(seth call $DAI_DEPLOY "daiApt()(address)")
 export DAI_FLAP=0x$(seth call $DAI_DEPLOY "flap()(address)")
 export DAI_FLOP=0x$(seth call $DAI_DEPLOY "flop()(address)")
 export DAI_MOM=0x$(seth call $DAI_DEPLOY "mom()(address)")
-export DAI_APT_DAI=$DAI_APT_DAI
 export DAI_APT_ETH=$DAI_APT_ETH
 export DAI_FLIP_ETH=$DAI_FLIP_ETH
 export DAI_PRICE_ETH=$DAI_PRICE_ETH

@@ -6,7 +6,7 @@ export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
 
 test -z "$SKIP_BUILD" && dapp build
 
-# Deploy DGX ilk (adapter, mover, price, flip and init variables)
+# Deploy DGX ilk (adapter, mover, spotter, flip and init variables)
 test -z "$MCD_DEPLOY" && exit 1
 test -z $DGX && DGX=$(dapp create DSToken $(seth --to-bytes32 $(seth --from-ascii "DGX")))
 test -z $PIP_DGX && PIP_DGX=$(dapp create DSValue)
@@ -16,7 +16,7 @@ MCD_MOVE_DGX=$(dapp create GemMove $MCD_VAT $(seth --to-bytes32 $(seth --from-as
 seth send $MCD_DEPLOY "deployCollateral(bytes32,address,address,address)" $(seth --to-bytes32 $(seth --from-ascii "DGX")) $MCD_JOIN_DGX $MCD_MOVE_DGX $PIP_DGX
 ilk=(`echo $(seth call $MCD_DEPLOY "ilks(bytes32)(address,address,address,address)" $(seth --to-bytes32 $(seth --from-ascii "DGX")))`)
 MCD_FLIP_DGX=0x${ilk[0]}
-MCD_PRICE_DGX=0x${ilk[3]}
+MCD_SPOT_DGX=0x${ilk[3]}
 
 cat > load-ilk-dgx-$(seth chain) << EOF
 #!/bin/bash
@@ -27,5 +27,5 @@ export PIP_DGX=$PIP_DGX
 export MCD_JOIN_DGX=$MCD_JOIN_DGX
 export MCD_MOVE_DGX=$MCD_MOVE_DGX
 export MCD_FLIP_DGX=$MCD_FLIP_DGX
-export MCD_PRICE_DGX=$MCD_PRICE_DGX
+export MCD_SPOT_DGX=$MCD_SPOT_DGX
 EOF

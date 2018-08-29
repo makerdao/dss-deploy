@@ -7,13 +7,13 @@ export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
 test -z "$SKIP_BUILD" && dapp build
 
 # Check all fabs are defined
-(test -z $VAT_FAB || test -z $PIT_FAB || test -z $DRIP_FAB || test -z $VOW_FAB || test -z $CAT_FAB || test -z $TOKEN_FAB || test -z $MCD_JOIN_FAB || test -z $MCD_MOVE_FAB ||test -z $FLAP_FAB || test -z $FLOP_FAB || test -z $MOM_FAB || test -z $FLIP_FAB || test -z $PRICE_FAB) && exit 1
+(test -z $VAT_FAB || test -z $PIT_FAB || test -z $DRIP_FAB || test -z $VOW_FAB || test -z $CAT_FAB || test -z $TOKEN_FAB || test -z $MCD_JOIN_FAB || test -z $MCD_MOVE_FAB ||test -z $FLAP_FAB || test -z $FLOP_FAB || test -z $MOM_FAB || test -z $FLIP_FAB || test -z $SPOT_FAB) && exit 1
 
 # If there is not Governance token defined, create one
 test -z $MCD_GOV && MCD_GOV=$(dapp create DSToken $(seth --to-bytes32 $(seth --from-ascii "MKR")))
 
 # Create deploy contract
-MCD_DEPLOY=$(dapp create DssDeploy $VAT_FAB $PIT_FAB $DRIP_FAB $VOW_FAB $CAT_FAB $TOKEN_FAB $MCD_JOIN_FAB $MCD_MOVE_FAB $FLAP_FAB $FLOP_FAB $MOM_FAB $FLIP_FAB $PRICE_FAB)
+MCD_DEPLOY=$(dapp create DssDeploy $VAT_FAB $PIT_FAB $DRIP_FAB $VOW_FAB $CAT_FAB $TOKEN_FAB $MCD_JOIN_FAB $MCD_MOVE_FAB $FLAP_FAB $FLOP_FAB $MOM_FAB $FLIP_FAB $SPOT_FAB)
 
 # If there is not Authorty defined, create one
 if [ -z $MCD_ADM ]

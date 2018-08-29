@@ -14,7 +14,7 @@ import {Flapper} from "dss/flap.sol";
 import {Flopper} from "dss/flop.sol";
 import {Flipper} from "dss/flip.sol";
 
-import {Price} from "./poke.sol";
+import {Spotter} from "./poke.sol";
 import {DaiMom} from "./mom.sol";
 
 contract VatFab {
@@ -90,10 +90,10 @@ contract FlipFab {
     }
 }
 
-contract PriceFab {
-    function newPrice(Pit pit, bytes32 ilk) public returns (Price price) {
-        price = new Price(pit, ilk);
-        price.rely(msg.sender);
+contract SpotFab {
+    function newSpotter(Pit pit, bytes32 ilk) public returns (Spotter spotter) {
+        spotter = new Spotter(pit, ilk);
+        spotter.rely(msg.sender);
     }
 }
 
@@ -117,7 +117,7 @@ contract DssDeploy is DSAuth {
     FlopFab    public flopFab;
     MomFab     public momFab;
     FlipFab    public flipFab;
-    PriceFab   public priceFab;
+    SpotFab    public spotFab;
 
     Vat     public vat;
     Pit     public pit;
@@ -141,7 +141,7 @@ contract DssDeploy is DSAuth {
         Flipper flip;
         address adapter;
         address mover;
-        Price price;
+        Spotter spotter;
     }
 
     constructor(
@@ -157,7 +157,7 @@ contract DssDeploy is DSAuth {
         FlopFab flopFab_,
         MomFab momFab_,
         FlipFab flipFab_,
-        PriceFab priceFab_
+        SpotFab spotFab_
     ) public {
         vatFab = vatFab_;
         pitFab = pitFab_;
@@ -171,7 +171,7 @@ contract DssDeploy is DSAuth {
         flopFab = flopFab_;
         momFab = momFab_;
         flipFab = flipFab_;
-        priceFab = priceFab_;
+        spotFab = spotFab_;
     }
 
     function deployVat() public auth {
@@ -269,9 +269,9 @@ contract DssDeploy is DSAuth {
         ilks[ilk].flip = flipFab.newFlip(daiMove, mover);
         ilks[ilk].adapter = adapter;
         ilks[ilk].mover = mover;
-        ilks[ilk].price = priceFab.newPrice(pit, ilk);
-        ilks[ilk].price.file(pip); // Set pip
-        ilks[ilk].price.file(ONE); // Set mat
+        ilks[ilk].spotter = spotFab.newSpotter(pit, ilk);
+        ilks[ilk].spotter.file(pip); // Set pip
+        ilks[ilk].spotter.file(ONE); // Set mat
 
         // Internal references set up
         cat.file(ilk, "flip", ilks[ilk].flip);
@@ -283,11 +283,11 @@ contract DssDeploy is DSAuth {
         vat.rely(ilks[ilk].flip);
         vat.rely(adapter);
         vat.rely(mover);
-        pit.rely(ilks[ilk].price);
-        ilks[ilk].price.rely(mom);
+        pit.rely(ilks[ilk].spotter);
+        ilks[ilk].spotter.rely(mom);
 
-        // Update price
-        ilks[ilk].price.poke();
+        // Update spotter
+        ilks[ilk].spotter.poke();
     }
 
     // developer backdoor

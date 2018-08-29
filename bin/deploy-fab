@@ -21,7 +21,7 @@ FLAP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 8)) dapp create FlapFab)
 FLOP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 9)) dapp create FlopFab)
 MOM_FABtx=$(ETH_NONCE=$((ETH_NONCE + 10)) dapp create MomFab)
 FLIP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 11)) dapp create FlipFab)
-PRICE_FABtx=$(ETH_NONCE=$((ETH_NONCE + 12)) dapp create PriceFab)
+SPOT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 12)) dapp create SpotFab)
 
 export SETH_ASYNC=no
 
@@ -37,7 +37,7 @@ FLAP_FAB=$(seth receipt $FLAP_FABtx contractAddress)
 FLOP_FAB=$(seth receipt $FLOP_FABtx contractAddress)
 MOM_FAB=$(seth receipt $MOM_FABtx contractAddress)
 FLIP_FAB=$(seth receipt $FLIP_FABtx contractAddress)
-PRICE_FAB=$(seth receipt $PRICE_FABtx contractAddress)
+SPOT_FAB=$(seth receipt $SPOT_FABtx contractAddress)
 
 cat > load-fab-$(seth chain) << EOF
 #!/bin/bash
@@ -57,5 +57,5 @@ export FLAP_FAB=$FLAP_FAB
 export FLOP_FAB=$FLOP_FAB
 export MOM_FAB=$MOM_FAB
 export FLIP_FAB=$FLIP_FAB
-export PRICE_FAB=$PRICE_FAB
+export SPOT_FAB=$SPOT_FAB
 EOF

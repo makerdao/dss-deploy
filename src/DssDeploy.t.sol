@@ -22,7 +22,7 @@ contract DssDeployTest is DSTest {
     FlopFab flopFab;
     MomFab momFab;
     FlipFab flipFab;
-    PriceFab priceFab;
+    SpotFab spotFab;
 
     DssDeploy dssDeploy;
 
@@ -46,10 +46,10 @@ contract DssDeployTest is DSTest {
         momFab = new MomFab();
 
         flipFab = new FlipFab();
-        priceFab = new PriceFab();
+        spotFab = new SpotFab();
 
         uint startGas = gasleft();
-        dssDeploy = new DssDeploy(vatFab, pitFab, dripFab, vowFab, catFab, tokenFab, daiJoinFab, daiMoveFab, flapFab, flopFab, momFab, flipFab, priceFab);
+        dssDeploy = new DssDeploy(vatFab, pitFab, dripFab, vowFab, catFab, tokenFab, daiJoinFab, daiMoveFab, flapFab, flopFab, momFab, flipFab, spotFab);
         uint endGas = gasleft();
         emit log_named_uint("Deploy DssDeploy", startGas - endGas);
 

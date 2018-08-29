@@ -4,92 +4,64 @@ set -ex
 export ETH_GAS=${ETH_GAS:-"7000000"}
 export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
 
-dapp build
+test -z "$SKIP_BUILD" && dapp build
 
 # Check all fabs are defined
-(test -z $VAT_FAB || test -z $PIT_FAB || test -z $DRIP_FAB || test -z $VOW_FAB || test -z $CAT_FAB || test -z $TOKEN_FAB || test -z $DAI_APT_FAB || test -z $DAI_MOVE_FAB ||test -z $FLAP_FAB || test -z $FLOP_FAB || test -z $MOM_FAB || test -z $FLIP_FAB || test -z $PRICE_FAB) && exit 1
+(test -z $VAT_FAB || test -z $PIT_FAB || test -z $DRIP_FAB || test -z $VOW_FAB || test -z $CAT_FAB || test -z $TOKEN_FAB || test -z $MCD_APT_FAB || test -z $MCD_MOVE_FAB ||test -z $FLAP_FAB || test -z $FLOP_FAB || test -z $MOM_FAB || test -z $FLIP_FAB || test -z $PRICE_FAB) && exit 1
 
 # If there is not Governance token defined, create one
-test -z $DAI_GOV && DAI_GOV=$(dapp create DSToken $(seth --to-bytes32 $(seth --from-ascii "MKR")))
+test -z $MCD_GOV && MCD_GOV=$(dapp create DSToken $(seth --to-bytes32 $(seth --from-ascii "MKR")))
 
 # Create deploy contract
-DAI_DEPLOY=$(dapp create DssDeploy $VAT_FAB $PIT_FAB $DRIP_FAB $VOW_FAB $CAT_FAB $TOKEN_FAB $DAI_APT_FAB $DAI_MOVE_FAB $FLAP_FAB $FLOP_FAB $MOM_FAB $FLIP_FAB $PRICE_FAB)
+MCD_DEPLOY=$(dapp create DssDeploy $VAT_FAB $PIT_FAB $DRIP_FAB $VOW_FAB $CAT_FAB $TOKEN_FAB $MCD_APT_FAB $MCD_MOVE_FAB $FLAP_FAB $FLOP_FAB $MOM_FAB $FLIP_FAB $PRICE_FAB)
 
 # If there is not Authorty defined, create one
-if [ -z $DAI_ADM ]
+if [ -z $MCD_ADM ]
 then
-    DAI_ADM=$(dapp create DSRoles)
-    seth send $DAI_ADM 'setRootUser(address,bool)' $ETH_FROM true
+    MCD_ADM=$(dapp create DSRoles)
+    seth send $MCD_ADM 'setRootUser(address,bool)' $ETH_FROM true
 fi
 
 
 # Deploy VAT
-seth send $DAI_DEPLOY "deployVat()"
+seth send $MCD_DEPLOY "deployVat()"
 
 # Deploy PIT
-seth send $DAI_DEPLOY "deployPit()"
+seth send $MCD_DEPLOY "deployPit()"
 
-# Deploy DAI
-seth send $DAI_DEPLOY "deployDai()"
+# Deploy MCD
+seth send $MCD_DEPLOY "deployDai()"
 
 # Deploy Taxation
-seth send $DAI_DEPLOY "deployTaxation(address)" $DAI_GOV
+seth send $MCD_DEPLOY "deployTaxation(address)" $MCD_GOV
 
 # Deploy Liquidation
-seth send $DAI_DEPLOY "deployLiquidation(address)" $DAI_GOV
+seth send $MCD_DEPLOY "deployLiquidation(address)" $MCD_GOV
 
 # Deploy mom
-seth send $DAI_DEPLOY "deployMom(address)" $DAI_ADM
+seth send $MCD_DEPLOY "deployMom(address)" $MCD_ADM
 
 # Get Vat address
-DAI_VAT=0x$(seth call $DAI_DEPLOY "vat()(address)")
+MCD_VAT=0x$(seth call $MCD_DEPLOY "vat()(address)")
 
-# Deploy ETH ilk (adapter, price, flip and init variables)
-test -z $PIP_ETH && PIP_ETH=$(dapp create DSValue)
-DAI_APT_ETH=$(dapp create ETHAdapter $DAI_VAT $(seth --to-bytes32 $(seth --from-ascii "ETH")))
-DAI_MOVE_ETH=$(dapp create GemMove $DAI_VAT $(seth --to-bytes32 $(seth --from-ascii "ETH")))
-seth send $DAI_DEPLOY "deployCollateral(bytes32,address,address,address)" $(seth --to-bytes32 $(seth --from-ascii "ETH")) $DAI_APT_ETH $DAI_MOVE_ETH $PIP_ETH
-ilk=(`echo $(seth call $DAI_DEPLOY "ilks(bytes32)(address,address,address,address)" $(seth --to-bytes32 $(seth --from-ascii "ETH")))`)
-DAI_FLIP_ETH=0x${ilk[0]}
-DAI_PRICE_ETH=0x${ilk[3]}
 
-# Deploy DGX ilk (adapter, mover, price, flip and init variables)
-test -z $DGX && DGX=$(dapp create DSToken $(seth --to-bytes32 $(seth --from-ascii "DGX")))
-test -z $PIP_DGX && PIP_DGX=$(dapp create DSValue)
-DAI_APT_DGX=$(dapp create Adapter $DAI_VAT $(seth --to-bytes32 $(seth --from-ascii "DGX")) $DGX)
-DAI_MOVE_DGX=$(dapp create GemMove $DAI_VAT $(seth --to-bytes32 $(seth --from-ascii "DGX")))
-seth send $DAI_DEPLOY "deployCollateral(bytes32,address,address,address)" $(seth --to-bytes32 $(seth --from-ascii "DGX")) $DAI_APT_DGX $DAI_MOVE_DGX $PIP_DGX
-ilk=(`echo $(seth call $DAI_DEPLOY "ilks(bytes32)(address,address,address,address)" $(seth --to-bytes32 $(seth --from-ascii "DGX")))`)
-DAI_FLIP_DGX=0x${ilk[0]}
-DAI_PRICE_DGX=0x${ilk[3]}
-
-cat > load-env-$(seth chain) << EOF
+cat > load-mcd-$(seth chain) << EOF
 #!/bin/bash
 
-# sai deployment on $(seth chain) from $(git rev-parse HEAD)
+# mcd deployment on $(seth chain) from $(git rev-parse HEAD)
 # $(date)
 
-export PIP_ETH=$PIP_ETH
-export PIP_DGX=$PIP_DGX
-export DAI_DEPLOY=$DAI_DEPLOY
-export DAI_GOV=$DAI_GOV
-export DAI_VAT=$DAI_VAT
-export DAI_PIT=0x$(seth call $DAI_DEPLOY "pit()(address)")
-export DAI_DRIP=0x$(seth call $DAI_DEPLOY "drip()(address)")
-export DAI_VOW=0x$(seth call $DAI_DEPLOY "vow()(address)")
-export DAI_CAT=0x$(seth call $DAI_DEPLOY "cat()(address)")
-export DAI_DAI=0x$(seth call $DAI_DEPLOY "dai()(address)")
-export DAI_APT_DAI=0x$(seth call $DAI_DEPLOY "daiApt()(address)")
-export DAI_MOVE_DAI=0x$(seth call $DAI_DEPLOY "daiMove()(address)")
-export DAI_FLAP=0x$(seth call $DAI_DEPLOY "flap()(address)")
-export DAI_FLOP=0x$(seth call $DAI_DEPLOY "flop()(address)")
-export DAI_MOM=0x$(seth call $DAI_DEPLOY "mom()(address)")
-export DAI_APT_ETH=$DAI_APT_ETH
-export DAI_MOVE_ETH=$DAI_MOVE_ETH
-export DAI_FLIP_ETH=$DAI_FLIP_ETH
-export DAI_PRICE_ETH=$DAI_PRICE_ETH
-export DAI_APT_DGX=$DAI_APT_DGX
-export DAI_MOVE_DGX=$DAI_MOVE_DGX
-export DAI_FLIP_DGX=$DAI_FLIP_DGX
-export DAI_PRICE_DGX=$DAI_PRICE_DGX
+export MCD_DEPLOY=$MCD_DEPLOY
+export MCD_GOV=$MCD_GOV
+export MCD_VAT=$MCD_VAT
+export MCD_PIT=0x$(seth call $MCD_DEPLOY "pit()(address)")
+export MCD_DRIP=0x$(seth call $MCD_DEPLOY "drip()(address)")
+export MCD_CAT=0x$(seth call $MCD_DEPLOY "cat()(address)")
+export MCD_VOW=0x$(seth call $MCD_DEPLOY "vow()(address)")
+export MCD_MCD=0x$(seth call $MCD_DEPLOY "dai()(address)")
+export MCD_APT_MCD=0x$(seth call $MCD_DEPLOY "daiApt()(address)")
+export MCD_MOVE_MCD=0x$(seth call $MCD_DEPLOY "daiMove()(address)")
+export MCD_FLAP=0x$(seth call $MCD_DEPLOY "flap()(address)")
+export MCD_FLOP=0x$(seth call $MCD_DEPLOY "flop()(address)")
+export MCD_MOM=0x$(seth call $MCD_DEPLOY "mom()(address)")
 EOF

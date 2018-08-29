@@ -8,7 +8,7 @@ import {Pit} from "dss/frob.sol";
 import {Drip} from "dss/drip.sol";
 import {Vow} from "dss/heal.sol";
 import {Cat} from "dss/bite.sol";
-import {DaiAdapter} from "dss/join.sol";
+import {DaiJoin} from "dss/join.sol";
 import {DaiMove} from "dss/move.sol";
 import {Flapper} from "dss/flap.sol";
 import {Flopper} from "dss/flop.sol";
@@ -59,9 +59,9 @@ contract TokenFab {
     }
 }
 
-contract DaiAptFab {
-    function newDaiApt(Vat vat, address dai) public returns (DaiAdapter daiApt) {
-        daiApt = new DaiAdapter(vat, dai);
+contract DaiJoinFab {
+    function newDaiJoin(Vat vat, address dai) public returns (DaiJoin daiJoin) {
+        daiJoin = new DaiJoin(vat, dai);
     }
 }
 
@@ -105,31 +105,32 @@ contract MomFab {
 }
 
 contract DssDeploy is DSAuth {
-    VatFab public vatFab;
-    PitFab public pitFab;
-    DripFab public dripFab;
-    VowFab public vowFab;
-    CatFab public catFab;
-    TokenFab public tokenFab;
-    DaiAptFab public daiAptFab;
+    VatFab     public vatFab;
+    PitFab     public pitFab;
+    DripFab    public dripFab;
+    VowFab     public vowFab;
+    CatFab     public catFab;
+    TokenFab   public tokenFab;
+    DaiJoinFab public daiJoinFab;
     DaiMoveFab public daiMoveFab;
-    FlapFab public flapFab;
-    FlopFab public flopFab;
-    MomFab public momFab;
-    FlipFab public flipFab;
-    PriceFab public priceFab;
+    FlapFab    public flapFab;
+    FlopFab    public flopFab;
+    MomFab     public momFab;
+    FlipFab    public flipFab;
+    PriceFab   public priceFab;
 
-    Vat public vat;
-    Pit public pit;
-    Drip public drip;
-    Vow public vow;
-    Cat public cat;
+    Vat     public vat;
+    Pit     public pit;
+    Drip    public drip;
+    Vow     public vow;
+    Cat     public cat;
     DSToken public dai;
-    DaiAdapter public daiApt;
+    DaiJoin public daiJoin;
     DaiMove public daiMove;
     Flapper public flap;
     Flopper public flop;
-    DaiMom public mom;
+    DaiMom  public mom;
+
     mapping(bytes32 => Ilk) public ilks;
 
     uint8 public step = 0;
@@ -150,7 +151,7 @@ contract DssDeploy is DSAuth {
         VowFab vowFab_,
         CatFab catFab_,
         TokenFab tokenFab_,
-        DaiAptFab daiAptFab_,
+        DaiJoinFab daiJoinFab_,
         DaiMoveFab daiMoveFab_,
         FlapFab flapFab_,
         FlopFab flopFab_,
@@ -164,7 +165,7 @@ contract DssDeploy is DSAuth {
         vowFab = vowFab_;
         catFab = catFab_;
         tokenFab = tokenFab_;
-        daiAptFab = daiAptFab_;
+        daiJoinFab = daiJoinFab_;
         daiMoveFab = daiMoveFab_;
         flapFab = flapFab_;
         flopFab = flopFab_;
@@ -191,11 +192,11 @@ contract DssDeploy is DSAuth {
 
         // Deploy
         dai     = tokenFab.newToken("DAI");
-        daiApt  = daiAptFab.newDaiApt(vat, dai);
+        daiJoin = daiJoinFab.newDaiJoin(vat, dai);
         daiMove = daiMoveFab.newDaiMove(vat);
 
         // Internal auth
-        vat.rely(daiApt);
+        vat.rely(daiJoin);
         vat.rely(daiMove);
     }
 

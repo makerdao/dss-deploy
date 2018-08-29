@@ -11,9 +11,9 @@ test -z "$MCD_DEPLOY" && exit 1
 test -z $DGX && DGX=$(dapp create DSToken $(seth --to-bytes32 $(seth --from-ascii "DGX")))
 test -z $PIP_DGX && PIP_DGX=$(dapp create DSValue)
 MCD_VAT=0x$(seth call "$MCD_DEPLOY" "vat()(address)")
-MCD_APT_DGX=$(dapp create Adapter $MCD_VAT $(seth --to-bytes32 $(seth --from-ascii "DGX")) $DGX)
+MCD_JOIN_DGX=$(dapp create GemJoin $MCD_VAT $(seth --to-bytes32 $(seth --from-ascii "DGX")) $DGX)
 MCD_MOVE_DGX=$(dapp create GemMove $MCD_VAT $(seth --to-bytes32 $(seth --from-ascii "DGX")))
-seth send $MCD_DEPLOY "deployCollateral(bytes32,address,address,address)" $(seth --to-bytes32 $(seth --from-ascii "DGX")) $MCD_APT_DGX $MCD_MOVE_DGX $PIP_DGX
+seth send $MCD_DEPLOY "deployCollateral(bytes32,address,address,address)" $(seth --to-bytes32 $(seth --from-ascii "DGX")) $MCD_JOIN_DGX $MCD_MOVE_DGX $PIP_DGX
 ilk=(`echo $(seth call $MCD_DEPLOY "ilks(bytes32)(address,address,address,address)" $(seth --to-bytes32 $(seth --from-ascii "DGX")))`)
 MCD_FLIP_DGX=0x${ilk[0]}
 MCD_PRICE_DGX=0x${ilk[3]}
@@ -24,7 +24,7 @@ cat > load-ilk-dgx-$(seth chain) << EOF
 # ilk deployment on $(seth chain) from $(git rev-parse HEAD)
 # $(date)
 export PIP_DGX=$PIP_DGX
-export MCD_APT_DGX=$MCD_APT_DGX
+export MCD_JOIN_DGX=$MCD_JOIN_DGX
 export MCD_MOVE_DGX=$MCD_MOVE_DGX
 export MCD_FLIP_DGX=$MCD_FLIP_DGX
 export MCD_PRICE_DGX=$MCD_PRICE_DGX

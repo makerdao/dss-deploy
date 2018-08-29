@@ -4,7 +4,7 @@ import {DSTest} from "ds-test/test.sol";
 import {DSValue} from "ds-value/value.sol";
 import {DSRoles} from "ds-roles/roles.sol";
 
-import {Adapter, ETHAdapter} from "dss/join.sol";
+import {GemJoin, ETHJoin} from "dss/join.sol";
 import {GemMove} from 'dss/move.sol';
 
 import "./DssDeploy.sol";
@@ -16,7 +16,7 @@ contract DssDeployTest is DSTest {
     VowFab vowFab;
     CatFab catFab;
     TokenFab tokenFab;
-    DaiAptFab daiAptFab;
+    DaiJoinFab daiJoinFab;
     DaiMoveFab daiMoveFab;
     FlapFab flapFab;
     FlopFab flopFab;
@@ -39,7 +39,7 @@ contract DssDeployTest is DSTest {
         vowFab = new VowFab();
         catFab = new CatFab();
         tokenFab = new TokenFab();
-        daiAptFab = new DaiAptFab();
+        daiJoinFab = new DaiJoinFab();
         daiMoveFab = new DaiMoveFab();
         flapFab = new FlapFab();
         flopFab = new FlopFab();
@@ -49,7 +49,7 @@ contract DssDeployTest is DSTest {
         priceFab = new PriceFab();
 
         uint startGas = gasleft();
-        dssDeploy = new DssDeploy(vatFab, pitFab, dripFab, vowFab, catFab, tokenFab, daiAptFab, daiMoveFab, flapFab, flopFab, momFab, flipFab, priceFab);
+        dssDeploy = new DssDeploy(vatFab, pitFab, dripFab, vowFab, catFab, tokenFab, daiJoinFab, daiMoveFab, flapFab, flopFab, momFab, flipFab, priceFab);
         uint endGas = gasleft();
         emit log_named_uint("Deploy DssDeploy", startGas - endGas);
 
@@ -92,17 +92,17 @@ contract DssDeployTest is DSTest {
         emit log_named_uint("Deploy MOM", startGas - endGas);
 
         startGas = gasleft();
-        ETHAdapter ethAdapter = new ETHAdapter(dssDeploy.vat(), "ETH");
-        GemMove    ethMove = new GemMove(dssDeploy.vat(), "ETH");
-        dssDeploy.deployCollateral("ETH", ethAdapter, ethMove, pipETH);
+        ETHJoin ethJoin = new ETHJoin(dssDeploy.vat(), "ETH");
+        GemMove ethMove = new GemMove(dssDeploy.vat(), "ETH");
+        dssDeploy.deployCollateral("ETH", ethJoin, ethMove, pipETH);
         endGas = gasleft();
         emit log_named_uint("Deploy ETH", startGas - endGas);
 
         startGas = gasleft();
         DSToken dgx = new DSToken("DGX");
-        Adapter adapterDGX = new Adapter(dssDeploy.vat(), "DGX", dgx);
-        GemMove moveDGX = new GemMove(dssDeploy.vat(), "DGX");
-        dssDeploy.deployCollateral("DGX", adapterDGX, moveDGX, pipDGX);
+        GemJoin dgxJoin = new GemJoin(dssDeploy.vat(), "DGX", dgx);
+        GemMove dgxMove = new GemMove(dssDeploy.vat(), "DGX");
+        dssDeploy.deployCollateral("DGX", dgxJoin, dgxMove, pipDGX);
         endGas = gasleft();
         emit log_named_uint("Deploy DGX", startGas - endGas);
     }

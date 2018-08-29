@@ -15,7 +15,7 @@ DRIP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 2)) dapp create DripFab)
 VOW_FABtx=$(ETH_NONCE=$((ETH_NONCE + 3)) dapp create VowFab)
 CAT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 4)) dapp create CatFab)
 TOKEN_FABtx=$(ETH_NONCE=$((ETH_NONCE + 5)) dapp create TokenFab)
-MCD_APT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 6)) dapp create DaiAptFab)
+MCD_JOIN_FABtx=$(ETH_NONCE=$((ETH_NONCE + 6)) dapp create DaiJoinFab)
 MCD_MOVE_FABtx=$(ETH_NONCE=$((ETH_NONCE + 7)) dapp create DaiMoveFab)
 FLAP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 8)) dapp create FlapFab)
 FLOP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 9)) dapp create FlopFab)
@@ -31,7 +31,7 @@ DRIP_FAB=$(seth receipt $DRIP_FABtx contractAddress)
 VOW_FAB=$(seth receipt $VOW_FABtx contractAddress)
 CAT_FAB=$(seth receipt $CAT_FABtx contractAddress)
 TOKEN_FAB=$(seth receipt $TOKEN_FABtx contractAddress)
-MCD_APT_FAB=$(seth receipt $MCD_APT_FABtx contractAddress)
+MCD_JOIN_FAB=$(seth receipt $MCD_JOIN_FABtx contractAddress)
 MCD_MOVE_FAB=$(seth receipt $MCD_MOVE_FABtx contractAddress)
 FLAP_FAB=$(seth receipt $FLAP_FABtx contractAddress)
 FLOP_FAB=$(seth receipt $FLOP_FABtx contractAddress)
@@ -51,7 +51,7 @@ export DRIP_FAB=$DRIP_FAB
 export VOW_FAB=$VOW_FAB
 export CAT_FAB=$CAT_FAB
 export TOKEN_FAB=$TOKEN_FAB
-export MCD_APT_FAB=$MCD_APT_FAB
+export MCD_JOIN_FAB=$MCD_JOIN_FAB
 export MCD_MOVE_FAB=$MCD_MOVE_FAB
 export FLAP_FAB=$FLAP_FAB
 export FLOP_FAB=$FLOP_FAB

@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -ex
+
+export ETH_GAS=${ETH_GAS:-"7000000"}
+export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
+
+test -z "$SKIP_BUILD" && dapp build
+
+# Deploy ETH ilk (adapter, spotter, flip and init variables)
+test -z "$MCD_DEPLOY" && exit 1
+test -z "$PIP_ETH" && PIP_ETH=$(dapp create DSValue)
+MCD_VAT=0x$(seth call "$MCD_DEPLOY" "vat()(address)")
+MCD_JOIN_ETH=$(dapp create ETHJoin $MCD_VAT $(seth --to-bytes32 $(seth --from-ascii "ETH")))
+MCD_MOVE_ETH=$(dapp create GemMove $MCD_VAT $(seth --to-bytes32 $(seth --from-ascii "ETH")))
+seth send $MCD_DEPLOY "deployCollateral(bytes32,address,address,address)" $(seth --to-bytes32 $(seth --from-ascii "ETH")) $MCD_JOIN_ETH $MCD_MOVE_ETH $PIP_ETH
+ilk=(`echo $(seth call $MCD_DEPLOY "ilks(bytes32)(address,address,address,address)" $(seth --to-bytes32 $(seth --from-ascii "ETH")))`)
+MCD_FLIP_ETH=0x${ilk[0]}
+MCD_SPOT_ETH=0x${ilk[3]}
+
+cat > load-ilk-eth-$(seth chain) << EOF
+#!/bin/bash
+
+# ilk deployment on $(seth chain) from $(git rev-parse HEAD)
+# $(date)
+export PIP_ETH=$PIP_ETH
+export MCD_JOIN_ETH=$MCD_JOIN_ETH
+export MCD_MOVE_ETH=$MCD_MOVE_ETH
+export MCD_FLIP_ETH=$MCD_FLIP_ETH
+export MCD_SPOT_ETH=$MCD_SPOT_ETH
+EOF

@@ -216,6 +216,7 @@ contract DssDeploy is DSAuth {
         vow.file("flap", flap);
 
         // Internal auth
+        vat.rely(vow);
         vat.rely(drip);
         vat.rely(flap);
     }

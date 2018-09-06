@@ -2,6 +2,8 @@ pragma solidity ^0.4.24;
 
 import {DSToken} from "ds-token/token.sol";
 import {DSAuth, DSAuthority} from "ds-auth/auth.sol";
+import {DSGuard} from "ds-guard/guard.sol";
+
 
 import {Vat} from "dss/tune.sol";
 import {Pit} from "dss/frob.sol";
@@ -193,6 +195,10 @@ contract DssDeploy is DSAuth {
         // Deploy
         dai     = tokenFab.newToken("DAI");
         daiJoin = daiJoinFab.newDaiJoin(vat, dai);
+        DSGuard guard = new DSGuard();
+        dai.setAuthority(guard);
+        guard.permit(daiJoin, dai, bytes4(keccak256("mint(address,uint256)")));
+        guard.permit(daiJoin, dai, bytes4(keccak256("burn(address,uint256)")));
         daiMove = daiMoveFab.newDaiMove(vat);
 
         // Internal auth
@@ -276,6 +282,7 @@ contract DssDeploy is DSAuth {
 
         // Internal references set up
         cat.file(ilk, "flip", ilks[ilk].flip);
+        cat.file(ilk, "lump", uint(10000 ether)); // 10000 DAI per batch
         cat.file(ilk, "chop", ONE);
         vat.init(ilk);
         drip.file(ilk, bytes32(address(vow)), ONE);

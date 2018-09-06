@@ -32,6 +32,23 @@ contract DssDeployTest is DSTest {
 
     DSRoles authority;
 
+    ETHJoin ethJoin;
+    GemJoin dgxJoin;
+
+    Vat vat;
+    Pit pit;
+    Drip drip;
+    Vow vow;
+    Cat cat;
+    Spotter ethPrice;
+
+    // --- Math ---
+    uint256 constant ONE = 10 ** 27;
+
+    function mul(uint x, uint y) internal pure returns (uint z) {
+        require(y == 0 || (z = x * y) / y == x);
+    }
+
     function setUp() public {
         vatFab = new VatFab();
         pitFab = new PitFab();
@@ -60,54 +77,159 @@ contract DssDeployTest is DSTest {
         authority.setRootUser(this, true);
     }
 
-    function testDeploy() public {
-        uint startGas = gasleft();
+    function deploy() public {
         dssDeploy.deployVat();
-        uint endGas = gasleft();
-        emit log_named_uint("Deploy VAT", startGas - endGas);
-
-        startGas = gasleft();
         dssDeploy.deployPit();
-        endGas = gasleft();
-        emit log_named_uint("Deploy PIT", startGas - endGas);
-
-        startGas = gasleft();
         dssDeploy.deployDai();
-        endGas = gasleft();
-        emit log_named_uint("Deploy DAI", startGas - endGas);
-
-        startGas = gasleft();
         dssDeploy.deployTaxation(gov);
-        endGas = gasleft();
-        emit log_named_uint("Deploy Taxation", startGas - endGas);
-
-        startGas = gasleft();
         dssDeploy.deployLiquidation(gov);
-        endGas = gasleft();
-        emit log_named_uint("Deploy Liquidation", startGas - endGas);
-
-        startGas = gasleft();
         dssDeploy.deployMom(authority);
-        endGas = gasleft();
-        emit log_named_uint("Deploy MOM", startGas - endGas);
 
-        startGas = gasleft();
-        ETHJoin ethJoin = new ETHJoin(dssDeploy.vat(), "ETH");
-        GemMove ethMove = new GemMove(dssDeploy.vat(), "ETH");
+        vat = dssDeploy.vat();
+        pit = dssDeploy.pit();
+        drip = dssDeploy.drip();
+        vow = dssDeploy.vow();
+        cat = dssDeploy.cat();
+
+        ethJoin = new ETHJoin(vat, "ETH");
+        GemMove ethMove = new GemMove(vat, "ETH");
         dssDeploy.deployCollateral("ETH", ethJoin, ethMove, pipETH);
-        endGas = gasleft();
-        emit log_named_uint("Deploy ETH", startGas - endGas);
 
-        startGas = gasleft();
         DSToken dgx = new DSToken("DGX");
-        GemJoin dgxJoin = new GemJoin(dssDeploy.vat(), "DGX", dgx);
-        GemMove dgxMove = new GemMove(dssDeploy.vat(), "DGX");
+        dgxJoin = new GemJoin(vat, "DGX", dgx);
+        GemMove dgxMove = new GemMove(vat, "DGX");
         dssDeploy.deployCollateral("DGX", dgxJoin, dgxMove, pipDGX);
-        endGas = gasleft();
-        emit log_named_uint("Deploy DGX", startGas - endGas);
+
+        // Set Params
+        dssDeploy.mom().file(address(pit), bytes32("Line"), uint(10000 ether));
+        dssDeploy.mom().file(address(pit), bytes32("ETH"), bytes32("line"), uint(10000 ether));
+
+        pipETH.poke(300 * 10 ** 18); // Price 300 DAI = 1 ETH (precision 18)
+        (,,, ethPrice) = dssDeploy.ilks("ETH");
+        dssDeploy.mom().file(address(ethPrice), uint(1500000000 ether)); // Liquidation ratio 150%
+        ethPrice.poke();
+        (uint spot, ) = pit.ilks("ETH");
+        assertEq(spot, 300 * ONE * ONE / 1500000000 ether);
     }
 
-    function testFailStep() public {
+    function testDeploy() public {
+        deploy();
+    }
+
+    function testFailDeploy() public {
         dssDeploy.deployPit();
+    }
+
+    function testFailDeploy2() public {
+        dssDeploy.deployVat();
+        dssDeploy.deployTaxation(gov);
+    }
+
+    function testFailDeploy3() public {
+        dssDeploy.deployVat();
+        dssDeploy.deployPit();
+        dssDeploy.deployDai();
+        dssDeploy.deployLiquidation(gov);
+    }
+
+    function testFailDeploy4() public {
+        dssDeploy.deployVat();
+        dssDeploy.deployPit();
+        dssDeploy.deployDai();
+        dssDeploy.deployTaxation(gov);
+        dssDeploy.deployMom(authority);
+    }
+
+    function testJoinCollateral() public {
+        deploy();
+        assertEq(vat.gem("ETH", bytes32(address(this))), 0);
+        ethJoin.join.value(1 ether)(bytes32(address(this)));
+        assertEq(vat.gem("ETH", bytes32(address(this))), mul(ONE, 1 ether));
+    }
+
+    function testExitCollateral() public {
+        deploy();
+        ethJoin.join.value(1 ether)(bytes32(address(this)));
+        ethJoin.exit(address(this), 1 ether);
+        assertEq(vat.gem("ETH", bytes32(address(this))), 0);
+    }
+
+    function testDrawDai() public {
+        deploy();
+        assertEq(dssDeploy.dai().balanceOf(address(this)), 0);
+        ethJoin.join.value(1 ether)(bytes32(address(this)));
+
+        pit.frob("ETH", 0.5 ether, 60 ether);
+        assertEq(vat.gem("ETH", bytes32(address(this))), mul(ONE, 0.5 ether));
+        assertEq(vat.dai(bytes32(address(this))), mul(ONE, 60 ether));
+
+        dssDeploy.daiJoin().exit(address(this), 60 ether);
+        assertEq(dssDeploy.dai().balanceOf(address(this)), 60 ether);
+        assertEq(vat.dai(bytes32(address(this))), 0);
+    }
+
+    function testDrawDaiLimit() public {
+        deploy();
+        ethJoin.join.value(1 ether)(bytes32(address(this)));
+        pit.frob("ETH", 0.5 ether, 100 ether); // 0.5 * 300 / 1.5 = 100 DAI max
+    }
+
+    function testFailDrawDaiLimit() public {
+        deploy();
+        ethJoin.join.value(1 ether)(bytes32(address(this)));
+        pit.frob("ETH", 0.5 ether, 100 ether + 1);
+    }
+
+    function testPaybackDai() public {
+        deploy();
+        ethJoin.join.value(1 ether)(bytes32(address(this)));
+        pit.frob("ETH", 0.5 ether, 60 ether);
+        dssDeploy.daiJoin().exit(address(this), 60 ether);
+        assertEq(dssDeploy.dai().balanceOf(address(this)), 60 ether);
+        dssDeploy.dai().approve(dssDeploy.daiJoin(), uint(-1));
+        dssDeploy.daiJoin().join(bytes32(address(this)), 60 ether);
+        assertEq(dssDeploy.dai().balanceOf(address(this)), 0);
+
+        assertEq(vat.dai(bytes32(address(this))), mul(ONE, 60 ether));
+        pit.frob("ETH", 0 ether, -60 ether);
+        assertEq(vat.dai(bytes32(address(this))), 0);
+    }
+
+    function testFailBite() public {
+        deploy();
+        ethJoin.join.value(1 ether)(bytes32(address(this)));
+        pit.frob("ETH", 0.5 ether, 100 ether); // Maximun DAI
+
+        cat.bite("ETH", bytes32(address(this)));
+    }
+
+    function testBite() public {
+        deploy();
+        ethJoin.join.value(0.5 ether)(bytes32(address(this)));
+        pit.frob("ETH", 0.5 ether, 100 ether); // Maximun DAI generated
+
+        pipETH.poke(300 * 10 ** 18 - 1); // Decrease price in 1 wei
+        ethPrice.poke();
+
+        (uint ink, uint art) = vat.urns("ETH", bytes32(address(this)));
+        assertEq(ink, 0.5 ether);
+        assertEq(art, 100 ether);
+        cat.bite("ETH", bytes32(address(this)));
+        (ink, art) = vat.urns("ETH", bytes32(address(this)));
+        assertEq(ink, 0);
+        assertEq(art, 0);
+    }
+
+    function testFlip() public {
+        deploy();
+        ethJoin.join.value(0.5 ether)(bytes32(address(this)));
+        pit.frob("ETH", 0.5 ether, 100 ether); // Maximun DAI generated
+        pipETH.poke(300 * 10 ** 18 - 1); // Decrease price in 1 wei
+        ethPrice.poke();
+        uint flipN = cat.bite("ETH", bytes32(address(this)));
+        cat.flip(flipN, 100 ether);
+    }
+
+    function() public payable {
     }
 }

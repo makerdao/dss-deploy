@@ -9,19 +9,50 @@ import {GemMove} from 'dss/move.sol';
 
 import "./DssDeploy.sol";
 
+import {WarpDrip} from "dss/drip.t.sol";
+import {WarpFlip} from "dss/flip.t.sol";
+import {WarpFlap} from "dss/flap.t.sol";
+import {WarpFlop} from "dss/flop.t.sol";
+
+contract WarpDripFab {
+    function newDrip(Vat vat) public returns (Drip drip) {
+        drip = new WarpDrip(vat);
+        drip.rely(msg.sender);
+    }
+}
+
+contract WarpFlipFab {
+    function newFlip(address dai, address gem) public returns (Flipper flop) {
+        flop = new WarpFlip(dai, gem);
+    }
+}
+
+contract WarpFlapFab {
+    function newFlap(address dai, address gov) public returns (Flapper flap) {
+        flap = new WarpFlap(dai, gov);
+    }
+}
+
+contract WarpFlopFab {
+    function newFlop(address dai, address gov) public returns (Flopper flop) {
+        flop = new WarpFlop(dai, gov);
+        flop.rely(msg.sender);
+    }
+}
+
 contract DssDeployTest is DSTest {
     VatFab vatFab;
     PitFab pitFab;
-    DripFab dripFab;
+    WarpDripFab dripFab;
     VowFab vowFab;
     CatFab catFab;
     TokenFab tokenFab;
     DaiJoinFab daiJoinFab;
     DaiMoveFab daiMoveFab;
-    FlapFab flapFab;
-    FlopFab flopFab;
+    WarpFlapFab flapFab;
+    WarpFlopFab flopFab;
     MomFab momFab;
-    FlipFab flipFab;
+    WarpFlipFab flipFab;
     SpotFab spotFab;
 
     DssDeploy dssDeploy;
@@ -42,6 +73,8 @@ contract DssDeployTest is DSTest {
     Cat cat;
     Spotter ethPrice;
 
+    Flipper ethFlip;
+
     // --- Math ---
     uint256 constant ONE = 10 ** 27;
 
@@ -52,21 +85,21 @@ contract DssDeployTest is DSTest {
     function setUp() public {
         vatFab = new VatFab();
         pitFab = new PitFab();
-        dripFab = new DripFab();
+        dripFab = new WarpDripFab();
         vowFab = new VowFab();
         catFab = new CatFab();
         tokenFab = new TokenFab();
         daiJoinFab = new DaiJoinFab();
         daiMoveFab = new DaiMoveFab();
-        flapFab = new FlapFab();
-        flopFab = new FlopFab();
+        flapFab = new WarpFlapFab();
+        flopFab = new WarpFlopFab();
         momFab = new MomFab();
 
-        flipFab = new FlipFab();
+        flipFab = new WarpFlipFab();
         spotFab = new SpotFab();
 
         uint startGas = gasleft();
-        dssDeploy = new DssDeploy(vatFab, pitFab, dripFab, vowFab, catFab, tokenFab, daiJoinFab, daiMoveFab, flapFab, flopFab, momFab, flipFab, spotFab);
+        dssDeploy = new DssDeploy(vatFab, pitFab, DripFab(dripFab), vowFab, catFab, tokenFab, daiJoinFab, daiMoveFab, FlapFab(flapFab), FlopFab(flopFab), momFab, FlipFab(flipFab), spotFab);
         uint endGas = gasleft();
         emit log_named_uint("Deploy DssDeploy", startGas - endGas);
 
@@ -105,7 +138,7 @@ contract DssDeployTest is DSTest {
         dssDeploy.mom().file(address(pit), bytes32("ETH"), bytes32("line"), uint(10000 ether));
 
         pipETH.poke(300 * 10 ** 18); // Price 300 DAI = 1 ETH (precision 18)
-        (,,, ethPrice) = dssDeploy.ilks("ETH");
+        (ethFlip,,, ethPrice) = dssDeploy.ilks("ETH");
         dssDeploy.mom().file(address(ethPrice), uint(1500000000 ether)); // Liquidation ratio 150%
         ethPrice.poke();
         (uint spot, ) = pit.ilks("ETH");
@@ -226,8 +259,10 @@ contract DssDeployTest is DSTest {
         pit.frob("ETH", 0.5 ether, 100 ether); // Maximun DAI generated
         pipETH.poke(300 * 10 ** 18 - 1); // Decrease price in 1 wei
         ethPrice.poke();
-        uint flipN = cat.bite("ETH", bytes32(address(this)));
-        cat.flip(flipN, 100 ether);
+        uint nflip = cat.bite("ETH", bytes32(address(this)));
+        assertEq(vat.gem("ETH", bytes32(address(ethFlip))), 0);
+        cat.flip(nflip, 100 ether);
+        assertEq(vat.gem("ETH", bytes32(address(ethFlip))), mul(0.5 ether, ONE));
     }
 
     function() public payable {

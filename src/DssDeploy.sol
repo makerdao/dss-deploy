@@ -225,6 +225,7 @@ contract DssDeploy is DSAuth {
         vat.rely(vow);
         vat.rely(drip);
         vat.rely(flap);
+        vat.rely(vow);
     }
 
     function deployLiquidation(address gov) public auth {
@@ -287,7 +288,8 @@ contract DssDeploy is DSAuth {
         cat.file(ilk, "lump", uint(10000 ether)); // 10000 DAI per batch
         cat.file(ilk, "chop", ONE);
         vat.init(ilk);
-        drip.file(ilk, bytes32(address(vow)), ONE);
+        drip.init(ilk);
+        drip.file("vow", bytes32(address(vow)));
 
         // Internal auth
         vat.rely(ilks[ilk].flip);

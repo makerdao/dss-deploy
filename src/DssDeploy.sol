@@ -48,8 +48,8 @@ contract VowFab {
 }
 
 contract CatFab {
-    function newCat(Vat vat, Pit pit, Vow vow) public returns (Cat cat) {
-        cat = new Cat(vat, pit, vow);
+    function newCat(Vat vat) public returns (Cat cat) {
+        cat = new Cat(vat);
         cat.rely(msg.sender);
     }
 }
@@ -233,7 +233,9 @@ contract DssDeploy is DSAuth {
         require(vow != address(0), "Missing VOW deployment");
 
         // Deploy
-        cat = catFab.newCat(vat, pit, vow);
+        cat = catFab.newCat(vat);
+        cat.file("vow", vow);
+        cat.file("pit", pit);
         flop = flopFab.newFlop(daiMove, gov);
 
         // Internal references set up

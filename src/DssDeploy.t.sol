@@ -40,6 +40,43 @@ contract WarpFlopFab {
     }
 }
 
+contract FakeUser {
+    function doApproval(DSToken token, address guy) public {
+        token.approve(guy);
+    }
+
+    function doDaiJoin(DaiJoin obj, bytes32 urn, uint wad) public {
+        obj.join(urn, wad);
+    }
+
+    function doEthJoin(ETHJoin obj, bytes32 addr, uint wad) public {
+        obj.join.value(wad)(addr);
+    }
+
+    function doFrob(Pit obj, bytes32 ilk, int dink, int dart) public {
+        obj.frob(ilk, dink, dart);
+    }
+
+    function doHope(DaiMove obj, address guy) public {
+        obj.hope(guy);
+    }
+
+    function doTend(Flipper obj, uint id, uint lot, uint bid) public {
+        obj.tend(id, lot, bid);
+    }
+
+    function doDent(Flipper obj, uint id, uint lot, uint bid) public {
+        obj.dent(id, lot, bid);
+    }
+
+    function doDeal(Flipper obj, uint id) public {
+        obj.deal(id);
+    }
+
+    function() public payable {
+    }
+}
+
 contract DssDeployTest is DSTest {
     VatFab vatFab;
     PitFab pitFab;
@@ -72,8 +109,14 @@ contract DssDeployTest is DSTest {
     Vow vow;
     Cat cat;
     Spotter ethPrice;
+    DSToken dai;
+    DaiJoin daiJoin;
+    DaiMove daiMove;
 
     Flipper ethFlip;
+
+    FakeUser user1;
+    FakeUser user2;
 
     // --- Math ---
     uint256 constant ONE = 10 ** 27;
@@ -108,6 +151,11 @@ contract DssDeployTest is DSTest {
         pipDGX = new DSValue();
         authority = new DSRoles();
         authority.setRootUser(this, true);
+
+        user1 = new FakeUser();
+        user2 = new FakeUser();
+        address(user1).transfer(100 ether);
+        address(user2).transfer(100 ether);
     }
 
     function deploy() public {
@@ -123,6 +171,9 @@ contract DssDeployTest is DSTest {
         drip = dssDeploy.drip();
         vow = dssDeploy.vow();
         cat = dssDeploy.cat();
+        dai = dssDeploy.dai();
+        daiJoin = dssDeploy.daiJoin();
+        daiMove = dssDeploy.daiMove();
 
         ethJoin = new ETHJoin(vat, "ETH");
         GemMove ethMove = new GemMove(vat, "ETH");
@@ -261,8 +312,30 @@ contract DssDeployTest is DSTest {
         ethPrice.poke();
         uint nflip = cat.bite("ETH", bytes32(address(this)));
         assertEq(vat.gem("ETH", bytes32(address(ethFlip))), 0);
-        cat.flip(nflip, 100 ether);
+        uint batchId = cat.flip(nflip, 100 ether);
         assertEq(vat.gem("ETH", bytes32(address(ethFlip))), mul(0.5 ether, ONE));
+        address(user1).transfer(10 ether);
+        user1.doEthJoin(ethJoin, bytes32(address(user1)), 10 ether);
+        user1.doFrob(pit, "ETH", 10 ether, 1000 ether);
+
+        address(user2).transfer(10 ether);
+        user2.doEthJoin(ethJoin, bytes32(address(user2)), 10 ether);
+        user2.doFrob(pit, "ETH", 10 ether, 1000 ether);
+
+        user1.doHope(daiMove, ethFlip);
+        user2.doHope(daiMove, ethFlip);
+
+        user1.doTend(ethFlip, batchId, 0.5 ether, 50 ether);
+        user2.doTend(ethFlip, batchId, 0.5 ether, 70 ether);
+        user1.doTend(ethFlip, batchId, 0.5 ether, 90 ether);
+        user2.doTend(ethFlip, batchId, 0.5 ether, 100 ether);
+
+        user1.doDent(ethFlip, batchId, 0.4 ether, 100 ether);
+        user2.doDent(ethFlip, batchId, 0.35 ether, 100 ether);
+        WarpFlip(ethFlip).warp(ethFlip.ttl() - 1);
+        user1.doDent(ethFlip, batchId, 0.3 ether, 100 ether);
+        WarpFlip(ethFlip).warp(ethFlip.era() + ethFlip.ttl() + 1);
+        user1.doDeal(ethFlip, batchId);
     }
 
     function() public payable {

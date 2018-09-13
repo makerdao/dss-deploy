@@ -84,6 +84,7 @@ contract DssDeployTest is DSTest {
     VowFab vowFab;
     CatFab catFab;
     TokenFab tokenFab;
+    GuardFab guardFab;
     DaiJoinFab daiJoinFab;
     DaiMoveFab daiMoveFab;
     WarpFlapFab flapFab;
@@ -132,6 +133,7 @@ contract DssDeployTest is DSTest {
         vowFab = new VowFab();
         catFab = new CatFab();
         tokenFab = new TokenFab();
+        guardFab = new GuardFab();
         daiJoinFab = new DaiJoinFab();
         daiMoveFab = new DaiMoveFab();
         flapFab = new WarpFlapFab();
@@ -142,7 +144,7 @@ contract DssDeployTest is DSTest {
         spotFab = new SpotFab();
 
         uint startGas = gasleft();
-        dssDeploy = new DssDeploy(vatFab, pitFab, DripFab(dripFab), vowFab, catFab, tokenFab, daiJoinFab, daiMoveFab, FlapFab(flapFab), FlopFab(flopFab), momFab, FlipFab(flipFab), spotFab);
+        dssDeploy = new DssDeploy(vatFab, pitFab, DripFab(dripFab), vowFab, catFab, tokenFab, guardFab, daiJoinFab, daiMoveFab, FlapFab(flapFab), FlopFab(flopFab), momFab, FlipFab(flipFab), spotFab);
         uint endGas = gasleft();
         emit log_named_uint("Deploy DssDeploy", startGas - endGas);
 

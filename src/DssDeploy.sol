@@ -4,7 +4,6 @@ import {DSToken} from "ds-token/token.sol";
 import {DSAuth, DSAuthority} from "ds-auth/auth.sol";
 import {DSGuard} from "ds-guard/guard.sol";
 
-
 import {Vat} from "dss/tune.sol";
 import {Pit} from "dss/frob.sol";
 import {Drip} from "dss/drip.sol";
@@ -61,6 +60,13 @@ contract TokenFab {
     }
 }
 
+contract GuardFab {
+    function newGuard() public returns (DSGuard guard) {
+        guard = new DSGuard();
+        guard.setOwner(msg.sender);
+    }
+}
+
 contract DaiJoinFab {
     function newDaiJoin(Vat vat, address dai) public returns (DaiJoin daiJoin) {
         daiJoin = new DaiJoin(vat, dai);
@@ -113,6 +119,7 @@ contract DssDeploy is DSAuth {
     VowFab     public vowFab;
     CatFab     public catFab;
     TokenFab   public tokenFab;
+    GuardFab   public guardFab;
     DaiJoinFab public daiJoinFab;
     DaiMoveFab public daiMoveFab;
     FlapFab    public flapFab;
@@ -127,6 +134,7 @@ contract DssDeploy is DSAuth {
     Vow     public vow;
     Cat     public cat;
     DSToken public dai;
+    DSGuard public guard;
     DaiJoin public daiJoin;
     DaiMove public daiMove;
     Flapper public flap;
@@ -153,6 +161,7 @@ contract DssDeploy is DSAuth {
         VowFab vowFab_,
         CatFab catFab_,
         TokenFab tokenFab_,
+        GuardFab guardFab_,
         DaiJoinFab daiJoinFab_,
         DaiMoveFab daiMoveFab_,
         FlapFab flapFab_,
@@ -167,6 +176,7 @@ contract DssDeploy is DSAuth {
         vowFab = vowFab_;
         catFab = catFab_;
         tokenFab = tokenFab_;
+        guardFab = guardFab_;
         daiJoinFab = daiJoinFab_;
         daiMoveFab = daiMoveFab_;
         flapFab = flapFab_;
@@ -195,10 +205,11 @@ contract DssDeploy is DSAuth {
         // Deploy
         dai     = tokenFab.newToken("DAI");
         daiJoin = daiJoinFab.newDaiJoin(vat, dai);
-        DSGuard guard = new DSGuard();
-        dai.setAuthority(guard);
+        guard = guardFab.newGuard();
         guard.permit(daiJoin, dai, bytes4(keccak256("mint(address,uint256)")));
         guard.permit(daiJoin, dai, bytes4(keccak256("burn(address,uint256)")));
+        dai.setAuthority(guard);
+        dai.setOwner(address(0));
         daiMove = daiMoveFab.newDaiMove(vat);
 
         // Internal auth
@@ -265,6 +276,8 @@ contract DssDeploy is DSAuth {
         mom.setOwner(0);
         this.setAuthority(authority);
         this.setOwner(0);
+        guard.setAuthority(authority);
+        guard.setOwner(msg.sender);
     }
 
     function deployCollateral(bytes32 ilk, address adapter, address mover, address pip) public auth {

@@ -1,12 +1,15 @@
 pragma solidity ^0.4.24;
 
-import "ds-auth/auth.sol";
+import {DSAuth}  from "ds-auth/auth.sol";
+import {DSGuard} from "ds-guard/guard.sol";
+import {DSToken} from "ds-token/token.sol";
 
 import {Cat} from "dss/bite.sol";
 import {Vat} from "dss/tune.sol";
 import {Vow} from "dss/heal.sol";
+import {DaiJoin} from "dss/join.sol";
 
-import {CatFab, VowFab, DssDeploy} from "./DssDeploy.sol";
+import {CatFab, VowFab, TokenFab, DaiJoinFab, DssDeploy} from "./DssDeploy.sol";
 import {DaiMom} from "./mom.sol";
 
 contract Patch00 is DSAuth {
@@ -71,5 +74,33 @@ contract Patch00 is DSAuth {
         deploy.rely(this);
         Vat vat = deploy.vat();
         vat.rely(vow);
+    }
+}
+
+contract Patch01 is DSAuth {
+    DssDeploy public deploy;
+    DSGuard   public guard;
+    DSToken   public dai;
+    DaiJoin   public daiJoin;
+
+    constructor(address deploy_) public {
+        deploy = DssDeploy(deploy_);
+    }
+
+    function apply() public auth {
+        Vat vat = deploy.vat();
+        dai     = TokenFab(deploy.tokenFab()).newToken("DAI");
+        daiJoin = DaiJoinFab(deploy.daiJoinFab()).newDaiJoin(vat, dai);
+
+        guard = new DSGuard();
+        guard.permit(daiJoin, dai, bytes4(keccak256("mint(address,uint256)")));
+        guard.permit(daiJoin, dai, bytes4(keccak256("burn(address,uint256)")));
+        guard.setAuthority(deploy.authority());
+        guard.setOwner(msg.sender);
+        dai.setAuthority(guard);
+        dai.setOwner(address(0));
+
+        deploy.rely(this);
+        vat.rely(daiJoin);
     }
 }

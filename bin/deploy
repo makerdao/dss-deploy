@@ -3,6 +3,7 @@ set -ex
 
 export ETH_GAS=${ETH_GAS:-"7000000"}
 export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
+export SOLC_FLAGS="--optimize"
 
 test -z "$SKIP_BUILD" && dapp build
 
@@ -13,7 +14,7 @@ test -z "$SKIP_BUILD" && dapp build
 test -z $MCD_GOV && MCD_GOV=$(dapp create DSToken $(seth --to-bytes32 $(seth --from-ascii "MKR")))
 
 # Create deploy contract
-MCD_DEPLOY=$(dapp create DssDeploy $VAT_FAB $PIT_FAB $DRIP_FAB $VOW_FAB $CAT_FAB $TOKEN_FAB $MCD_JOIN_FAB $MCD_MOVE_FAB $FLAP_FAB $FLOP_FAB $MOM_FAB $FLIP_FAB $SPOT_FAB)
+MCD_DEPLOY=$(dapp create DssDeploy $VAT_FAB $PIT_FAB $DRIP_FAB $VOW_FAB $CAT_FAB $TOKEN_FAB $GUARD_FAB $MCD_JOIN_FAB $MCD_MOVE_FAB $FLAP_FAB $FLOP_FAB $MOM_FAB $FLIP_FAB $SPOT_FAB)
 
 # If there is not Authorty defined, create one
 if [ -z $MCD_ADM ]
@@ -41,10 +42,6 @@ seth send $MCD_DEPLOY "deployLiquidation(address)" $MCD_GOV
 # Deploy mom
 seth send $MCD_DEPLOY "deployMom(address)" $MCD_ADM
 
-# Get Vat address
-MCD_VAT=0x$(seth call $MCD_DEPLOY "vat()(address)")
-
-
 cat > load-mcd-$(seth chain) << EOF
 #!/bin/bash
 
@@ -53,7 +50,7 @@ cat > load-mcd-$(seth chain) << EOF
 
 export MCD_DEPLOY=$MCD_DEPLOY
 export MCD_GOV=$MCD_GOV
-export MCD_VAT=$MCD_VAT
+export MCD_VAT=0x$(seth call $MCD_DEPLOY "vat()(address)")
 export MCD_PIT=0x$(seth call $MCD_DEPLOY "pit()(address)")
 export MCD_DRIP=0x$(seth call $MCD_DEPLOY "drip()(address)")
 export MCD_CAT=0x$(seth call $MCD_DEPLOY "cat()(address)")
@@ -64,4 +61,6 @@ export MCD_MOVE_MCD=0x$(seth call $MCD_DEPLOY "daiMove()(address)")
 export MCD_FLAP=0x$(seth call $MCD_DEPLOY "flap()(address)")
 export MCD_FLOP=0x$(seth call $MCD_DEPLOY "flop()(address)")
 export MCD_MOM=0x$(seth call $MCD_DEPLOY "mom()(address)")
+export MCD_DAI=0x$(seth call $MCD_DEPLOY "dai()(address)")
+export MCD_DAI_GUARD=0x$(seth call $MCD_DEPLOY "guard()(address)")
 EOF

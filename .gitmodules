@@ -3,19 +3,19 @@
 	url = https://github.com/dapphub/ds-test
 [submodule "lib/dss"]
 	path = lib/dss
-	url = git@github.com:makerdao/dss.git
+	url = https://github.com/makerdao/dss.git
 [submodule "lib/ds-token"]
 	path = lib/ds-token
-	url = git@github.com:dapphub/ds-token.git
+	url = https://github.com/dapphub/ds-token.git
 [submodule "lib/ds-value"]
 	path = lib/ds-value
-	url = git@github.com:dapphub/ds-value.git
+	url = https://github.com/dapphub/ds-value.git
 [submodule "lib/ds-auth"]
 	path = lib/ds-auth
-	url = git@github.com:dapphub/ds-auth.git
+	url = https://github.com/dapphub/ds-auth.git
 [submodule "lib/ds-roles"]
 	path = lib/ds-roles
-	url = git@github.com:dapphub/ds-roles.git
+	url = https://github.com/dapphub/ds-roles.git
 [submodule "lib/ds-guard"]
 	path = lib/ds-guard
 	url = https://github.com/dapphub/ds-guard

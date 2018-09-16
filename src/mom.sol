@@ -8,6 +8,7 @@ contract Setter {
     function file(uint) public;
     function file(bytes32, uint) public;
     function file(bytes32, bytes32, uint) public;
+    function file(bytes32, bytes32, address) public;
 }
 
 contract DaiMom is DSAuth {
@@ -29,5 +30,9 @@ contract DaiMom is DSAuth {
 
     function file(address who, bytes32 ilk, bytes32 what, uint val) public auth {
         Setter(who).file(ilk, what, val);
+    }
+
+    function file(address who, bytes32 ilk, bytes32 what, address addr) public auth {
+        Setter(who).file(ilk, what, addr);
     }
 }

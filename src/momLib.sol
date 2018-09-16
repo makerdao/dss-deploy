@@ -8,6 +8,8 @@ contract Setter {
     function file(bytes32, bytes32) public;
     function file(bytes32, bytes32, uint) public;
     function file(bytes32, bytes32, address) public;
+    function rely(address) public;
+    function deny(address) public;
 }
 
 contract MomLib {
@@ -37,5 +39,13 @@ contract MomLib {
 
     function file(address who, bytes32 ilk, bytes32 what, address data) public {
         Setter(who).file(ilk, what, data);
+    }
+
+    function rely(address who, address to) public {
+        Setter(who).rely(to);
+    }
+
+    function deny(address who, address to) public {
+        Setter(who).deny(to);
     }
 }

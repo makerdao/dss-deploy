@@ -3,6 +3,7 @@ pragma solidity ^0.4.24;
 import {DSTest} from "ds-test/test.sol";
 import {DSValue} from "ds-value/value.sol";
 import {DSRoles} from "ds-roles/roles.sol";
+import {DSProxy} from "ds-proxy/proxy.sol";
 
 import {GemJoin, ETHJoin} from "dss/join.sol";
 import {GemMove} from 'dss/move.sol';

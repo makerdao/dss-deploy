@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -ex
 
+export ETH_GAS=${ETH_GAS:-"2000000"}
+
 # dependencies
 (test -z $MCD_PIT) && exit 1
 (test -z $PIP_ETH) && exit 1

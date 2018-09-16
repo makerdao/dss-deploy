@@ -3,6 +3,7 @@ pragma solidity ^0.4.24;
 import {DSToken} from "ds-token/token.sol";
 import {DSAuth, DSAuthority} from "ds-auth/auth.sol";
 import {DSGuard} from "ds-guard/guard.sol";
+import {DSProxy, DSProxyCache} from "ds-proxy/proxy.sol";
 
 import {Vat} from "dss/tune.sol";
 import {Pit} from "dss/frob.sol";
@@ -16,7 +17,6 @@ import {Flopper} from "dss/flop.sol";
 import {Flipper} from "dss/flip.sol";
 
 import {Spotter} from "./poke.sol";
-import {DaiMom} from "./mom.sol";
 
 contract VatFab {
     function newVat() public returns (Vat vat) {
@@ -105,10 +105,10 @@ contract SpotFab {
     }
 }
 
-contract MomFab {
-    function newMom() public returns (DaiMom mom) {
-        mom = new DaiMom();
-        mom.setOwner(msg.sender);
+contract ProxyFab {
+    function newProxy() public returns (DSProxy proxy) {
+        proxy = new DSProxy(new DSProxyCache());
+        proxy.setOwner(msg.sender);
     }
 }
 
@@ -124,9 +124,9 @@ contract DssDeploy is DSAuth {
     DaiMoveFab public daiMoveFab;
     FlapFab    public flapFab;
     FlopFab    public flopFab;
-    MomFab     public momFab;
     FlipFab    public flipFab;
     SpotFab    public spotFab;
+    ProxyFab   public proxyFab;
 
     Vat     public vat;
     Pit     public pit;
@@ -139,7 +139,7 @@ contract DssDeploy is DSAuth {
     DaiMove public daiMove;
     Flapper public flap;
     Flopper public flop;
-    DaiMom  public mom;
+    DSProxy public mom;
 
     mapping(bytes32 => Ilk) public ilks;
 
@@ -166,9 +166,9 @@ contract DssDeploy is DSAuth {
         DaiMoveFab daiMoveFab_,
         FlapFab flapFab_,
         FlopFab flopFab_,
-        MomFab momFab_,
         FlipFab flipFab_,
-        SpotFab spotFab_
+        SpotFab spotFab_,
+        ProxyFab proxyFab_
     ) public {
         vatFab = vatFab_;
         pitFab = pitFab_;
@@ -181,9 +181,9 @@ contract DssDeploy is DSAuth {
         daiMoveFab = daiMoveFab_;
         flapFab = flapFab_;
         flopFab = flopFab_;
-        momFab = momFab_;
         flipFab = flipFab_;
         spotFab = spotFab_;
+        proxyFab = proxyFab_;
     }
 
     function deployVat() public auth {
@@ -267,7 +267,7 @@ contract DssDeploy is DSAuth {
         require(cat != address(0), "Missing CAT deployment");
 
         // Auth
-        mom = momFab.newMom();
+        mom = proxyFab.newProxy();
         pit.rely(mom);
         cat.rely(mom);
         vow.rely(mom);

@@ -21,9 +21,9 @@ MCD_JOIN_FABtx=$(ETH_NONCE=$((ETH_NONCE + 7)) dapp create DaiJoinFab)
 MCD_MOVE_FABtx=$(ETH_NONCE=$((ETH_NONCE + 8)) dapp create DaiMoveFab)
 FLAP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 9)) dapp create FlapFab)
 FLOP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 10)) dapp create FlopFab)
-MOM_FABtx=$(ETH_NONCE=$((ETH_NONCE + 11)) dapp create MomFab)
-FLIP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 12)) dapp create FlipFab)
-SPOT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 13)) dapp create SpotFab)
+FLIP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 11)) dapp create FlipFab)
+SPOT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 12)) dapp create SpotFab)
+PROXY_FABtx=$(ETH_NONCE=$((ETH_NONCE + 13)) dapp create ProxyFab)
 
 export SETH_ASYNC=no
 
@@ -38,9 +38,9 @@ MCD_JOIN_FAB=$(seth receipt $MCD_JOIN_FABtx contractAddress)
 MCD_MOVE_FAB=$(seth receipt $MCD_MOVE_FABtx contractAddress)
 FLAP_FAB=$(seth receipt $FLAP_FABtx contractAddress)
 FLOP_FAB=$(seth receipt $FLOP_FABtx contractAddress)
-MOM_FAB=$(seth receipt $MOM_FABtx contractAddress)
 FLIP_FAB=$(seth receipt $FLIP_FABtx contractAddress)
 SPOT_FAB=$(seth receipt $SPOT_FABtx contractAddress)
+PROXY_FAB=$(seth receipt $PROXY_FABtx contractAddress)
 
 cat > load-fab-$(seth chain) << EOF
 #!/bin/bash
@@ -59,7 +59,7 @@ export MCD_JOIN_FAB=$MCD_JOIN_FAB
 export MCD_MOVE_FAB=$MCD_MOVE_FAB
 export FLAP_FAB=$FLAP_FAB
 export FLOP_FAB=$FLOP_FAB
-export MOM_FAB=$MOM_FAB
 export FLIP_FAB=$FLIP_FAB
 export SPOT_FAB=$SPOT_FAB
+export PROXY_FAB=$PROXY_FAB
 EOF

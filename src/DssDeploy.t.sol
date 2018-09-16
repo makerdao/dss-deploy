@@ -14,6 +14,8 @@ import {WarpFlip} from "dss/flip.t.sol";
 import {WarpFlap} from "dss/flap.t.sol";
 import {WarpFlop} from "dss/flop.t.sol";
 
+import {MomLib} from "./momLib.sol";
+
 contract WarpDripFab {
     function newDrip(Vat vat) public returns (Drip drip) {
         drip = new WarpDrip(vat);
@@ -89,9 +91,9 @@ contract DssDeployTest is DSTest {
     DaiMoveFab daiMoveFab;
     WarpFlapFab flapFab;
     WarpFlopFab flopFab;
-    MomFab momFab;
     WarpFlipFab flipFab;
     SpotFab spotFab;
+    ProxyFab proxyFab;
 
     DssDeploy dssDeploy;
 
@@ -119,6 +121,8 @@ contract DssDeployTest is DSTest {
     FakeUser user1;
     FakeUser user2;
 
+    MomLib momLib;
+
     // --- Math ---
     uint256 constant ONE = 10 ** 27;
 
@@ -138,13 +142,28 @@ contract DssDeployTest is DSTest {
         daiMoveFab = new DaiMoveFab();
         flapFab = new WarpFlapFab();
         flopFab = new WarpFlopFab();
-        momFab = new MomFab();
+        proxyFab = new ProxyFab();
 
         flipFab = new WarpFlipFab();
         spotFab = new SpotFab();
 
         uint startGas = gasleft();
-        dssDeploy = new DssDeploy(vatFab, pitFab, DripFab(dripFab), vowFab, catFab, tokenFab, guardFab, daiJoinFab, daiMoveFab, FlapFab(flapFab), FlopFab(flopFab), momFab, FlipFab(flipFab), spotFab);
+        dssDeploy = new DssDeploy(
+            vatFab,
+            pitFab,
+            DripFab(dripFab),
+            vowFab,
+            catFab,
+            tokenFab,
+            guardFab,
+            daiJoinFab,
+            daiMoveFab,
+            FlapFab(flapFab),
+            FlopFab(flopFab),
+            FlipFab(flipFab),
+            spotFab,
+            proxyFab
+        );
         uint endGas = gasleft();
         emit log_named_uint("Deploy DssDeploy", startGas - endGas);
 
@@ -158,6 +177,21 @@ contract DssDeployTest is DSTest {
         user2 = new FakeUser();
         address(user1).transfer(100 ether);
         address(user2).transfer(100 ether);
+    }
+
+    function file(address who, uint data) external {
+        who;data;
+        dssDeploy.mom().execute(momLib, msg.data);
+    }
+
+    function file(address who, bytes32 what, uint data) external {
+        who;what;data;
+        dssDeploy.mom().execute(momLib, msg.data);
+    }
+
+    function file(address who, bytes32 ilk, bytes32 what, uint data) external {
+        who;ilk;what;data;
+        dssDeploy.mom().execute(momLib, msg.data);
     }
 
     function deploy() public {
@@ -187,12 +221,13 @@ contract DssDeployTest is DSTest {
         dssDeploy.deployCollateral("DGX", dgxJoin, dgxMove, pipDGX);
 
         // Set Params
-        dssDeploy.mom().file(address(pit), bytes32("Line"), uint(10000 ether));
-        dssDeploy.mom().file(address(pit), bytes32("ETH"), bytes32("line"), uint(10000 ether));
+        momLib = new MomLib();
+        this.file(address(pit), bytes32("Line"), uint(10000 ether));
+        this.file(address(pit), bytes32("ETH"), bytes32("line"), uint(10000 ether));
 
         pipETH.poke(300 * 10 ** 18); // Price 300 DAI = 1 ETH (precision 18)
         (ethFlip,,, ethPrice) = dssDeploy.ilks("ETH");
-        dssDeploy.mom().file(address(ethPrice), uint(1500000000 ether)); // Liquidation ratio 150%
+        this.file(address(ethPrice), uint(1500000000 ether)); // Liquidation ratio 150%
         ethPrice.poke();
         (uint spot, ) = pit.ilks("ETH");
         assertEq(spot, 300 * ONE * ONE / 1500000000 ether);

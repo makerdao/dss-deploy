@@ -7,7 +7,7 @@ import {Spotter} from "./poke.sol";
 import {SpotFab} from "./DssDeploy.sol";
 
 contract Patch04 {
-    Spotter spotter;
+    Spotter public spotter;
 
     function upgrade_eth_spotter(SpotFab spotFab, Pit pit, address pip, address mom) public {
         spotter = spotFab.newSpotter(pit, bytes32("ETH"));

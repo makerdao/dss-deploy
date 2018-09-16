@@ -1,40 +1,20 @@
 pragma solidity ^0.4.24;
 
-import {Vat} from "dss/tune.sol";
-import {Cat} from "dss/bite.sol";
-import {Vow} from "dss/heal.sol";
+import {Pit} from "dss/frob.sol";
 
-import {CatFab, VowFab} from "./DssDeploy.sol";
+import {Spotter} from "./poke.sol";
 
-contract Patch03 {
-    Cat public cat;
-    Vow public vow;
+import {SpotFab} from "./DssDeploy.sol";
 
-    function upgrade_vow(VowFab fab, address vat, address flap, address flop, address mom) public {
-        vow = fab.newVow();
+contract Patch04 {
+    Spotter spotter;
 
-        vow.file("vat",  vat);
-        vow.file("flap", flap);
-        vow.file("flop", flop);
-
-        vow.file("bump", uint(10000 ether));
-        vow.file("sump", uint(10000 ether));
-
-        vow.rely(mom);
-    }
-    function upgrade_cat(CatFab fab, address vat, address pit, address flip, address mom) public {
-        require(address(vow) != address(0));
-
-        cat = fab.newCat(Vat(vat));
-
-        cat.file("vow", vow);
-        cat.file("pit", pit);
-
-        cat.file("ETH", "flip", flip);
-        cat.file("ETH", "chop", uint(1.1E27));
-        cat.file("ETH", "lump", uint(10000 ether));
-
-        vow.rely(cat);
-        cat.rely(mom);
+    function upgrade_eth_spotter(SpotFab spotFab, Pit pit, address pip, address mom) public {
+        spotter = spotFab.newSpotter(pit, bytes32("ETH"));
+        spotter.file(address(pip)); // Set pip
+        spotter.file(uint(1.5 * 10 ** 27)); // Set mat
+        pit.rely(spotter);
+        spotter.rely(mom);
+        spotter.poke();
     }
 }

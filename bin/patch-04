@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -ex
+
+# dependencies
+(test -z $MCD_PIT) && exit 1
+(test -z $PIP_ETH) && exit 1
+(test -z $MCD_MOM) && exit 1
+
+patch=$(dapp create Patch04)
+SPOT_FAB=$(dapp create SpotFab)
+
+MOM_LIB=$(dapp create MomLib)
+
+# Rely Patch in Pit
+seth send $MCD_MOM 'execute(address,bytes)' $MOM_LIB $(seth sig 'rely(address,address)')$(seth --to-word $MCD_PIT)$(seth --to-word $patch)
+
+seth send $patch 'upgrade_eth_spotter(address,address,address,address)' $SPOT_FAB $MCD_PIT $PIP_ETH $MCD_MOM
+
+# Deny Patch in Pit
+seth send $MCD_MOM 'execute(address,bytes)' $MOM_LIB $(seth sig 'deny(address,address)')$(seth --to-word $MCD_PIT)$(seth --to-word $patch)
+
+MCD_SPOT_ETH=0x$(seth call $patch 'spotter()(address)')
+
+cat > load-mcd-$(seth chain) << EOF
+#!/bin/bash
+
+# mcd patch on $(seth chain) from $(git rev-parse HEAD)
+# $(date)
+export MCD_SPOT_ETH=$MCD_SPOT_ETH
+EOF

@@ -17,11 +17,12 @@ import {DripFab} from "./DssDeploy.sol";
 contract Patch05 is DSAuth {
     Drip public drip;
 
-    function upgrade_drip(DripFab fab, Vat vat, address vow, Pit pit) public auth {
+    function upgrade_drip(DripFab fab, Vat vat, address vow, Pit pit, address mom) public auth {
         drip = fab.newDrip(vat);
 
         drip.init("ETH");
         drip.file("vow", bytes32(vow));
+        drip.rely(mom);
 
         pit.file("drip", drip);
         vat.rely(drip);

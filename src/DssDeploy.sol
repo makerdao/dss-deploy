@@ -231,6 +231,7 @@ contract DssDeploy is DSAuth {
         pit.file("drip", drip);
         vow.file("vat", vat);
         vow.file("flap", flap);
+        drip.file("vow", bytes32(address(vow)));
 
         // Internal auth
         vat.rely(vow);
@@ -302,7 +303,6 @@ contract DssDeploy is DSAuth {
         cat.file(ilk, "chop", ONE);
         vat.init(ilk);
         drip.init(ilk);
-        drip.file("vow", bytes32(address(vow)));
 
         // Internal auth
         vat.rely(ilks[ilk].flip);

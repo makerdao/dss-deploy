@@ -2,6 +2,7 @@
 set -ex
 
 # dependencies
+(test -z $MCD_DEPLOY) && exit 1
 (test -z $MCD_VAT) && exit 1
 (test -z $MCD_VOW) && exit 1
 (test -z $MCD_PIT) && exit 1

@@ -1,55 +1,22 @@
 #!/usr/bin/env bash
 set -ex
 
-export ETH_GAS=${ETH_GAS:-"4000000"}
-
 # dependencies
-(test -z $REP) && exit 1
-(test -z $PIP_REP) && exit 1
-
 (test -z $MCD_VAT) && exit 1
-(test -z $MCD_CAT) && exit 1
+(test -z $MCD_VOW) && exit 1
 (test -z $MCD_PIT) && exit 1
-(test -z $MCD_MOVE_DAI) && exit 1
-
-(test -z $MCD_MOM) && exit 1
 
 patch=$(dapp create Patch05)
+MCD_DRIP_FAB=$(dapp create DripFab)
 
-SPOT_FAB=$(dapp create SpotFab)
-FLIP_FAB=$(dapp create FlipFab)
-
-MOM_LIB=$(dapp create MomLib)
-
-MCD_MOVE_REP=$(dapp create GemMove $MCD_VAT $(seth --to-bytes32 $(seth --from-ascii "REP")))
-MCD_JOIN_REP=$(dapp create GemJoin $MCD_VAT $(seth --to-bytes32 $(seth --from-ascii "REP")) $REP)
-
-# Rely Patch in Vat, Cat, Drip and Pit
-seth send $MCD_MOM 'execute(address,bytes)' $MOM_LIB $(seth sig 'rely(address,address)')$(seth --to-word $MCD_VAT)$(seth --to-word $patch)
-seth send $MCD_MOM 'execute(address,bytes)' $MOM_LIB $(seth sig 'rely(address,address)')$(seth --to-word $MCD_CAT)$(seth --to-word $patch)
-seth send $MCD_MOM 'execute(address,bytes)' $MOM_LIB $(seth sig 'rely(address,address)')$(seth --to-word $MCD_DRIP)$(seth --to-word $patch)
-seth send $MCD_MOM 'execute(address,bytes)' $MOM_LIB $(seth sig 'rely(address,address)')$(seth --to-word $MCD_PIT)$(seth --to-word $patch)
-
-seth send $patch 'add_rep_collateral(address,address,address,address,address,address,address,address,address,address,address)' $FLIP_FAB $SPOT_FAB $MCD_VAT $MCD_CAT $MCD_PIT $MCD_MOVE_DAI $MCD_MOVE_REP $MCD_JOIN_REP $PIP_REP $MCD_MOM
-
-# Rely Patch in Vat, Cat, Drip and Pit
-seth send $MCD_MOM 'execute(address,bytes)' $MOM_LIB $(seth sig 'deny(address,address)')$(seth --to-word $MCD_VAT)$(seth --to-word $patch)
-seth send $MCD_MOM 'execute(address,bytes)' $MOM_LIB $(seth sig 'deny(address,address)')$(seth --to-word $MCD_CAT)$(seth --to-word $patch)
-seth send $MCD_MOM 'execute(address,bytes)' $MOM_LIB $(seth sig 'deny(address,address)')$(seth --to-word $MCD_DRIP)$(seth --to-word $patch)
-seth send $MCD_MOM 'execute(address,bytes)' $MOM_LIB $(seth sig 'deny(address,address)')$(seth --to-word $MCD_PIT)$(seth --to-word $patch)
-
-MCD_FLIP_REP=0x$(seth call $patch 'flip()(address)')
-MCD_SPOT_REP=0x$(seth call $patch 'spotter()(address)')
+seth send $MCD_DEPLOY 'rely(address)' $patch
+seth send $patch 'upgrade_drip(address,address,address,address)' $MCD_DRIP_FAB $MCD_VAT $MCD_VOW $MCD_PIT
+MCD_DRIP=0x$(seth call $patch 'drip()(address)')
 
 cat > load-mcd-$(seth chain) << EOF
 #!/bin/bash
 
 # mcd patch on $(seth chain) from $(git rev-parse HEAD)
 # $(date)
-export REP=$REP
-export PIP_REP=$PIP_REP
-export MCD_JOIN_REP=$MCD_JOIN_REP
-export MCD_MOVE_REP=$MCD_MOVE_REP
-export MCD_FLIP_REP=$MCD_FLIP_REP
-export MCD_SPOT_REP=$MCD_SPOT_REP
+export MCD_DRIP=$MCD_DRIP
 EOF

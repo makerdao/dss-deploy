@@ -1,15 +1,34 @@
 pragma solidity ^0.4.24;
 
+import {DSAuth} from "ds-auth/auth.sol";
+
 import {Vat} from "dss/tune.sol";
 import {Cat} from "dss/bite.sol";
 import {Pit} from "dss/frob.sol";
+import {Drip} from "dss/drip.sol";
 import {Flipper} from "dss/flip.sol";
 
 import {Spotter} from "./poke.sol";
 
 import {FlipFab, SpotFab} from "./DssDeploy.sol";
+import {DripFab} from "./DssDeploy.sol";
 
-contract Patch05 {
+
+contract Patch05 is DSAuth {
+    Drip public drip;
+
+    function upgrade_drip(DripFab fab, Vat vat, address vow, Pit pit) public auth {
+        drip = fab.newDrip(vat);
+
+        drip.init("ETH");
+        drip.file("vow", bytes32(vow));
+
+        pit.file("drip", drip);
+        vat.rely(drip);
+    }
+}
+
+contract Patch06 {
     Spotter public spotter;
     Flipper public flip;
 
@@ -49,3 +68,4 @@ contract Patch05 {
         spotter.poke();
     }
 }
+

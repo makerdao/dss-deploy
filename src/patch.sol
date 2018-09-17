@@ -2,7 +2,6 @@ pragma solidity ^0.4.24;
 
 import {Vat} from "dss/tune.sol";
 import {Cat} from "dss/bite.sol";
-import {Drip} from "dss/drip.sol";
 import {Pit} from "dss/frob.sol";
 import {Flipper} from "dss/flip.sol";
 
@@ -19,7 +18,6 @@ contract Patch05 {
         SpotFab spotFab,
         Vat vat,
         Cat cat,
-        Drip drip,
         Pit pit,
         address daiMove,
         address mover,

@@ -9,7 +9,6 @@ export ETH_GAS=${ETH_GAS:-"4000000"}
 
 (test -z $MCD_VAT) && exit 1
 (test -z $MCD_CAT) && exit 1
-(test -z $MCD_DRIP) && exit 1
 (test -z $MCD_PIT) && exit 1
 (test -z $MCD_MOVE_DAI) && exit 1
 
@@ -31,7 +30,7 @@ seth send $MCD_MOM 'execute(address,bytes)' $MOM_LIB $(seth sig 'rely(address,ad
 seth send $MCD_MOM 'execute(address,bytes)' $MOM_LIB $(seth sig 'rely(address,address)')$(seth --to-word $MCD_DRIP)$(seth --to-word $patch)
 seth send $MCD_MOM 'execute(address,bytes)' $MOM_LIB $(seth sig 'rely(address,address)')$(seth --to-word $MCD_PIT)$(seth --to-word $patch)
 
-seth send $patch 'add_rep_collateral(address,address,address,address,address,address,address,address,address,address,address)' $FLIP_FAB $SPOT_FAB $MCD_VAT $MCD_CAT $MCD_DRIP $MCD_PIT $MCD_MOVE_DAI $MCD_MOVE_REP $MCD_JOIN_REP $PIP_REP $MCD_MOM
+seth send $patch 'add_rep_collateral(address,address,address,address,address,address,address,address,address,address,address)' $FLIP_FAB $SPOT_FAB $MCD_VAT $MCD_CAT $MCD_PIT $MCD_MOVE_DAI $MCD_MOVE_REP $MCD_JOIN_REP $PIP_REP $MCD_MOM
 
 # Rely Patch in Vat, Cat, Drip and Pit
 seth send $MCD_MOM 'execute(address,bytes)' $MOM_LIB $(seth sig 'deny(address,address)')$(seth --to-word $MCD_VAT)$(seth --to-word $patch)

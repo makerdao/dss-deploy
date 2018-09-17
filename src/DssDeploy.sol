@@ -269,6 +269,7 @@ contract DssDeploy is DSAuth {
 
         // Auth
         mom = proxyFab.newProxy();
+        vat.rely(mom);
         pit.rely(mom);
         cat.rely(mom);
         vow.rely(mom);

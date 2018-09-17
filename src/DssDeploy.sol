@@ -237,7 +237,6 @@ contract DssDeploy is DSAuth {
         vat.rely(vow);
         vat.rely(drip);
         vat.rely(flap);
-        vat.rely(vow);
     }
 
     function deployLiquidation(address gov) public auth {

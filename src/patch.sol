@@ -28,7 +28,7 @@ contract Patch05 is DSAuth {
     }
 }
 
-contract Patch06 {
+contract Patch06 is DSAuth {
     Spotter public spotter;
     Flipper public flip;
 
@@ -38,12 +38,13 @@ contract Patch06 {
         Vat vat,
         Cat cat,
         Pit pit,
+        Drip drip,
         address daiMove,
         address mover,
         address adapter,
         address pip,
         address mom
-    ) public {
+    ) public auth {
         // Deploy
         flip = flipFab.newFlip(daiMove, mover);
         spotter = spotFab.newSpotter(pit, "REP");
@@ -55,7 +56,7 @@ contract Patch06 {
         cat.file("REP", "lump", uint(10000 ether)); // 10000 DAI per batch
         cat.file("REP", "chop", uint(10 ** 27));
         pit.file("REP", "line", uint(2000000 ether)); // Set debt ceiling
-        // vat.init("REP");
+        drip.init("REP");
 
         // Internal auth
         vat.rely(flip);

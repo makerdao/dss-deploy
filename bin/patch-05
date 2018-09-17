@@ -6,12 +6,13 @@ set -ex
 (test -z $MCD_VAT) && exit 1
 (test -z $MCD_VOW) && exit 1
 (test -z $MCD_PIT) && exit 1
+(test -z $MCD_MOM) && exit 1
 
 patch=$(dapp create Patch05)
 MCD_DRIP_FAB=$(dapp create DripFab)
 
 seth send $MCD_DEPLOY 'rely(address)' $patch
-seth send $patch 'upgrade_drip(address,address,address,address)' $MCD_DRIP_FAB $MCD_VAT $MCD_VOW $MCD_PIT
+seth send $patch 'upgrade_drip(address,address,address,address,address)' $MCD_DRIP_FAB $MCD_VAT $MCD_VOW $MCD_PIT $MCD_MOM
 MCD_DRIP=0x$(seth call $patch 'drip()(address)')
 
 cat > load-mcd-$(seth chain) << EOF

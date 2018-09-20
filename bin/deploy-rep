@@ -25,6 +25,7 @@ cat > load-ilk-rep-$(seth chain) << EOF
 # ilk deployment on $(seth chain) from $(git rev-parse HEAD)
 # $(date)
 export PIP_REP=$PIP_REP
+export REP=$REP
 export MCD_JOIN_REP=$MCD_JOIN_REP
 export MCD_MOVE_REP=$MCD_MOVE_REP
 export MCD_FLIP_REP=$MCD_FLIP_REP

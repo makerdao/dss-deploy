@@ -228,7 +228,6 @@ contract DssDeploy is DSAuth {
         flap = flapFab.newFlap(daiMove, gov);
 
         // Internal references set up
-        pit.file("drip", drip);
         vow.file("vat", vat);
         vow.file("flap", flap);
         drip.file("vow", bytes32(address(vow)));

@@ -9,37 +9,10 @@ import {GemMove} from 'dss/move.sol';
 
 import "./DssDeploy.sol";
 
-import {WarpDrip} from "dss/drip.t.sol";
-import {WarpFlip} from "dss/flip.t.sol";
-import {WarpFlap} from "dss/flap.t.sol";
-import {WarpFlop} from "dss/flop.t.sol";
-
 import {MomLib} from "./momLib.sol";
 
-contract WarpDripFab {
-    function newDrip(Vat vat) public returns (Drip drip) {
-        drip = new WarpDrip(vat);
-        drip.rely(msg.sender);
-    }
-}
-
-contract WarpFlipFab {
-    function newFlip(address dai, address gem) public returns (Flipper flop) {
-        flop = new WarpFlip(dai, gem);
-    }
-}
-
-contract WarpFlapFab {
-    function newFlap(address dai, address gov) public returns (Flapper flap) {
-        flap = new WarpFlap(dai, gov);
-    }
-}
-
-contract WarpFlopFab {
-    function newFlop(address dai, address gov) public returns (Flopper flop) {
-        flop = new WarpFlop(dai, gov);
-        flop.rely(msg.sender);
-    }
+contract Hevm {
+    function warp(uint256) public;
 }
 
 contract FakeUser {
@@ -80,18 +53,20 @@ contract FakeUser {
 }
 
 contract DssDeployTest is DSTest {
+    Hevm hevm;
+
     VatFab vatFab;
     PitFab pitFab;
-    WarpDripFab dripFab;
+    DripFab dripFab;
     VowFab vowFab;
     CatFab catFab;
     TokenFab tokenFab;
     GuardFab guardFab;
     DaiJoinFab daiJoinFab;
     DaiMoveFab daiMoveFab;
-    WarpFlapFab flapFab;
-    WarpFlopFab flopFab;
-    WarpFlipFab flipFab;
+    FlapFab flapFab;
+    FlopFab flopFab;
+    FlipFab flipFab;
     SpotFab spotFab;
     ProxyFab proxyFab;
 
@@ -133,18 +108,18 @@ contract DssDeployTest is DSTest {
     function setUp() public {
         vatFab = new VatFab();
         pitFab = new PitFab();
-        dripFab = new WarpDripFab();
+        dripFab = new DripFab();
         vowFab = new VowFab();
         catFab = new CatFab();
         tokenFab = new TokenFab();
         guardFab = new GuardFab();
         daiJoinFab = new DaiJoinFab();
         daiMoveFab = new DaiMoveFab();
-        flapFab = new WarpFlapFab();
-        flopFab = new WarpFlopFab();
+        flapFab = new FlapFab();
+        flopFab = new FlopFab();
         proxyFab = new ProxyFab();
 
-        flipFab = new WarpFlipFab();
+        flipFab = new FlipFab();
         spotFab = new SpotFab();
 
         uint startGas = gasleft();
@@ -177,6 +152,9 @@ contract DssDeployTest is DSTest {
         user2 = new FakeUser();
         address(user1).transfer(100 ether);
         address(user2).transfer(100 ether);
+
+        hevm = Hevm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
+        hevm.warp(0);
     }
 
     function file(address who, uint data) external {
@@ -369,9 +347,9 @@ contract DssDeployTest is DSTest {
 
         user1.doDent(ethFlip, batchId, 0.4 ether, 100 ether);
         user2.doDent(ethFlip, batchId, 0.35 ether, 100 ether);
-        WarpFlip(ethFlip).warp(ethFlip.ttl() - 1);
+        hevm.warp(ethFlip.ttl() - 1);
         user1.doDent(ethFlip, batchId, 0.3 ether, 100 ether);
-        WarpFlip(ethFlip).warp(ethFlip.era() + ethFlip.ttl() + 1);
+        hevm.warp(now + ethFlip.ttl() + 1);
         user1.doDeal(ethFlip, batchId);
     }
 

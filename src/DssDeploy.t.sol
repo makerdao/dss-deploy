@@ -429,12 +429,18 @@ contract DssDeployTest is DSTest {
 
         // mom
         assertEq(mom.authority(), authority);
+        assertEq(mom.owner(), address(0));
 
         // dssDeploy
         assertEq(dssDeploy.authority(), authority);
+        assertEq(dssDeploy.owner(), address(0));
 
         // root
         assertTrue(authority.isUserRoot(this));
+
+        // guard
+        assertEq(guard.authority(), authority);
+        assertEq(guard.owner(), this);
     }
 
     function() public payable {

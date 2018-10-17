@@ -77,6 +77,7 @@ contract DssDeployTest is DSTest {
     DSValue pipDGX;
 
     DSRoles authority;
+    DSGuard guard;
 
     ETHJoin ethJoin;
     GemJoin dgxJoin;
@@ -86,12 +87,21 @@ contract DssDeployTest is DSTest {
     Drip drip;
     Vow vow;
     Cat cat;
-    Spotter ethPrice;
+    Flapper flap;
+    Flopper flop;
     DSToken dai;
     DaiJoin daiJoin;
     DaiMove daiMove;
 
+    DSProxy mom;
+
+    GemMove ethMove;
+    Spotter ethPrice;
     Flipper ethFlip;
+
+    GemMove dgxMove;
+    Spotter dgxPrice;
+    Flipper dgxFlip;
 
     FakeUser user1;
     FakeUser user2;
@@ -185,17 +195,21 @@ contract DssDeployTest is DSTest {
         drip = dssDeploy.drip();
         vow = dssDeploy.vow();
         cat = dssDeploy.cat();
+        flap = dssDeploy.flap();
+        flop = dssDeploy.flop();
         dai = dssDeploy.dai();
         daiJoin = dssDeploy.daiJoin();
         daiMove = dssDeploy.daiMove();
+        guard = dssDeploy.guard();
+        mom = dssDeploy.mom();
 
         ethJoin = new ETHJoin(vat, "ETH");
-        GemMove ethMove = new GemMove(vat, "ETH");
+        ethMove = new GemMove(vat, "ETH");
         dssDeploy.deployCollateral("ETH", ethJoin, ethMove, pipETH);
 
         DSToken dgx = new DSToken("DGX");
         dgxJoin = new GemJoin(vat, "DGX", dgx);
-        GemMove dgxMove = new GemMove(vat, "DGX");
+        dgxMove = new GemMove(vat, "DGX");
         dssDeploy.deployCollateral("DGX", dgxJoin, dgxMove, pipDGX);
 
         // Set Params
@@ -205,6 +219,7 @@ contract DssDeployTest is DSTest {
 
         pipETH.poke(300 * 10 ** 18); // Price 300 DAI = 1 ETH (precision 18)
         (ethFlip,,, ethPrice) = dssDeploy.ilks("ETH");
+        (dgxFlip,,, dgxPrice) = dssDeploy.ilks("DGX");
         this.file(address(ethPrice), uint(1500000000 ether)); // Liquidation ratio 150%
         ethPrice.poke();
         (uint spot, ) = pit.ilks("ETH");
@@ -351,6 +366,75 @@ contract DssDeployTest is DSTest {
         user1.doDent(ethFlip, batchId, 0.3 ether, 100 ether);
         hevm.warp(now + ethFlip.ttl() + 1);
         user1.doDeal(ethFlip, batchId);
+    }
+
+    function testAuth() public {
+        deploy();
+
+        // vat
+        assertEq(vat.wards(dssDeploy), 1);
+
+        assertEq(vat.wards(ethFlip), 1);
+        assertEq(vat.wards(ethJoin), 1);
+        assertEq(vat.wards(ethMove), 1);
+
+        assertEq(vat.wards(dgxFlip), 1);
+        assertEq(vat.wards(dgxJoin), 1);
+        assertEq(vat.wards(dgxMove), 1);
+
+        assertEq(vat.wards(daiJoin), 1);
+        assertEq(vat.wards(daiMove), 1);
+
+        assertEq(vat.wards(flap), 1);
+        assertEq(vat.wards(flop), 1);
+        assertEq(vat.wards(vow), 1);
+        assertEq(vat.wards(cat), 1);
+        assertEq(vat.wards(pit), 1);
+        assertEq(vat.wards(drip), 1);
+
+        // dai
+        assertEq(dai.authority(), guard);
+        assertTrue(guard.canCall(address(daiJoin), address(dai), bytes4(keccak256("mint(address,uint256)"))));
+        assertTrue(guard.canCall(address(daiJoin), address(dai), bytes4(keccak256("burn(address,uint256)"))));
+
+        // flop
+        assertEq(flop.wards(dssDeploy), 1);
+        assertEq(flop.wards(vow), 1);
+
+        // vow
+        assertEq(vow.wards(dssDeploy), 1);
+        assertEq(vow.wards(mom), 1);
+        assertEq(vow.wards(cat), 1);
+
+        // cat
+        assertEq(cat.wards(dssDeploy), 1);
+        assertEq(cat.wards(mom), 1);
+
+        // pit
+        assertEq(pit.wards(dssDeploy), 1);
+        assertEq(pit.wards(mom), 1);
+        assertEq(pit.wards(ethPrice), 1);
+        assertEq(pit.wards(dgxPrice), 1);
+
+        // spotters
+        assertEq(ethPrice.wards(dssDeploy), 1);
+        assertEq(ethPrice.wards(mom), 1);
+
+        assertEq(dgxPrice.wards(dssDeploy), 1);
+        assertEq(dgxPrice.wards(mom), 1);
+
+        // drip
+        assertEq(drip.wards(dssDeploy), 1);
+        assertEq(drip.wards(mom), 1);
+
+        // mom
+        assertEq(mom.authority(), authority);
+
+        // dssDeploy
+        assertEq(dssDeploy.authority(), authority);
+
+        // root
+        assertTrue(authority.isUserRoot(this));
     }
 
     function() public payable {

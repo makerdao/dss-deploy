@@ -256,26 +256,31 @@ const rely = async graph => {
 // -----------------------------------------------------------------------------
 
 const getDSNoteEvents = async (contract, sig) => {
-  const raw = await contract.getPastEvents('LogNote', {
-    filter: { sig },
-    fromBlock: 0,
-    toBlock: 10000000000000
-  });
-  return raw.map(log => {
-    const guy = log.returnValues.foo;
-    return { src: log.address, guy: '0x' + guy.substr(guy.length - 40) };
-  });
+  return await getNoteEvents(contract, sig, 'LogNote');
 };
 
 const getVatNoteEvents = async (contract, sig) => {
-  const raw = await contract.getPastEvents('Note', {
-    filter: { sig },
-    fromBlock: 0,
-    toBlock: 10000000000000
-  });
+  return await getNoteEvents(contract, sig, 'Note');
+};
+
+const getNoteEvents = async (contract, sig, EventName) => {
+  const raw = await getRawLogs(contract, { sig }, EventName);
   return raw.map(log => {
     const guy = log.returnValues.foo;
-    return { src: log.address, guy: '0x' + guy.substr(guy.length - 40) };
+    return {
+      blockNumber: log.blockNumber,
+      txIndex: log.transactionIndex,
+      src: log.address,
+      guy: '0x' + guy.substr(guy.length - 40)
+    };
+  });
+};
+
+const getRawLogs = async (contract, filter, EventName) => {
+  return await contract.getPastEvents(EventName, {
+    filter,
+    fromBlock: 0,
+    toBlock: web3.eth.blockNumber
   });
 };
 

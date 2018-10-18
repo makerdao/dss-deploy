@@ -1,0 +1,11 @@
+{
+  "name": "testchain_scripts",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "dagre": "^0.8.2",
+    "graphlib-dot": "^0.6.2",
+    "mz": "^2.7.0",
+    "web3": "^1.0.0-beta.36"
+  }
+}

@@ -187,7 +187,30 @@ const contracts = (graph, addresses, abis) => {
 };
 
 // -----------------------------------------------------------------------------
-// Gather Events
+// Build Edges
+// -----------------------------------------------------------------------------
+
+const apply = async (events, graph) => {
+  events.map(event => {
+    switch (event.type) {
+      case 'rely':
+        graph.setEdge(label(event.src, graph), label(event.guy, graph), 'rely');
+        break;
+      case 'deny':
+        graph.removeEdge(
+          label(event.src, graph),
+          label(event.guy, graph),
+          'rely'
+        );
+        break;
+    }
+  });
+
+  return graph;
+};
+
+// -----------------------------------------------------------------------------
+// Reverse Lookup
 // -----------------------------------------------------------------------------
 
 const label = (address, graph) => {
@@ -207,6 +230,16 @@ const label = (address, graph) => {
   }
 
   return labels[0];
+};
+
+// -----------------------------------------------------------------------------
+// Fetch All Events
+// -----------------------------------------------------------------------------
+
+const fetchEvents = async graph => {
+  let events = [];
+  events = events.concat(await rely(graph));
+  return events;
 };
 
 const rely = async graph => {
@@ -242,17 +275,11 @@ const rely = async graph => {
     })
   );
 
-  const merged = [].concat.apply([], relies);
-
-  merged.map(rely => {
-    graph.setEdge(label(rely.src, graph), label(rely.guy, graph));
-  });
-
-  return graph;
+  return [].concat.apply([], relies);
 };
 
 // -----------------------------------------------------------------------------
-// Events
+// Individual Event Fetchers
 // -----------------------------------------------------------------------------
 
 const getDSNoteEvents = async (contract, sig) => {
@@ -265,13 +292,24 @@ const getVatNoteEvents = async (contract, sig) => {
 
 const getNoteEvents = async (contract, sig, EventName) => {
   const raw = await getRawLogs(contract, { sig }, EventName);
+
+  let type = '';
+  if (sig === RELY) {
+    type = 'rely';
+  } else if (sig === DENY) {
+    type = 'deny';
+  } else {
+    throw new Error(`unknown event sig: ${sig}`);
+  }
+
   return raw.map(log => {
     const guy = log.returnValues.foo;
     return {
       blockNumber: log.blockNumber,
-      txIndex: log.transactionIndex,
+      logIndex: log.logIndex,
       src: log.address,
-      guy: '0x' + guy.substr(guy.length - 40)
+      guy: '0x' + guy.substr(guy.length - 40),
+      type
     };
   });
 };
@@ -299,8 +337,18 @@ const main = async () => {
 
   let graph = new dagre.graphlib.Graph();
   graph = contracts(graph, addresses, abis);
-  graph = await rely(graph);
 
+  const events = await fetchEvents(graph);
+  const sorted = events.sort((a, b) => {
+    if (a.blockNumber === b.blockNumber) {
+      return a.logIndex - b.logIndex;
+    }
+    return a.blockNumber - b.blockNumber;
+  });
+
+  graph = await apply(sorted, graph);
+
+  console.log(graph);
   console.log(dot.write(graph));
 };
 

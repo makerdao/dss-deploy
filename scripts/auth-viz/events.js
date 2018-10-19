@@ -239,11 +239,20 @@ const label = (address, graph) => {
 const fetchEvents = async graph => {
   let events = [];
   events = events.concat(await rely(graph));
+  events = events.concat(await deny(graph));
   return events;
 };
 
 const rely = async graph => {
-  const relies = await Promise.all(
+  return await fetchNoteEvents(graph, RELY, 'rely');
+};
+
+const deny = async graph => {
+  return await fetchNoteEvents(graph, DENY, 'deny');
+};
+
+const fetchNoteEvents = async (graph, sig, name) => {
+  const events = await Promise.all(
     graph.nodes().map(async label => {
       const node = graph.node(label);
       switch (label) {
@@ -252,30 +261,25 @@ const rely = async graph => {
         case 'moveDgx':
         case 'moveEth':
         case 'moveRep':
-          console.log(`found 0 events for ${label}`);
-          return [];
         case 'spotDgx':
         case 'spotEth':
         case 'spotRep':
-          console.log(`found 0 events for ${label}`);
-          return []; // TODO: make spotter note
         case 'daiGuard':
-          console.log(`found 0 events for ${label}`);
-          return []; // TODO: implement getDSGuardEvents
-        // return await getDSGuardEvents(node.contract, RELY);
+          console.log(`found 0 ${name} events for ${label}`);
+          return [];
         case 'vat':
-          const vatNotes = await getVatNoteEvents(node.contract, RELY);
-          console.log(`found ${vatNotes.length} events for ${label}`);
+          const vatNotes = await getVatNoteEvents(node.contract, sig);
+          console.log(`found ${vatNotes.length} ${name} events for ${label}`);
           return vatNotes;
         default:
-          const dsNotes = await getDSNoteEvents(node.contract, RELY);
-          console.log(`found ${dsNotes.length} events for ${label}`);
+          const dsNotes = await getDSNoteEvents(node.contract, sig);
+          console.log(`found ${dsNotes.length} ${name} events for ${label}`);
           return dsNotes;
       }
     })
   );
 
-  return [].concat.apply([], relies);
+  return [].concat.apply([], events);
 };
 
 // -----------------------------------------------------------------------------
@@ -348,7 +352,6 @@ const main = async () => {
 
   graph = await apply(sorted, graph);
 
-  console.log(graph);
   console.log(dot.write(graph));
 };
 

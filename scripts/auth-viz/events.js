@@ -48,6 +48,15 @@ const getAbis = async dir => {
 
 const contracts = (graph, addresses, abis) => {
   // Deployer
+  graph.setNode('null', {
+    label: 'NULL',
+    contract: new web3.eth.Contract(
+      [],
+      '0x0000000000000000000000000000000000000000'
+    )
+  });
+
+  // Deployer
   graph.setNode('deploy', {
     label: 'DssDeploy',
     contract: new web3.eth.Contract(abis.DssDeploy, addresses.MCD_DEPLOY)
@@ -194,13 +203,22 @@ const apply = async (events, graph) => {
   events.map(event => {
     switch (event.type) {
       case 'rely':
-        graph.setEdge(label(event.src, graph), label(event.guy, graph), 'rely');
+        const node = label(event.src, graph);
+        const edges = graph.outEdges(node);
+        console.log(edges);
+        graph.setEdge(
+          label(event.src, graph),
+          label(event.guy, graph),
+          'rely',
+          'rely'
+        );
         break;
       case 'deny':
         graph.removeEdge(
           label(event.src, graph),
           label(event.guy, graph),
-          'rely'
+          'deny',
+          'deny'
         );
         break;
     }
@@ -240,7 +258,48 @@ const fetchEvents = async graph => {
   let events = [];
   events = events.concat(await rely(graph));
   events = events.concat(await deny(graph));
+  events = events.concat(await dsAuth(graph));
   return events;
+};
+
+const dsAuth = async graph => {
+  const events = await Promise.all(
+    graph.nodes().map(async label => {
+      const node = graph.node(label);
+      switch (label) {
+        case 'null':
+        case 'vat':
+        case 'pit':
+        case 'drip':
+        case 'cat':
+        case 'vow':
+        case 'flap':
+        case 'flop':
+        case 'daiJoin':
+        case 'daiMove':
+        case 'joinDgx':
+        case 'moveDgx':
+        case 'flipDgx':
+        case 'spotDgx':
+        case 'joinEth':
+        case 'moveEth':
+        case 'flipEth':
+        case 'spotEth':
+        case 'joinRep':
+        case 'moveRep':
+        case 'flipRep':
+        case 'spotRep':
+          console.log(`found 0 DSAuth events for ${label}`);
+          return [];
+        default:
+          const authEvents = await getDSAuthEvents(node.contract);
+          console.log(`found ${authEvents.length} DSAuth events for ${label}`);
+          return authEvents;
+      }
+    })
+  );
+
+  return [].concat.apply([], events);
 };
 
 const rely = async graph => {
@@ -256,6 +315,7 @@ const fetchNoteEvents = async (graph, sig, name) => {
     graph.nodes().map(async label => {
       const node = graph.node(label);
       switch (label) {
+        case 'null':
         case 'deploy':
         case 'daiMove':
         case 'moveDgx':
@@ -283,8 +343,40 @@ const fetchNoteEvents = async (graph, sig, name) => {
 };
 
 // -----------------------------------------------------------------------------
-// Individual Event Fetchers
+// Per Contract Event Fetchers
 // -----------------------------------------------------------------------------
+
+const getDSAuthEvents = async contract => {
+  const setAuth = await getLogSetAuthorityEvents(contract);
+  const setOwner = await getLogSetOwnerEvents(contract);
+  return setAuth.concat(setOwner);
+};
+
+const getLogSetAuthorityEvents = async contract => {
+  const raw = await getRawLogs(contract, {}, 'LogSetAuthority');
+  return raw.map(log => {
+    return {
+      type: 'LogSetAuthority',
+      blockNumber: log.blockNumber,
+      logIndex: log.logIndex,
+      src: log.address,
+      authority: log.returnValues.authority
+    };
+  });
+};
+
+const getLogSetOwnerEvents = async contract => {
+  const raw = await getRawLogs(contract, {}, 'LogSetOwner');
+  return raw.map(log => {
+    return {
+      type: 'LogSetOwner',
+      blockNumber: log.blockNumber,
+      logIndex: log.logIndex,
+      src: log.address,
+      owner: log.returnValues.owner
+    };
+  });
+};
 
 const getDSNoteEvents = async (contract, sig) => {
   return await getNoteEvents(contract, sig, 'LogNote');

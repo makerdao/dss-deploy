@@ -56,6 +56,7 @@ const dsAuth = async graph => {
       const node = graph.node(label);
       switch (label) {
         case 'null':
+        case 'root':
         case 'vat':
         case 'pit':
         case 'drip':
@@ -104,6 +105,7 @@ const fetchNoteEvents = async (graph, sig, name) => {
       const node = graph.node(label);
       switch (label) {
         case 'null':
+        case 'root':
         case 'deploy':
         case 'daiMove':
         case 'moveDgx':

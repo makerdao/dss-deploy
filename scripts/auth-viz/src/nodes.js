@@ -46,6 +46,12 @@ const contracts = (graph, addresses, abis) => {
     )
   });
 
+  // Root
+  graph.setNode('root', {
+    label: 'root',
+    contract: new web3.eth.Contract([], addresses.ETH_FROM)
+  });
+
   // Deployer
   graph.setNode('deploy', {
     label: 'DssDeploy',
@@ -186,8 +192,8 @@ const contracts = (graph, addresses, abis) => {
 };
 
 module.exports.nodes = async testchainOutputDir => {
-  const addresses = await parseAddressJson(testchainOutputDir);
   const abis = await getAbis(testchainOutputDir);
+  const addresses = await parseAddressJson(testchainOutputDir);
 
   let graph = new dagre.graphlib.Graph();
   graph = contracts(graph, addresses, abis);

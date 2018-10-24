@@ -1,29 +1,51 @@
-const { RELY, DENY } = require('../constants');
-const { getRawLogs } = require('../helper');
+const { getRawLogs } = require('./shared');
+const { signatures, message } = require('./shared');
 
 // ------------------------------------------------------------
 
-module.exports.getDSNoteEvents = async (contract, sig) => {
-  return await getNoteEvents(contract, sig, 'LogNote');
-};
+const ignore = [
+  'null',
+  'root',
+  'deploy',
+  'daiMove',
+  'moveDgx',
+  'moveEth',
+  'moveRep',
+  'spotDgx',
+  'spotEth',
+  'spotRep',
+  'daiGuard'
+];
 
-module.exports.getVatNoteEvents = async (contract, sig) => {
-  return await getNoteEvents(contract, sig, 'Note');
+// ------------------------------------------------------------
+
+module.exports.fromGraph = async (graph, sig) => {
+  const events = await Promise.all(
+    graph.nodes().map(async label => {
+      if (ignore.includes(label)) return [];
+      const contract = graph.node(label).contract;
+
+      switch (label) {
+        case 'vat':
+          const vatNotes = await fromContract(contract, sig, 'Note');
+          message(vatNotes.length, type(sig), label);
+          return vatNotes;
+
+        default:
+          const dsNotes = await fromContract(contract, sig, 'LogNote');
+          message(dsNotes.length, type(sig), label);
+          return dsNotes;
+      }
+    })
+  );
+
+  return [].concat.apply([], events);
 };
 
 // ------------------------------------------------------------
 
-const getNoteEvents = async (contract, sig, EventName) => {
-  const raw = await getRawLogs(contract, { sig }, EventName);
-
-  let type = '';
-  if (sig === RELY) {
-    type = 'rely';
-  } else if (sig === DENY) {
-    type = 'deny';
-  } else {
-    throw new Error(`unknown event sig: ${sig}`);
-  }
+const fromContract = async (contract, sig, eventName) => {
+  const raw = await getRawLogs(contract, { sig }, eventName);
 
   return raw.map(log => {
     const guy = log.returnValues.foo;
@@ -32,7 +54,22 @@ const getNoteEvents = async (contract, sig, EventName) => {
       logIndex: log.logIndex,
       src: log.address,
       guy: '0x' + guy.substr(guy.length - 40),
-      type
+      type: type(sig)
     };
   });
 };
+
+// ------------------------------------------------------------
+
+const type = sig => {
+  switch (sig) {
+    case signatures.rely:
+      return 'rely';
+    case signatures.deny:
+      return 'deny';
+    default:
+      throw new Error(`unknown event sig: ${sig}`);
+  }
+};
+
+// ------------------------------------------------------------

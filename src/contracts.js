@@ -1,43 +1,23 @@
 const path = require('path');
-const dagre = require('dagre');
 const fs = require('mz/fs');
-const Web3 = require('web3');
-const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:2000'));
+const { web3 } = require('./helper');
 
 // -----------------------------------------------------------------------------
-// Read Contract Metadata From Testchain Deployment
-// -----------------------------------------------------------------------------
 
-const parseAddressJson = async dir => {
-  const json = await fs.readFile(path.join(dir, 'addresses.json'));
-  return JSON.parse(json);
-};
-
-const getAbis = async dir => {
-  const files = (await fs.readdir(dir)).filter(path => path.endsWith('.abi'));
-
-  const contracts = await Promise.all(
-    files.map(async file => {
-      const abi = (await fs.readFile(path.join(dir, file))).toString();
-      return {
-        file: path.parse(file).name,
-        abi: JSON.parse(abi)
-      };
-    })
+// adds nodes to a graph for all the contracts we are interested in based on
+// the contents of the output directory of a testchain deployment
+module.exports.contracts = async (graph, testchainOutputDir) => {
+  return await setNodes(
+    graph,
+    await addresses(testchainOutputDir),
+    await abis(testchainOutputDir)
   );
-
-  return contracts.reduce((acc, elem) => {
-    acc[elem.file] = elem.abi;
-    return acc;
-  }, {});
 };
 
 // -----------------------------------------------------------------------------
-// Construct Nodes
-// -----------------------------------------------------------------------------
 
-const contracts = (graph, addresses, abis) => {
-  // Deployer
+const setNodes = (graph, addresses, abis) => {
+  // Null
   graph.setNode('null', {
     label: 'NULL',
     contract: new web3.eth.Contract(
@@ -58,15 +38,19 @@ const contracts = (graph, addresses, abis) => {
     contract: new web3.eth.Contract(abis.DssDeploy, addresses.MCD_DEPLOY)
   });
 
-  // CDP's
+  // Core
   graph.setNode('vat', {
     label: 'Vat',
     contract: new web3.eth.Contract(abis.Vat, addresses.MCD_VAT)
   });
+
+  // UI
   graph.setNode('pit', {
     label: 'Pit',
     contract: new web3.eth.Contract(abis.Pit, addresses.MCD_PIT)
   });
+
+  // Stability Fee Collection
   graph.setNode('drip', {
     label: 'Drip',
     contract: new web3.eth.Contract(abis.Drip, addresses.MCD_DRIP)
@@ -191,12 +175,32 @@ const contracts = (graph, addresses, abis) => {
   return graph;
 };
 
-module.exports.nodes = async testchainOutputDir => {
-  const abis = await getAbis(testchainOutputDir);
-  const addresses = await parseAddressJson(testchainOutputDir);
+// -----------------------------------------------------------------------------
 
-  let graph = new dagre.graphlib.Graph();
-  graph = contracts(graph, addresses, abis);
-
-  return graph;
+const addresses = async dir => {
+  const json = await fs.readFile(path.join(dir, 'addresses.json'));
+  return JSON.parse(json);
 };
+
+// -----------------------------------------------------------------------------
+
+const abis = async dir => {
+  const files = (await fs.readdir(dir)).filter(path => path.endsWith('.abi'));
+
+  const contracts = await Promise.all(
+    files.map(async file => {
+      const abi = (await fs.readFile(path.join(dir, file))).toString();
+      return {
+        file: path.parse(file).name,
+        abi: JSON.parse(abi)
+      };
+    })
+  );
+
+  return contracts.reduce((acc, elem) => {
+    acc[elem.file] = elem.abi;
+    return acc;
+  }, {});
+};
+
+// -----------------------------------------------------------------------------

@@ -16,7 +16,7 @@ module.exports.contracts = async (graph, testchainOutputDir) => {
 
 // -----------------------------------------------------------------------------
 
-const setNodes = (graph, addresses, abis) => {
+const setNodes = async (graph, addresses, abis) => {
   // Null
   graph.setNode('null', {
     label: 'NULL',
@@ -36,6 +36,146 @@ const setNodes = (graph, addresses, abis) => {
   graph.setNode('deploy', {
     label: 'DssDeploy',
     contract: new web3.eth.Contract(abis.DssDeploy, addresses.MCD_DEPLOY)
+  });
+  graph.setNode('vatFab', {
+    label: 'VatFab',
+    contract: new web3.eth.Contract(
+      abis.VatFab,
+      await graph
+        .node('deploy')
+        .contract.methods.vatFab()
+        .call()
+    )
+  });
+  graph.setNode('pitFab', {
+    label: 'PitFab',
+    contract: new web3.eth.Contract(
+      abis.PitFab,
+      await graph
+        .node('deploy')
+        .contract.methods.pitFab()
+        .call()
+    )
+  });
+  graph.setNode('dripFab', {
+    label: 'DripFab',
+    contract: new web3.eth.Contract(
+      abis.DripFab,
+      await graph
+        .node('deploy')
+        .contract.methods.dripFab()
+        .call()
+    )
+  });
+  graph.setNode('vowFab', {
+    label: 'VowFab',
+    contract: new web3.eth.Contract(
+      abis.VowFab,
+      await graph
+        .node('deploy')
+        .contract.methods.vowFab()
+        .call()
+    )
+  });
+  graph.setNode('catFab', {
+    label: 'CatFab',
+    contract: new web3.eth.Contract(
+      abis.CatFab,
+      await graph
+        .node('deploy')
+        .contract.methods.catFab()
+        .call()
+    )
+  });
+  graph.setNode('tokenFab', {
+    label: 'TokenFab',
+    contract: new web3.eth.Contract(
+      abis.TokenFab,
+      await graph
+        .node('deploy')
+        .contract.methods.tokenFab()
+        .call()
+    )
+  });
+  graph.setNode('guardFab', {
+    label: 'GuardFab',
+    contract: new web3.eth.Contract(
+      abis.GuardFab,
+      await graph
+        .node('deploy')
+        .contract.methods.guardFab()
+        .call()
+    )
+  });
+  graph.setNode('daiJoinFab', {
+    label: 'DaiJoinFab',
+    contract: new web3.eth.Contract(
+      abis.DaiJoinFab,
+      await graph
+        .node('deploy')
+        .contract.methods.daiJoinFab()
+        .call()
+    )
+  });
+  graph.setNode('daiMoveFab', {
+    label: 'DaiMoveFab',
+    contract: new web3.eth.Contract(
+      abis.DaiMoveFab,
+      await graph
+        .node('deploy')
+        .contract.methods.daiMoveFab()
+        .call()
+    )
+  });
+  graph.setNode('flapFab', {
+    label: 'FlapFab',
+    contract: new web3.eth.Contract(
+      abis.FlapFab,
+      await graph
+        .node('deploy')
+        .contract.methods.flapFab()
+        .call()
+    )
+  });
+  graph.setNode('flopFab', {
+    label: 'FlopFab',
+    contract: new web3.eth.Contract(
+      abis.FlopFab,
+      await graph
+        .node('deploy')
+        .contract.methods.flopFab()
+        .call()
+    )
+  });
+  graph.setNode('flipFab', {
+    label: 'FlipFab',
+    contract: new web3.eth.Contract(
+      abis.FlipFab,
+      await graph
+        .node('deploy')
+        .contract.methods.flipFab()
+        .call()
+    )
+  });
+  graph.setNode('spotFab', {
+    label: 'SpotFab',
+    contract: new web3.eth.Contract(
+      abis.SpotFab,
+      await graph
+        .node('deploy')
+        .contract.methods.spotFab()
+        .call()
+    )
+  });
+  graph.setNode('proxyFab', {
+    label: 'ProxyFab',
+    contract: new web3.eth.Contract(
+      abis.ProxyFab,
+      await graph
+        .node('deploy')
+        .contract.methods.proxyFab()
+        .call()
+    )
   });
 
   // Core

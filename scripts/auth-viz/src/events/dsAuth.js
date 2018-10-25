@@ -3,6 +3,20 @@ const { message, getRawLogs } = require('./shared');
 // ------------------------------------------------------------
 
 const ignore = [
+  'vatFab',
+  'pitFab',
+  'dripFab',
+  'vowFab',
+  'catFab',
+  'tokenFab',
+  'guardFab',
+  'daiJoinFab',
+  'daiMoveFab',
+  'flapFab',
+  'flopFab',
+  'flipFab',
+  'spotFab',
+  'proxyFab',
   'null',
   'root',
   'vat',

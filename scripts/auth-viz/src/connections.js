@@ -3,24 +3,26 @@
 // iterates over events and adds / removes edges accordingly
 module.exports.connections = async (events, graph) => {
   events.map(event => {
-    const node = label(event.src, graph);
+    const src = label(event.src, graph);
     switch (event.type) {
-      case 'rely':
-        graph.setEdge(label(event.src, graph), label(event.guy, graph), 'rely');
+      case 'rely': {
+        const guy = label(event.guy, graph);
+        graph.setEdge(src, guy, 'rely');
         break;
+      }
 
-      case 'deny':
-        graph.removeEdge(
-          label(event.src, graph),
-          label(event.guy, graph),
-          'deny'
-        );
+      case 'deny': {
+        const guy = label(event.guy, graph);
+        graph.removeEdge(src, guy, 'deny');
         break;
+      }
 
-      case 'LogSetOwner':
-        const edges = graph.outEdges(node);
-        console.log(edges);
+      case 'LogSetOwner': {
+        const owner = label(event.owner, graph);
+        graph.setEdge(src, owner, 'rely');
+        console.log(graph.outEdges(src));
         break;
+      }
     }
   });
 

@@ -50,6 +50,7 @@ cat > load-mcd-$(seth chain) << EOF
 
 export MCD_DEPLOY=$MCD_DEPLOY
 export MCD_GOV=$MCD_GOV
+export MCD_ADM=$MCD_ADM
 export MCD_VAT=0x$(seth call $MCD_DEPLOY "vat()(address)")
 export MCD_PIT=0x$(seth call $MCD_DEPLOY "pit()(address)")
 export MCD_DRIP=0x$(seth call $MCD_DEPLOY "drip()(address)")

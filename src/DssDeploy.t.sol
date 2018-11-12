@@ -167,19 +167,16 @@ contract DssDeployTest is DSTest {
         hevm.warp(0);
     }
 
-    function file(address who, uint data) external {
-        who;data;
-        dssDeploy.mom().execute(momLib, msg.data);
+    function file(address, uint) external {
+        mom.execute(momLib, msg.data);
     }
 
-    function file(address who, bytes32 what, uint data) external {
-        who;what;data;
-        dssDeploy.mom().execute(momLib, msg.data);
+    function file(address, bytes32, uint) external {
+        mom.execute(momLib, msg.data);
     }
 
-    function file(address who, bytes32 ilk, bytes32 what, uint data) external {
-        who;ilk;what;data;
-        dssDeploy.mom().execute(momLib, msg.data);
+    function file(address, bytes32, bytes32, uint) external {
+        mom.execute(momLib, msg.data);
     }
 
     function deploy() public {
@@ -270,15 +267,15 @@ contract DssDeployTest is DSTest {
 
     function testDrawDai() public {
         deploy();
-        assertEq(dssDeploy.dai().balanceOf(address(this)), 0);
+        assertEq(dai.balanceOf(address(this)), 0);
         ethJoin.join.value(1 ether)(bytes32(address(this)));
 
         pit.frob("ETH", 0.5 ether, 60 ether);
         assertEq(vat.gem("ETH", bytes32(address(this))), mul(ONE, 0.5 ether));
         assertEq(vat.dai(bytes32(address(this))), mul(ONE, 60 ether));
 
-        dssDeploy.daiJoin().exit(address(this), 60 ether);
-        assertEq(dssDeploy.dai().balanceOf(address(this)), 60 ether);
+        daiJoin.exit(address(this), 60 ether);
+        assertEq(dai.balanceOf(address(this)), 60 ether);
         assertEq(vat.dai(bytes32(address(this))), 0);
     }
 
@@ -298,11 +295,11 @@ contract DssDeployTest is DSTest {
         deploy();
         ethJoin.join.value(1 ether)(bytes32(address(this)));
         pit.frob("ETH", 0.5 ether, 60 ether);
-        dssDeploy.daiJoin().exit(address(this), 60 ether);
-        assertEq(dssDeploy.dai().balanceOf(address(this)), 60 ether);
-        dssDeploy.dai().approve(dssDeploy.daiJoin(), uint(-1));
-        dssDeploy.daiJoin().join(bytes32(address(this)), 60 ether);
-        assertEq(dssDeploy.dai().balanceOf(address(this)), 0);
+        daiJoin.exit(address(this), 60 ether);
+        assertEq(dai.balanceOf(address(this)), 60 ether);
+        dai.approve(daiJoin, uint(-1));
+        daiJoin.join(bytes32(address(this)), 60 ether);
+        assertEq(dai.balanceOf(address(this)), 0);
 
         assertEq(vat.dai(bytes32(address(this))), mul(ONE, 60 ether));
         pit.frob("ETH", 0 ether, -60 ether);

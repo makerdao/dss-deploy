@@ -99,6 +99,7 @@ contract DssDeployTest is DSTest {
     Spotter ethPrice;
     Flipper ethFlip;
 
+    DSToken dgx;
     GemMove dgxMove;
     Spotter dgxPrice;
     Flipper dgxFlip;
@@ -204,7 +205,7 @@ contract DssDeployTest is DSTest {
         ethMove = new GemMove(vat, "ETH");
         dssDeploy.deployCollateral("ETH", ethJoin, ethMove, pipETH);
 
-        DSToken dgx = new DSToken("DGX");
+        dgx = new DSToken("DGX");
         dgxJoin = new GemJoin(vat, "DGX", dgx);
         dgxMove = new GemMove(vat, "DGX");
         dssDeploy.deployCollateral("DGX", dgxJoin, dgxMove, pipDGX);
@@ -213,14 +214,20 @@ contract DssDeployTest is DSTest {
         momLib = new MomLib();
         this.file(address(pit), bytes32("Line"), uint(10000 ether));
         this.file(address(pit), bytes32("ETH"), bytes32("line"), uint(10000 ether));
+        this.file(address(pit), bytes32("DGX"), bytes32("line"), uint(10000 ether));
 
         pipETH.poke(300 * 10 ** 18); // Price 300 DAI = 1 ETH (precision 18)
+        pipDGX.poke(45 * 10 ** 18); // Price 45 DAI = 1 DGX (precision 18)
         (ethFlip,,, ethPrice) = dssDeploy.ilks("ETH");
         (dgxFlip,,, dgxPrice) = dssDeploy.ilks("DGX");
         this.file(address(ethPrice), uint(1500000000 ether)); // Liquidation ratio 150%
+        this.file(address(dgxPrice), uint(1100000000 ether)); // Liquidation ratio 110%
         ethPrice.poke();
+        dgxPrice.poke();
         (uint spot, ) = pit.ilks("ETH");
         assertEq(spot, 300 * ONE * ONE / 1500000000 ether);
+        (spot, ) = pit.ilks("DGX");
+        assertEq(spot, 45 * ONE * ONE / 1100000000 ether);
     }
 
     function testDeploy() public {
@@ -251,18 +258,39 @@ contract DssDeployTest is DSTest {
         dssDeploy.deployMom(authority);
     }
 
-    function testJoinCollateral() public {
+    function testJoinETH() public {
         deploy();
         assertEq(vat.gem("ETH", bytes32(address(this))), 0);
         ethJoin.join.value(1 ether)(bytes32(address(this)));
         assertEq(vat.gem("ETH", bytes32(address(this))), mul(ONE, 1 ether));
     }
 
-    function testExitCollateral() public {
+    function testJoinERC20() public {
+        deploy();
+        dgx.mint(1 ether);
+        assertEq(dgx.balanceOf(this), 1 ether);
+        assertEq(vat.gem("DGX", bytes32(address(this))), 0);
+        dgx.approve(dgxJoin, 1 ether);
+        dgxJoin.join(bytes32(address(this)), 1 ether);
+        assertEq(dgx.balanceOf(this), 0);
+        assertEq(vat.gem("DGX", bytes32(address(this))), mul(ONE, 1 ether));
+    }
+
+    function testExitETH() public {
         deploy();
         ethJoin.join.value(1 ether)(bytes32(address(this)));
         ethJoin.exit(address(this), 1 ether);
         assertEq(vat.gem("ETH", bytes32(address(this))), 0);
+    }
+
+    function testExitERC20() public {
+        deploy();
+        dgx.mint(1 ether);
+        dgx.approve(dgxJoin, 1 ether);
+        dgxJoin.join(bytes32(address(this)), 1 ether);
+        dgxJoin.exit(address(this), 1 ether);
+        assertEq(dgx.balanceOf(this), 1 ether);
+        assertEq(vat.gem("DGX", bytes32(address(this))), 0);
     }
 
     function testDrawDai() public {
@@ -279,16 +307,45 @@ contract DssDeployTest is DSTest {
         assertEq(vat.dai(bytes32(address(this))), 0);
     }
 
+    function testDrawDaiERC20() public {
+        deploy();
+        assertEq(dai.balanceOf(address(this)), 0);
+        dgx.mint(1 ether);
+        dgx.approve(dgxJoin, 1 ether);
+        dgxJoin.join(bytes32(address(this)), 1 ether);
+
+        pit.frob("DGX", 0.5 ether, 20 ether);
+
+        daiJoin.exit(address(this), 20 ether);
+        assertEq(dai.balanceOf(address(this)), 20 ether);
+    }
+
     function testDrawDaiLimit() public {
         deploy();
         ethJoin.join.value(1 ether)(bytes32(address(this)));
         pit.frob("ETH", 0.5 ether, 100 ether); // 0.5 * 300 / 1.5 = 100 DAI max
     }
 
+    function testDrawDaiERC20Limit() public {
+        deploy();
+        dgx.mint(1 ether);
+        dgx.approve(dgxJoin, 1 ether);
+        dgxJoin.join(bytes32(address(this)), 1 ether);
+        pit.frob("DGX", 0.5 ether, 20.454545454545454545 ether); // 0.5 * 45 / 1.1 = 20.454545454545454545 DAI max
+    }
+
     function testFailDrawDaiLimit() public {
         deploy();
         ethJoin.join.value(1 ether)(bytes32(address(this)));
         pit.frob("ETH", 0.5 ether, 100 ether + 1);
+    }
+
+    function testFailDrawDaiERC20Limit() public {
+        deploy();
+        dgx.mint(1 ether);
+        dgx.approve(dgxJoin, 1 ether);
+        dgxJoin.join(bytes32(address(this)), 1 ether);
+        pit.frob("DGX", 0.5 ether, 20.454545454545454545 ether + 1);
     }
 
     function testPaybackDai() public {

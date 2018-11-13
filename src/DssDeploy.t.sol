@@ -15,13 +15,23 @@ contract Hevm {
     function warp(uint256) public;
 }
 
+contract AuctionLike {
+    function tend(uint, uint, uint) public;
+    function dent(uint, uint, uint) public;
+    function deal(uint) public;
+}
+
 contract FakeUser {
-    function doApproval(DSToken token, address guy) public {
+    function doApprove(DSToken token, address guy) public {
         token.approve(guy);
     }
 
     function doDaiJoin(DaiJoin obj, bytes32 urn, uint wad) public {
         obj.join(urn, wad);
+    }
+
+    function doDaiExit(DaiJoin obj, address guy, uint wad) public {
+        obj.exit(guy, wad);
     }
 
     function doEthJoin(ETHJoin obj, bytes32 addr, uint wad) public {
@@ -36,16 +46,16 @@ contract FakeUser {
         obj.hope(guy);
     }
 
-    function doTend(Flipper obj, uint id, uint lot, uint bid) public {
-        obj.tend(id, lot, bid);
+    function doTend(address obj, uint id, uint lot, uint bid) public {
+        AuctionLike(obj).tend(id, lot, bid);
     }
 
-    function doDent(Flipper obj, uint id, uint lot, uint bid) public {
-        obj.dent(id, lot, bid);
+    function doDent(address obj, uint id, uint lot, uint bid) public {
+        AuctionLike(obj).dent(id, lot, bid);
     }
 
-    function doDeal(Flipper obj, uint id) public {
-        obj.deal(id);
+    function doDeal(address obj, uint id) public {
+        AuctionLike(obj).deal(id);
     }
 
     function() public payable {
@@ -154,6 +164,7 @@ contract DssDeployTest is DSTest {
         emit log_named_uint("Deploy DssDeploy", startGas - endGas);
 
         gov = new DSToken("GOV");
+        gov.setAuthority(new DSGuard());
         pipETH = new DSValue();
         pipDGX = new DSValue();
         authority = new DSRoles();
@@ -228,6 +239,10 @@ contract DssDeployTest is DSTest {
         assertEq(spot, 300 * ONE * ONE / 1500000000 ether);
         (spot, ) = pit.ilks("DGX");
         assertEq(spot, 45 * ONE * ONE / 1100000000 ether);
+
+        DSGuard(gov.authority()).permit(flop, gov, bytes4(keccak256("mint(address,uint256)")));
+
+        gov.mint(100 ether);
     }
 
     function testDeploy() public {
@@ -420,6 +435,91 @@ contract DssDeployTest is DSTest {
         user1.doDent(ethFlip, batchId, 0.3 ether, 100 ether);
         hevm.warp(now + ethFlip.ttl() + 1);
         user1.doDeal(ethFlip, batchId);
+    }
+
+    function testFlop() public {
+        deploy();
+        ethJoin.join.value(0.5 ether)(bytes32(address(this)));
+        pit.frob("ETH", 0.5 ether, 100 ether); // Maximun DAI generated
+        pipETH.poke(300 * 10 ** 18 - 1); // Decrease price in 1 wei
+        ethPrice.poke();
+        uint48 eraBite = uint48(now);
+        uint nflip = cat.bite("ETH", bytes32(address(this)));
+        uint batchId = cat.flip(nflip, 100 ether);
+        address(user1).transfer(10 ether);
+        user1.doEthJoin(ethJoin, bytes32(address(user1)), 10 ether);
+        user1.doFrob(pit, "ETH", 10 ether, 1000 ether);
+
+        address(user2).transfer(10 ether);
+        user2.doEthJoin(ethJoin, bytes32(address(user2)), 10 ether);
+        user2.doFrob(pit, "ETH", 10 ether, 1000 ether);
+
+        user1.doHope(daiMove, ethFlip);
+        user2.doHope(daiMove, ethFlip);
+
+        user1.doTend(ethFlip, batchId, 0.5 ether, 50 ether);
+        user2.doTend(ethFlip, batchId, 0.5 ether, 70 ether);
+        user1.doTend(ethFlip, batchId, 0.5 ether, 90 ether);
+
+        hevm.warp(now + ethFlip.ttl() + 1);
+        user1.doDeal(ethFlip, batchId);
+
+        vow.flog(eraBite);
+        vow.heal(90 ether);
+        this.file(address(vow), bytes32("sump"), uint(10 ether));
+        batchId = vow.flop();
+
+        (uint bid,,,,,) = flop.bids(batchId);
+        assertEq(bid, 10 ether);
+        user1.doHope(daiMove, flop);
+        user2.doHope(daiMove, flop);
+        user1.doDent(flop, batchId, 0.3 ether, 10 ether);
+        hevm.warp(now + flop.ttl() - 1);
+        user2.doDent(flop, batchId, 0.1 ether, 10 ether);
+        user1.doDent(flop, batchId, 0.08 ether, 10 ether);
+        hevm.warp(now + flop.ttl() + 1);
+        uint prevGovSupply = gov.totalSupply();
+        user1.doDeal(flop, batchId);
+        assertEq(gov.totalSupply(), prevGovSupply + 0.08 ether);
+        vow.kiss(10 ether);
+        assertEq(vow.Joy(), 0);
+        assertEq(vow.Woe(), 0);
+        assertEq(vow.Awe(), 0);
+    }
+
+    function testFlap() public {
+        deploy();
+        this.file(address(drip), bytes32("ETH"), bytes32("tax"), uint(1.05 * 10 ** 27));
+        ethJoin.join.value(0.5 ether)(bytes32(address(this)));
+        pit.frob("ETH", 0.1 ether, 10 ether);
+        hevm.warp(now + 1);
+        assertEq(vow.Joy(), 0);
+        drip.drip("ETH");
+        assertEq(vow.Joy(), 10 * 0.05 * 10 ** 18);
+        this.file(address(vow), bytes32("bump"), uint(0.05 ether));
+        uint batchId = vow.flap();
+
+        (,uint lot,,,,) = flap.bids(batchId);
+        assertEq(lot, 0.05 ether);
+        user1.doApprove(gov, flap);
+        user2.doApprove(gov, flap);
+        gov.transfer(user1, 1 ether);
+        gov.transfer(user2, 1 ether);
+
+        assertEq(dai.balanceOf(user1), 0);
+        assertEq(gov.balanceOf(address(0)), 0);
+
+        user1.doTend(flap, batchId, 0.05 ether, 0.001 ether);
+        user2.doTend(flap, batchId, 0.05 ether, 0.0015 ether);
+        user1.doTend(flap, batchId, 0.05 ether, 0.0016 ether);
+
+        assertEq(gov.balanceOf(user1), 1 ether - 0.0016 ether);
+        assertEq(gov.balanceOf(user2), 1 ether);
+        hevm.warp(now + flap.ttl() + 1);
+        user1.doDeal(flap, batchId);
+        assertEq(gov.balanceOf(address(0)), 0.0016 ether);
+        user1.doDaiExit(daiJoin, user1, 0.05 ether);
+        assertEq(dai.balanceOf(user1), 0.05 ether);
     }
 
     function testAuth() public {

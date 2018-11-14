@@ -280,7 +280,7 @@ contract DssDeployTest is DSTest {
         assertEq(vat.gem("ETH", bytes32(address(this))), mul(ONE, 1 ether));
     }
 
-    function testJoinERC20() public {
+    function testJoinGem() public {
         deploy();
         dgx.mint(1 ether);
         assertEq(dgx.balanceOf(this), 1 ether);
@@ -298,7 +298,7 @@ contract DssDeployTest is DSTest {
         assertEq(vat.gem("ETH", bytes32(address(this))), 0);
     }
 
-    function testExitERC20() public {
+    function testExitGem() public {
         deploy();
         dgx.mint(1 ether);
         dgx.approve(dgxJoin, 1 ether);
@@ -322,7 +322,7 @@ contract DssDeployTest is DSTest {
         assertEq(vat.dai(bytes32(address(this))), 0);
     }
 
-    function testDrawDaiERC20() public {
+    function testDrawDaiGem() public {
         deploy();
         assertEq(dai.balanceOf(address(this)), 0);
         dgx.mint(1 ether);
@@ -341,7 +341,7 @@ contract DssDeployTest is DSTest {
         pit.frob("ETH", 0.5 ether, 100 ether); // 0.5 * 300 / 1.5 = 100 DAI max
     }
 
-    function testDrawDaiERC20Limit() public {
+    function testDrawDaiGemLimit() public {
         deploy();
         dgx.mint(1 ether);
         dgx.approve(dgxJoin, 1 ether);
@@ -355,7 +355,7 @@ contract DssDeployTest is DSTest {
         pit.frob("ETH", 0.5 ether, 100 ether + 1);
     }
 
-    function testFailDrawDaiERC20Limit() public {
+    function testFailDrawDaiGemLimit() public {
         deploy();
         dgx.mint(1 ether);
         dgx.approve(dgxJoin, 1 ether);

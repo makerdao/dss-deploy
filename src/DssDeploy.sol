@@ -1,4 +1,4 @@
-pragma solidity ^0.4.24;
+pragma solidity >=0.5.0;
 
 import {DSToken} from "ds-token/token.sol";
 import {DSAuth, DSAuthority} from "ds-auth/auth.sol";
@@ -27,14 +27,14 @@ contract VatFab {
 
 contract PitFab {
     function newPit(Vat vat) public returns (Pit pit) {
-        pit = new Pit(vat);
+        pit = new Pit(address(vat));
         pit.rely(msg.sender);
     }
 }
 
 contract DripFab {
     function newDrip(Vat vat) public returns (Drip drip) {
-        drip = new Drip(vat);
+        drip = new Drip(address(vat));
         drip.rely(msg.sender);
     }
 }
@@ -48,7 +48,7 @@ contract VowFab {
 
 contract CatFab {
     function newCat(Vat vat) public returns (Cat cat) {
-        cat = new Cat(vat);
+        cat = new Cat(address(vat));
         cat.rely(msg.sender);
     }
 }
@@ -69,13 +69,13 @@ contract GuardFab {
 
 contract DaiJoinFab {
     function newDaiJoin(Vat vat, address dai) public returns (DaiJoin daiJoin) {
-        daiJoin = new DaiJoin(vat, dai);
+        daiJoin = new DaiJoin(address(vat), address(dai));
     }
 }
 
 contract DaiMoveFab {
     function newDaiMove(Vat vat) public returns (DaiMove daiMove) {
-        daiMove = new DaiMove(vat);
+        daiMove = new DaiMove(address(vat));
     }
 }
 
@@ -87,27 +87,27 @@ contract FlapFab {
 
 contract FlopFab {
     function newFlop(address dai, address gov) public returns (Flopper flop) {
-        flop = new Flopper(dai, gov);
+        flop = new Flopper(address(dai), address(gov));
         flop.rely(msg.sender);
     }
 }
 
 contract FlipFab {
     function newFlip(address dai, address gem) public returns (Flipper flop) {
-        flop = new Flipper(dai, gem);
+        flop = new Flipper(address(dai), address(gem));
     }
 }
 
 contract SpotFab {
     function newSpotter(Pit pit, bytes32 ilk) public returns (Spotter spotter) {
-        spotter = new Spotter(pit, ilk);
+        spotter = new Spotter(address(pit), ilk);
         spotter.rely(msg.sender);
     }
 }
 
 contract ProxyFab {
     function newProxy() public returns (DSProxy proxy) {
-        proxy = new DSProxy(new DSProxyCache());
+        proxy = new DSProxy(address(new DSProxyCache()));
         proxy.setOwner(msg.sender);
     }
 }
@@ -187,95 +187,95 @@ contract DssDeploy is DSAuth {
     }
 
     function deployVat() public auth {
-        require(vat == address(0), "VAT already deployed");
+        require(address(vat) == address(0), "VAT already deployed");
         vat = vatFab.newVat();
     }
 
     function deployPit() public auth {
-        require(vat != address(0), "Missing VAT deployment");
+        require(address(vat) != address(0), "Missing VAT deployment");
         pit = pitFab.newPit(vat);
 
         // Internal auth
-        vat.rely(pit);
+        vat.rely(address(pit));
     }
 
     function deployDai() public auth {
-        require(vat != address(0), "Missing VAT deployment");
+        require(address(vat) != address(0), "Missing VAT deployment");
 
         // Deploy
         dai     = tokenFab.newToken("DAI");
-        daiJoin = daiJoinFab.newDaiJoin(vat, dai);
+        daiJoin = daiJoinFab.newDaiJoin(vat, address(dai));
         guard = guardFab.newGuard();
-        guard.permit(daiJoin, dai, bytes4(keccak256("mint(address,uint256)")));
-        guard.permit(daiJoin, dai, bytes4(keccak256("burn(address,uint256)")));
+        guard.permit(address(daiJoin), address(dai), bytes4(keccak256("mint(address,uint256)")));
+        guard.permit(address(daiJoin), address(dai), bytes4(keccak256("burn(address,uint256)")));
         dai.setAuthority(guard);
         dai.setOwner(address(0));
         daiMove = daiMoveFab.newDaiMove(vat);
 
         // Internal auth
-        vat.rely(daiJoin);
-        vat.rely(daiMove);
+        vat.rely(address(daiJoin));
+        vat.rely(address(daiMove));
     }
 
     function deployTaxation(address gov) public auth {
         require(gov != address(0), "Missing GOV address");
-        require(vat != address(0), "Missing VAT deployment");
-        require(pit != address(0), "Missing PIT deployment");
+        require(address(vat) != address(0), "Missing VAT deployment");
+        require(address(pit) != address(0), "Missing PIT deployment");
 
         // Deploy
         vow = vowFab.newVow();
         drip = dripFab.newDrip(vat);
-        flap = flapFab.newFlap(daiMove, gov);
+        flap = flapFab.newFlap(address(daiMove), gov);
 
         // Internal references set up
-        vow.file("vat", vat);
-        vow.file("flap", flap);
-        drip.file("vow", bytes32(address(vow)));
+        vow.file("vat", address(vat));
+        vow.file("flap", address(flap));
+        drip.file("vow", bytes32(bytes20(address(vow))));
 
         // Internal auth
-        vat.rely(vow);
-        vat.rely(drip);
-        vat.rely(flap);
+        vat.rely(address(vow));
+        vat.rely(address(drip));
+        vat.rely(address(flap));
     }
 
     function deployLiquidation(address gov) public auth {
-        require(vat != address(0), "Missing VAT deployment");
-        require(pit != address(0), "Missing PIT deployment");
-        require(vow != address(0), "Missing VOW deployment");
+        require(address(vat) != address(0), "Missing VAT deployment");
+        require(address(pit) != address(0), "Missing PIT deployment");
+        require(address(vow) != address(0), "Missing VOW deployment");
 
         // Deploy
         cat = catFab.newCat(vat);
-        cat.file("vow", vow);
-        cat.file("pit", pit);
-        flop = flopFab.newFlop(daiMove, gov);
+        cat.file("vow", address(vow));
+        cat.file("pit", address(pit));
+        flop = flopFab.newFlop(address(daiMove), gov);
 
         // Internal references set up
-        vow.file("flop", flop);
+        vow.file("flop", address(flop));
 
         // Internal auth
-        vat.rely(cat);
-        vat.rely(flop);
-        vow.rely(cat);
-        flop.rely(vow);
+        vat.rely(address(cat));
+        vat.rely(address(flop));
+        vow.rely(address(cat));
+        flop.rely(address(vow));
     }
 
     function deployMom(DSAuthority authority) public auth {
-        require(pit != address(0), "Missing PIT deployment");
-        require(vow != address(0), "Missing VOW deployment");
-        require(drip != address(0), "Missing DRIP deployment");
-        require(cat != address(0), "Missing CAT deployment");
+        require(address(pit) != address(0), "Missing PIT deployment");
+        require(address(vow) != address(0), "Missing VOW deployment");
+        require(address(drip) != address(0), "Missing DRIP deployment");
+        require(address(cat) != address(0), "Missing CAT deployment");
 
         // Auth
         mom = proxyFab.newProxy();
-        vat.rely(mom);
-        pit.rely(mom);
-        cat.rely(mom);
-        vow.rely(mom);
-        drip.rely(mom);
+        vat.rely(address(mom));
+        pit.rely(address(mom));
+        cat.rely(address(mom));
+        vow.rely(address(mom));
+        drip.rely(address(mom));
         mom.setAuthority(authority);
-        mom.setOwner(0);
+        mom.setOwner(address(0));
         this.setAuthority(authority);
-        this.setOwner(0);
+        this.setOwner(address(0));
         guard.setAuthority(authority);
         guard.setOwner(msg.sender);
     }
@@ -285,30 +285,30 @@ contract DssDeploy is DSAuth {
         require(adapter != address(0), "Missing adapter address");
         require(mover   != address(0), "Missing mover address");
         require(pip != address(0), "Missing PIP address");
-        require(vat != address(0), "Missing VAT deployment");
-        require(cat != address(0), "Missing VAT deployment");
+        require(address(vat) != address(0), "Missing VAT deployment");
+        require(address(cat) != address(0), "Missing VAT deployment");
 
         // Deploy
-        ilks[ilk].flip = flipFab.newFlip(daiMove, mover);
+        ilks[ilk].flip = flipFab.newFlip(address(daiMove), mover);
         ilks[ilk].adapter = adapter;
         ilks[ilk].mover = mover;
         ilks[ilk].spotter = spotFab.newSpotter(pit, ilk);
-        ilks[ilk].spotter.file(pip); // Set pip
+        ilks[ilk].spotter.file(address(pip)); // Set pip
         ilks[ilk].spotter.file(ONE); // Set mat
 
         // Internal references set up
-        cat.file(ilk, "flip", ilks[ilk].flip);
+        cat.file(ilk, "flip", address(ilks[ilk].flip));
         cat.file(ilk, "lump", uint(10000 ether)); // 10000 DAI per batch
         cat.file(ilk, "chop", ONE);
         vat.init(ilk);
         drip.init(ilk);
 
         // Internal auth
-        vat.rely(ilks[ilk].flip);
+        vat.rely(address(ilks[ilk].flip));
         vat.rely(adapter);
         vat.rely(mover);
-        pit.rely(ilks[ilk].spotter);
-        ilks[ilk].spotter.rely(mom);
+        pit.rely(address(ilks[ilk].spotter));
+        ilks[ilk].spotter.rely(address(mom));
 
         // Update spotter
         ilks[ilk].spotter.poke();

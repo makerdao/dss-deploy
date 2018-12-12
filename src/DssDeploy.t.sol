@@ -30,8 +30,8 @@ contract FakeUser {
         obj.join(urn, wad);
     }
 
-    function doDaiExit(DaiJoin obj, address guy, uint wad) public {
-        obj.exit(guy, wad);
+    function doDaiExit(DaiJoin obj, bytes32 urn, address guy, uint wad) public {
+        obj.exit(urn, guy, wad);
     }
 
     function doEthJoin(ETHJoin obj, bytes32 addr, uint wad) public {
@@ -294,7 +294,7 @@ contract DssDeployTest is DSTest {
     function testExitETH() public {
         deploy();
         ethJoin.join.value(1 ether)(bytes32(bytes20(address(this))));
-        ethJoin.exit(address(this), 1 ether);
+        ethJoin.exit(bytes32(bytes20(address(this))), address(this), 1 ether);
         assertEq(vat.gem("ETH", bytes32(bytes20(address(this)))), 0);
     }
 
@@ -303,7 +303,7 @@ contract DssDeployTest is DSTest {
         dgx.mint(1 ether);
         dgx.approve(address(dgxJoin), 1 ether);
         dgxJoin.join(bytes32(bytes20(address(this))), 1 ether);
-        dgxJoin.exit(address(this), 1 ether);
+        dgxJoin.exit(bytes32(bytes20(address(this))), address(this), 1 ether);
         assertEq(dgx.balanceOf(address(this)), 1 ether);
         assertEq(vat.gem("DGX", bytes32(bytes20(address(this)))), 0);
     }
@@ -317,7 +317,7 @@ contract DssDeployTest is DSTest {
         assertEq(vat.gem("ETH", bytes32(bytes20(address(this)))), mul(ONE, 0.5 ether));
         assertEq(vat.dai(bytes32(bytes20(address(this)))), mul(ONE, 60 ether));
 
-        daiJoin.exit(address(this), 60 ether);
+        daiJoin.exit(bytes32(bytes20(address(this))), address(this), 60 ether);
         assertEq(dai.balanceOf(address(this)), 60 ether);
         assertEq(vat.dai(bytes32(bytes20(address(this)))), 0);
     }
@@ -331,7 +331,7 @@ contract DssDeployTest is DSTest {
 
         pit.frob(bytes32(bytes20(address(this))), "DGX", 0.5 ether, 20 ether);
 
-        daiJoin.exit(address(this), 20 ether);
+        daiJoin.exit(bytes32(bytes20(address(this))), address(this), 20 ether);
         assertEq(dai.balanceOf(address(this)), 20 ether);
     }
 
@@ -367,7 +367,7 @@ contract DssDeployTest is DSTest {
         deploy();
         ethJoin.join.value(1 ether)(bytes32(bytes20(address(this))));
         pit.frob(bytes32(bytes20(address(this))), "ETH", 0.5 ether, 60 ether);
-        daiJoin.exit(address(this), 60 ether);
+        daiJoin.exit(bytes32(bytes20(address(this))), address(this), 60 ether);
         assertEq(dai.balanceOf(address(this)), 60 ether);
         dai.approve(address(daiJoin), uint(-1));
         daiJoin.join(bytes32(bytes20(address(this))), 60 ether);
@@ -518,7 +518,7 @@ contract DssDeployTest is DSTest {
         hevm.warp(now + flap.ttl() + 1);
         user1.doDeal(address(flap), batchId);
         assertEq(gov.balanceOf(address(0)), 0.0016 ether);
-        user1.doDaiExit(daiJoin, address(user1), 0.05 ether);
+        user1.doDaiExit(daiJoin, bytes32(bytes20(address(user1))), address(user1), 0.05 ether);
         assertEq(dai.balanceOf(address(user1)), 0.05 ether);
     }
 

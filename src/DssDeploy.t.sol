@@ -62,7 +62,7 @@ contract FakeUser {
     }
 }
 
-contract DssDeployTest is DSTest {
+contract DssDeployTestBase is DSTest {
     Hevm hevm;
 
     VatFab vatFab;
@@ -244,7 +244,9 @@ contract DssDeployTest is DSTest {
 
         gov.mint(100 ether);
     }
+}
 
+contract DssDeployTest is DssDeployTestBase {
     function testDeploy() public {
         deploy();
     }

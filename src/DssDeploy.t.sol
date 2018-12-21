@@ -71,7 +71,7 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(dai.balanceOf(address(this)), 0);
         ethJoin.join.value(1 ether)(bytes32(bytes20(address(this))));
 
-        pit.frob(bytes32(bytes20(address(this))), "ETH", 0.5 ether, 60 ether);
+        pit.frob("ETH", bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), 0.5 ether, 60 ether);
         assertEq(vat.gem("ETH", bytes32(bytes20(address(this)))), mul(ONE, 0.5 ether));
         assertEq(vat.dai(bytes32(bytes20(address(this)))), mul(ONE, 60 ether));
 
@@ -87,7 +87,7 @@ contract DssDeployTest is DssDeployTestBase {
         dgx.approve(address(dgxJoin), 1 ether);
         dgxJoin.join(bytes32(bytes20(address(this))), 1 ether);
 
-        pit.frob(bytes32(bytes20(address(this))), "DGX", 0.5 ether, 20 ether);
+        pit.frob("DGX", bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), 0.5 ether, 20 ether);
 
         daiJoin.exit(bytes32(bytes20(address(this))), address(this), 20 ether);
         assertEq(dai.balanceOf(address(this)), 20 ether);
@@ -96,7 +96,7 @@ contract DssDeployTest is DssDeployTestBase {
     function testDrawDaiLimit() public {
         deploy();
         ethJoin.join.value(1 ether)(bytes32(bytes20(address(this))));
-        pit.frob(bytes32(bytes20(address(this))), "ETH", 0.5 ether, 100 ether); // 0.5 * 300 / 1.5 = 100 DAI max
+        pit.frob("ETH", bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), 0.5 ether, 100 ether); // 0.5 * 300 / 1.5 = 100 DAI max
     }
 
     function testDrawDaiGemLimit() public {
@@ -104,13 +104,13 @@ contract DssDeployTest is DssDeployTestBase {
         dgx.mint(1 ether);
         dgx.approve(address(dgxJoin), 1 ether);
         dgxJoin.join(bytes32(bytes20(address(this))), 1 ether);
-        pit.frob(bytes32(bytes20(address(this))), "DGX", 0.5 ether, 20.454545454545454545 ether); // 0.5 * 45 / 1.1 = 20.454545454545454545 DAI max
+        pit.frob("DGX", bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), 0.5 ether, 20.454545454545454545 ether); // 0.5 * 45 / 1.1 = 20.454545454545454545 DAI max
     }
 
     function testFailDrawDaiLimit() public {
         deploy();
         ethJoin.join.value(1 ether)(bytes32(bytes20(address(this))));
-        pit.frob(bytes32(bytes20(address(this))), "ETH", 0.5 ether, 100 ether + 1);
+        pit.frob("ETH", bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), 0.5 ether, 100 ether + 1);
     }
 
     function testFailDrawDaiGemLimit() public {
@@ -118,13 +118,13 @@ contract DssDeployTest is DssDeployTestBase {
         dgx.mint(1 ether);
         dgx.approve(address(dgxJoin), 1 ether);
         dgxJoin.join(bytes32(bytes20(address(this))), 1 ether);
-        pit.frob(bytes32(bytes20(address(this))), "DGX", 0.5 ether, 20.454545454545454545 ether + 1);
+        pit.frob("DGX", bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), 0.5 ether, 20.454545454545454545 ether + 1);
     }
 
     function testPaybackDai() public {
         deploy();
         ethJoin.join.value(1 ether)(bytes32(bytes20(address(this))));
-        pit.frob(bytes32(bytes20(address(this))), "ETH", 0.5 ether, 60 ether);
+        pit.frob("ETH", bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), 0.5 ether, 60 ether);
         daiJoin.exit(bytes32(bytes20(address(this))), address(this), 60 ether);
         assertEq(dai.balanceOf(address(this)), 60 ether);
         dai.approve(address(daiJoin), uint(-1));
@@ -132,14 +132,14 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(dai.balanceOf(address(this)), 0);
 
         assertEq(vat.dai(bytes32(bytes20(address(this)))), mul(ONE, 60 ether));
-        pit.frob(bytes32(bytes20(address(this))), "ETH", 0 ether, -60 ether);
+        pit.frob("ETH", bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), 0 ether, -60 ether);
         assertEq(vat.dai(bytes32(bytes20(address(this)))), 0);
     }
 
     function testFailBite() public {
         deploy();
         ethJoin.join.value(1 ether)(bytes32(bytes20(address(this))));
-        pit.frob(bytes32(bytes20(address(this))), "ETH", 0.5 ether, 100 ether); // Maximun DAI
+        pit.frob("ETH", bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), 0.5 ether, 100 ether); // Maximun DAI
 
         cat.bite("ETH", bytes32(bytes20(address(this))));
     }
@@ -147,7 +147,7 @@ contract DssDeployTest is DssDeployTestBase {
     function testBite() public {
         deploy();
         ethJoin.join.value(0.5 ether)(bytes32(bytes20(address(this))));
-        pit.frob(bytes32(bytes20(address(this))), "ETH", 0.5 ether, 100 ether); // Maximun DAI generated
+        pit.frob("ETH", bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), 0.5 ether, 100 ether); // Maximun DAI generated
 
         pipETH.poke(bytes32(uint(300 * 10 ** 18 - 1))); // Decrease price in 1 wei
         ethPrice.poke();
@@ -164,7 +164,7 @@ contract DssDeployTest is DssDeployTestBase {
     function testFlip() public {
         deploy();
         ethJoin.join.value(0.5 ether)(bytes32(bytes20(address(this))));
-        pit.frob(bytes32(bytes20(address(this))), "ETH", 0.5 ether, 100 ether); // Maximun DAI generated
+        pit.frob("ETH", bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), 0.5 ether, 100 ether); // Maximun DAI generated
         pipETH.poke(bytes32(uint(300 * 10 ** 18 - 1))); // Decrease price in 1 wei
         ethPrice.poke();
         uint nflip = cat.bite("ETH", bytes32(bytes20(address(this))));
@@ -173,11 +173,11 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(vat.gem("ETH", bytes32(bytes20(address(ethFlip)))), mul(0.5 ether, ONE));
         address(user1).transfer(10 ether);
         user1.doEthJoin(ethJoin, bytes32(bytes20(address(user1))), 10 ether);
-        user1.doFrob(pit, "ETH", 10 ether, 1000 ether);
+        user1.doFrob(pit, "ETH", bytes32(bytes20(address(user1))), bytes32(bytes20(address(user1))), bytes32(bytes20(address(user1))), 10 ether, 1000 ether);
 
         address(user2).transfer(10 ether);
         user2.doEthJoin(ethJoin, bytes32(bytes20(address(user2))), 10 ether);
-        user2.doFrob(pit, "ETH", 10 ether, 1000 ether);
+        user2.doFrob(pit, "ETH", bytes32(bytes20(address(user2))), bytes32(bytes20(address(user2))), bytes32(bytes20(address(user2))), 10 ether, 1000 ether);
 
         user1.doHope(daiMove, address(ethFlip));
         user2.doHope(daiMove, address(ethFlip));
@@ -198,7 +198,7 @@ contract DssDeployTest is DssDeployTestBase {
     function testFlop() public {
         deploy();
         ethJoin.join.value(0.5 ether)(bytes32(bytes20(address(this))));
-        pit.frob(bytes32(bytes20(address(this))), "ETH", 0.5 ether, 100 ether); // Maximun DAI generated
+        pit.frob("ETH", bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), 0.5 ether, 100 ether); // Maximun DAI generated
         pipETH.poke(bytes32(uint(300 * 10 ** 18 - 1))); // Decrease price in 1 wei
         ethPrice.poke();
         uint48 eraBite = uint48(now);
@@ -206,11 +206,11 @@ contract DssDeployTest is DssDeployTestBase {
         uint batchId = cat.flip(nflip, 100 ether);
         address(user1).transfer(10 ether);
         user1.doEthJoin(ethJoin, bytes32(bytes20(address(user1))), 10 ether);
-        user1.doFrob(pit, "ETH", 10 ether, 1000 ether);
+        user1.doFrob(pit, "ETH", bytes32(bytes20(address(user1))), bytes32(bytes20(address(user1))), bytes32(bytes20(address(user1))), 10 ether, 1000 ether);
 
         address(user2).transfer(10 ether);
         user2.doEthJoin(ethJoin, bytes32(bytes20(address(user2))), 10 ether);
-        user2.doFrob(pit, "ETH", 10 ether, 1000 ether);
+        user2.doFrob(pit, "ETH", bytes32(bytes20(address(user2))), bytes32(bytes20(address(user2))), bytes32(bytes20(address(user2))), 10 ether, 1000 ether);
 
         user1.doHope(daiMove, address(ethFlip));
         user2.doHope(daiMove, address(ethFlip));
@@ -249,7 +249,7 @@ contract DssDeployTest is DssDeployTestBase {
         deploy();
         this.file(address(drip), bytes32("ETH"), bytes32("tax"), uint(1.05 * 10 ** 27));
         ethJoin.join.value(0.5 ether)(bytes32(bytes20(address(this))));
-        pit.frob(bytes32(bytes20(address(this))), "ETH", 0.1 ether, 10 ether);
+        pit.frob("ETH", bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), 0.1 ether, 10 ether);
         hevm.warp(now + 1);
         assertEq(vow.Joy(), 0);
         drip.drip("ETH");

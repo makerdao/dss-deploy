@@ -38,8 +38,8 @@ contract FakeUser {
         obj.join.value(wad)(addr);
     }
 
-    function doFrob(Pit obj, bytes32 ilk, int dink, int dart) public {
-        obj.frob(ilk, dink, dart);
+    function doFrob(Pit obj, bytes32 ilk, bytes32 urn, bytes32 gem, bytes32 dai, int dink, int dart) public {
+        obj.frob(ilk, urn, gem, dai, dink, dart);
     }
 
     function doHope(DaiMove obj, address guy) public {

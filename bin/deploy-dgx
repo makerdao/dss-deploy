@@ -25,6 +25,7 @@ cat > load-ilk-dgx-$(seth chain) << EOF
 # ilk deployment on $(seth chain) from $(git rev-parse HEAD)
 # $(date)
 export PIP_DGX=$PIP_DGX
+export DGX=$DGX
 export MCD_JOIN_DGX=$MCD_JOIN_DGX
 export MCD_MOVE_DGX=$MCD_MOVE_DGX
 export MCD_FLIP_DGX=$MCD_FLIP_DGX

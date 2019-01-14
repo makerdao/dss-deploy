@@ -27,6 +27,21 @@ PROXY_FABtx=$(ETH_NONCE=$((ETH_NONCE + 13)) dapp create ProxyFab)
 
 export SETH_ASYNC=no
 
+test $(seth receipt $VAT_FABtx status) -eq 0 && exit 1
+test $(seth receipt $PIT_FABtx status) -eq 0 && exit 1
+test $(seth receipt $DRIP_FABtx status) -eq 0 && exit 1
+test $(seth receipt $VOW_FABtx status) -eq 0 && exit 1
+test $(seth receipt $CAT_FABtx status) -eq 0 && exit 1
+test $(seth receipt $TOKEN_FABtx status) -eq 0 && exit 1
+test $(seth receipt $GUARD_FABtx status) -eq 0 && exit 1
+test $(seth receipt $MCD_JOIN_FABtx status) -eq 0 && exit 1
+test $(seth receipt $MCD_MOVE_FABtx status) -eq 0 && exit 1
+test $(seth receipt $FLAP_FABtx status) -eq 0 && exit 1
+test $(seth receipt $FLOP_FABtx status) -eq 0 && exit 1
+test $(seth receipt $FLIP_FABtx status) -eq 0 && exit 1
+test $(seth receipt $SPOT_FABtx status) -eq 0 && exit 1
+test $(seth receipt $PROXY_FABtx status) -eq 0 && exit 1
+
 VAT_FAB=$(seth receipt $VAT_FABtx contractAddress)
 PIT_FAB=$(seth receipt $PIT_FABtx contractAddress)
 DRIP_FAB=$(seth receipt $DRIP_FABtx contractAddress)

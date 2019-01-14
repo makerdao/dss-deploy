@@ -23,7 +23,6 @@ then
     seth send $MCD_ADM 'setRootUser(address,bool)' $ETH_FROM true
 fi
 
-
 # Deploy VAT
 seth send $MCD_DEPLOY "deployVat()"
 

@@ -286,19 +286,15 @@ contract DssDeployTest is DssDeployTestBase {
         // vat
         assertEq(vat.wards(address(dssDeploy)), 1);
 
-        assertEq(vat.wards(address(ethFlip)), 1);
         assertEq(vat.wards(address(ethJoin)), 1);
         assertEq(vat.wards(address(ethMove)), 1);
 
-        assertEq(vat.wards(address(dgxFlip)), 1);
         assertEq(vat.wards(address(dgxJoin)), 1);
         assertEq(vat.wards(address(dgxMove)), 1);
 
         assertEq(vat.wards(address(daiJoin)), 1);
         assertEq(vat.wards(address(daiMove)), 1);
 
-        assertEq(vat.wards(address(flap)), 1);
-        assertEq(vat.wards(address(flop)), 1);
         assertEq(vat.wards(address(vow)), 1);
         assertEq(vat.wards(address(cat)), 1);
         assertEq(vat.wards(address(pit)), 1);

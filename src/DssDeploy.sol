@@ -37,6 +37,7 @@ contract VatFab {
     function newVat() public returns (Vat vat) {
         vat = new Vat();
         vat.rely(msg.sender);
+        vat.deny(address(this));
     }
 }
 
@@ -44,6 +45,7 @@ contract PitFab {
     function newPit(Vat vat) public returns (Pit pit) {
         pit = new Pit(address(vat));
         pit.rely(msg.sender);
+        pit.deny(address(this));
     }
 }
 
@@ -51,6 +53,7 @@ contract DripFab {
     function newDrip(Vat vat) public returns (Drip drip) {
         drip = new Drip(address(vat));
         drip.rely(msg.sender);
+        drip.deny(address(this));
     }
 }
 
@@ -58,6 +61,7 @@ contract VowFab {
     function newVow() public returns (Vow vow) {
         vow = new Vow();
         vow.rely(msg.sender);
+        vow.deny(address(this));
     }
 }
 
@@ -65,6 +69,7 @@ contract CatFab {
     function newCat(Vat vat) public returns (Cat cat) {
         cat = new Cat(address(vat));
         cat.rely(msg.sender);
+        cat.deny(address(this));
     }
 }
 
@@ -104,6 +109,7 @@ contract FlopFab {
     function newFlop(address dai, address gov) public returns (Flopper flop) {
         flop = new Flopper(address(dai), address(gov));
         flop.rely(msg.sender);
+        flop.deny(address(this));
     }
 }
 
@@ -117,6 +123,7 @@ contract SpotFab {
     function newSpotter(Pit pit, bytes32 ilk) public returns (Spotter spotter) {
         spotter = new Spotter(address(pit), ilk);
         spotter.rely(msg.sender);
+        spotter.deny(address(this));
     }
 }
 
@@ -250,7 +257,6 @@ contract DssDeploy is DSAuth {
         // Internal auth
         vat.rely(address(vow));
         vat.rely(address(drip));
-        vat.rely(address(flap));
     }
 
     function deployLiquidation(address gov) public auth {
@@ -269,7 +275,6 @@ contract DssDeploy is DSAuth {
 
         // Internal auth
         vat.rely(address(cat));
-        vat.rely(address(flop));
         vow.rely(address(cat));
         flop.rely(address(vow));
     }
@@ -319,7 +324,6 @@ contract DssDeploy is DSAuth {
         drip.init(ilk);
 
         // Internal auth
-        vat.rely(address(ilks[ilk].flip));
         vat.rely(adapter);
         vat.rely(mover);
         pit.rely(address(ilks[ilk].spotter));

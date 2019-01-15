@@ -9,7 +9,7 @@ test -z "$SKIP_BUILD" && dapp --use solc:0.5.0 build
 
 export SETH_ASYNC=yes
 
-ETH_NONCE=$(seth nonce $ETH_FROM)
+ETH_NONCE=$(seth nonce "$ETH_FROM")
 VAT_FABtx=$(ETH_NONCE=$ETH_NONCE dapp create VatFab)
 PIT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 1)) dapp create PitFab)
 DRIP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 2)) dapp create DripFab)
@@ -27,37 +27,37 @@ PROXY_FABtx=$(ETH_NONCE=$((ETH_NONCE + 13)) dapp create ProxyFab)
 
 export SETH_ASYNC=no
 
-test $(seth receipt $VAT_FABtx status) -eq 0 && exit 1
-test $(seth receipt $PIT_FABtx status) -eq 0 && exit 1
-test $(seth receipt $DRIP_FABtx status) -eq 0 && exit 1
-test $(seth receipt $VOW_FABtx status) -eq 0 && exit 1
-test $(seth receipt $CAT_FABtx status) -eq 0 && exit 1
-test $(seth receipt $TOKEN_FABtx status) -eq 0 && exit 1
-test $(seth receipt $GUARD_FABtx status) -eq 0 && exit 1
-test $(seth receipt $MCD_JOIN_FABtx status) -eq 0 && exit 1
-test $(seth receipt $MCD_MOVE_FABtx status) -eq 0 && exit 1
-test $(seth receipt $FLAP_FABtx status) -eq 0 && exit 1
-test $(seth receipt $FLOP_FABtx status) -eq 0 && exit 1
-test $(seth receipt $FLIP_FABtx status) -eq 0 && exit 1
-test $(seth receipt $SPOT_FABtx status) -eq 0 && exit 1
-test $(seth receipt $PROXY_FABtx status) -eq 0 && exit 1
+test "$(seth receipt "$VAT_FABtx" status)" -eq 0 && exit 1
+test "$(seth receipt "$PIT_FABtx" status)" -eq 0 && exit 1
+test "$(seth receipt "$DRIP_FABtx" status)" -eq 0 && exit 1
+test "$(seth receipt "$VOW_FABtx" status)" -eq 0 && exit 1
+test "$(seth receipt "$CAT_FABtx" status)" -eq 0 && exit 1
+test "$(seth receipt "$TOKEN_FABtx" status)" -eq 0 && exit 1
+test "$(seth receipt "$GUARD_FABtx" status)" -eq 0 && exit 1
+test "$(seth receipt "$MCD_JOIN_FABtx" status)" -eq 0 && exit 1
+test "$(seth receipt "$MCD_MOVE_FABtx" status)" -eq 0 && exit 1
+test "$(seth receipt "$FLAP_FABtx" status)" -eq 0 && exit 1
+test "$(seth receipt "$FLOP_FABtx" status)" -eq 0 && exit 1
+test "$(seth receipt "$FLIP_FABtx" status)" -eq 0 && exit 1
+test "$(seth receipt "$SPOT_FABtx" status)" -eq 0 && exit 1
+test "$(seth receipt "$PROXY_FABtx" status)" -eq 0 && exit 1
 
-VAT_FAB=$(seth receipt $VAT_FABtx contractAddress)
-PIT_FAB=$(seth receipt $PIT_FABtx contractAddress)
-DRIP_FAB=$(seth receipt $DRIP_FABtx contractAddress)
-VOW_FAB=$(seth receipt $VOW_FABtx contractAddress)
-CAT_FAB=$(seth receipt $CAT_FABtx contractAddress)
-TOKEN_FAB=$(seth receipt $TOKEN_FABtx contractAddress)
-GUARD_FAB=$(seth receipt $GUARD_FABtx contractAddress)
-MCD_JOIN_FAB=$(seth receipt $MCD_JOIN_FABtx contractAddress)
-MCD_MOVE_FAB=$(seth receipt $MCD_MOVE_FABtx contractAddress)
-FLAP_FAB=$(seth receipt $FLAP_FABtx contractAddress)
-FLOP_FAB=$(seth receipt $FLOP_FABtx contractAddress)
-FLIP_FAB=$(seth receipt $FLIP_FABtx contractAddress)
-SPOT_FAB=$(seth receipt $SPOT_FABtx contractAddress)
-PROXY_FAB=$(seth receipt $PROXY_FABtx contractAddress)
+VAT_FAB=$(seth receipt "$VAT_FABtx" contractAddress)
+PIT_FAB=$(seth receipt "$PIT_FABtx" contractAddress)
+DRIP_FAB=$(seth receipt "$DRIP_FABtx" contractAddress)
+VOW_FAB=$(seth receipt "$VOW_FABtx" contractAddress)
+CAT_FAB=$(seth receipt "$CAT_FABtx" contractAddress)
+TOKEN_FAB=$(seth receipt "$TOKEN_FABtx" contractAddress)
+GUARD_FAB=$(seth receipt "$GUARD_FABtx" contractAddress)
+MCD_JOIN_FAB=$(seth receipt "$MCD_JOIN_FABtx" contractAddress)
+MCD_MOVE_FAB=$(seth receipt "$MCD_MOVE_FABtx" contractAddress)
+FLAP_FAB=$(seth receipt "$FLAP_FABtx" contractAddress)
+FLOP_FAB=$(seth receipt "$FLOP_FABtx" contractAddress)
+FLIP_FAB=$(seth receipt "$FLIP_FABtx" contractAddress)
+SPOT_FAB=$(seth receipt "$SPOT_FABtx" contractAddress)
+PROXY_FAB=$(seth receipt "$PROXY_FABtx" contractAddress)
 
-cat > load-fab-$(seth chain) << EOF
+cat > load-fab-"$(seth chain)" << EOF
 #!/bin/bash
 
 # fab deployment on $(seth chain) from $(git rev-parse HEAD)

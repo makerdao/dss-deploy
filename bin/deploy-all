@@ -25,34 +25,39 @@ dapp update
 message DEPLOYING FABS
 
 "$SCRIPT_DIR/deploy-fab"
-source "$SCRIPT_DIR/../load-fab-unknown"
+# shellcheck source=/dev/null
+source "$SCRIPT_DIR/../load-fab-$(seth chain)"
 
 # -----------------------------------------------------------------------------------------
 
 message DEPLOYING MCD
 
 "${SCRIPT_DIR}/deploy"
-source "${SCRIPT_DIR}/../load-mcd-unknown"
+# shellcheck source=/dev/null
+source "${SCRIPT_DIR}/../load-mcd-$(seth chain)"
 
 # -----------------------------------------------------------------------------------------
 
 message DEPLOYING REP
 
 "${SCRIPT_DIR}/deploy-rep"
-source "${SCRIPT_DIR}/../load-ilk-rep-unknown"
+# shellcheck source=/dev/null
+source "${SCRIPT_DIR}/../load-ilk-rep-$(seth chain)"
 
 # -----------------------------------------------------------------------------------------
 
 message DEPLOYING DGX
 
 "${SCRIPT_DIR}/deploy-dgx"
-source "${SCRIPT_DIR}/../load-ilk-dgx-unknown"
+# shellcheck source=/dev/null
+source "${SCRIPT_DIR}/../load-ilk-dgx-$(seth chain)"
 
 # -----------------------------------------------------------------------------------------
 
 message DEPLOYING ETH
 
 "${SCRIPT_DIR}/deploy-eth"
-source "${SCRIPT_DIR}/../load-ilk-eth-unknown"
+# shellcheck source=/dev/null
+source "${SCRIPT_DIR}/../load-ilk-eth-$(seth chain)"
 
 # -----------------------------------------------------------------------------------------

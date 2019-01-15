@@ -9,17 +9,17 @@ test -z "$SKIP_BUILD" && dapp --use solc:0.5.0 build
 
 # Deploy DGX ilk (adapter, mover, spotter, flip and init variables)
 test -z "$MCD_DEPLOY" && exit 1
-test -z $DGX && DGX=$(dapp create DSToken $(seth --to-bytes32 $(seth --from-ascii "DGX")))
-test -z $PIP_DGX && PIP_DGX=$(dapp create DSValue)
+test -z "$DGX" && DGX=$(dapp create DSToken "$(seth --to-bytes32 "$(seth --from-ascii "DGX")")")
+test -z "$PIP_DGX" && PIP_DGX=$(dapp create DSValue)
 MCD_VAT=0x$(seth call "$MCD_DEPLOY" "vat()(address)")
-MCD_JOIN_DGX=$(dapp create GemJoin $MCD_VAT $(seth --to-bytes32 $(seth --from-ascii "DGX")) $DGX)
-MCD_MOVE_DGX=$(dapp create GemMove $MCD_VAT $(seth --to-bytes32 $(seth --from-ascii "DGX")))
-seth send $MCD_DEPLOY "deployCollateral(bytes32,address,address,address)" $(seth --to-bytes32 $(seth --from-ascii "DGX")) $MCD_JOIN_DGX $MCD_MOVE_DGX $PIP_DGX
-ilk=(`echo $(seth call $MCD_DEPLOY "ilks(bytes32)(address,address,address,address)" $(seth --to-bytes32 $(seth --from-ascii "DGX")))`)
+MCD_JOIN_DGX=$(dapp create GemJoin "$MCD_VAT" "$(seth --to-bytes32 "$(seth --from-ascii "DGX")")" "$DGX")
+MCD_MOVE_DGX=$(dapp create GemMove "$MCD_VAT" "$(seth --to-bytes32 "$(seth --from-ascii "DGX")")")
+seth send "$MCD_DEPLOY" "deployCollateral(bytes32,address,address,address)" "$(seth --to-bytes32 "$(seth --from-ascii "DGX")")" "$MCD_JOIN_DGX" "$MCD_MOVE_DGX" "$PIP_DGX"
+while IFS=$'\n' read -r line; do ilk+=("$line"); done < <(seth call "$MCD_DEPLOY" "ilks(bytes32)(address,address,address,address)" "$(seth --to-bytes32 "$(seth --from-ascii "DGX")")")
 MCD_FLIP_DGX=0x${ilk[0]}
 MCD_SPOT_DGX=0x${ilk[3]}
 
-cat > load-ilk-dgx-$(seth chain) << EOF
+cat > load-ilk-dgx-"$(seth chain)" << EOF
 #!/bin/bash
 
 # ilk deployment on $(seth chain) from $(git rev-parse HEAD)

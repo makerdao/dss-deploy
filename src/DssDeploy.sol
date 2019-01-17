@@ -120,8 +120,8 @@ contract FlipFab {
 }
 
 contract SpotFab {
-    function newSpotter(Pit pit, bytes32 ilk) public returns (Spotter spotter) {
-        spotter = new Spotter(address(pit), ilk);
+    function newSpotter(Pit pit) public returns (Spotter spotter) {
+        spotter = new Spotter(address(pit));
         spotter.rely(msg.sender);
         spotter.deny(address(this));
     }
@@ -161,6 +161,7 @@ contract DssDeploy is DSAuth {
     DaiMove public daiMove;
     Flapper public flap;
     Flopper public flop;
+    Spotter public spotter;
     DSProxy public mom;
 
     mapping(bytes32 => Ilk) public ilks;
@@ -173,7 +174,6 @@ contract DssDeploy is DSAuth {
         Flipper flip;
         address adapter;
         address mover;
-        Spotter spotter;
     }
 
     constructor(
@@ -216,9 +216,11 @@ contract DssDeploy is DSAuth {
     function deployPit() public auth {
         require(address(vat) != address(0), "Missing VAT deployment");
         pit = pitFab.newPit(vat);
+        spotter = spotFab.newSpotter(pit);
 
         // Internal auth
         vat.rely(address(pit));
+        pit.rely(address(spotter));
     }
 
     function deployDai() public auth {
@@ -292,6 +294,7 @@ contract DssDeploy is DSAuth {
         cat.rely(address(mom));
         vow.rely(address(mom));
         drip.rely(address(mom));
+        spotter.rely(address(mom));
         mom.setAuthority(authority);
         mom.setOwner(address(0));
         this.setAuthority(authority);
@@ -312,9 +315,8 @@ contract DssDeploy is DSAuth {
         ilks[ilk].flip = flipFab.newFlip(address(daiMove), mover);
         ilks[ilk].adapter = adapter;
         ilks[ilk].mover = mover;
-        ilks[ilk].spotter = spotFab.newSpotter(pit, ilk);
-        ilks[ilk].spotter.file(address(pip)); // Set pip
-        ilks[ilk].spotter.file(ONE); // Set mat
+        Spotter(spotter).file(ilk, address(pip)); // Set pip
+        Spotter(spotter).file(ilk, "mat", ONE); // Set mat
 
         // Internal references set up
         cat.file(ilk, "flip", address(ilks[ilk].flip));
@@ -326,11 +328,9 @@ contract DssDeploy is DSAuth {
         // Internal auth
         vat.rely(adapter);
         vat.rely(mover);
-        pit.rely(address(ilks[ilk].spotter));
-        ilks[ilk].spotter.rely(address(mom));
 
         // Update spotter
-        ilks[ilk].spotter.poke();
+        spotter.poke(ilk);
     }
 
     // developer backdoor

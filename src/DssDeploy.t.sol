@@ -150,7 +150,7 @@ contract DssDeployTest is DssDeployTestBase {
         pit.frob("ETH", bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), 0.5 ether, 100 ether); // Maximun DAI generated
 
         pipETH.poke(bytes32(uint(300 * 10 ** 18 - 1))); // Decrease price in 1 wei
-        ethPrice.poke();
+        spotter.poke("ETH");
 
         (uint ink, uint art) = vat.urns("ETH", bytes32(bytes20(address(this))));
         assertEq(ink, 0.5 ether);
@@ -166,7 +166,7 @@ contract DssDeployTest is DssDeployTestBase {
         ethJoin.join.value(0.5 ether)(bytes32(bytes20(address(this))));
         pit.frob("ETH", bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), 0.5 ether, 100 ether); // Maximun DAI generated
         pipETH.poke(bytes32(uint(300 * 10 ** 18 - 1))); // Decrease price in 1 wei
-        ethPrice.poke();
+        spotter.poke("ETH");
         uint nflip = cat.bite("ETH", bytes32(bytes20(address(this))));
         assertEq(vat.gem("ETH", bytes32(bytes20(address(ethFlip)))), 0);
         uint batchId = cat.flip(nflip, 100 ether);
@@ -200,7 +200,7 @@ contract DssDeployTest is DssDeployTestBase {
         ethJoin.join.value(0.5 ether)(bytes32(bytes20(address(this))));
         pit.frob("ETH", bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), 0.5 ether, 100 ether); // Maximun DAI generated
         pipETH.poke(bytes32(uint(300 * 10 ** 18 - 1))); // Decrease price in 1 wei
-        ethPrice.poke();
+        spotter.poke("ETH");
         uint48 eraBite = uint48(now);
         uint nflip = cat.bite("ETH", bytes32(bytes20(address(this))));
         uint batchId = cat.flip(nflip, 100 ether);
@@ -321,15 +321,11 @@ contract DssDeployTest is DssDeployTestBase {
         // pit
         assertEq(pit.wards(address(dssDeploy)), 1);
         assertEq(pit.wards(address(mom)), 1);
-        assertEq(pit.wards(address(ethPrice)), 1);
-        assertEq(pit.wards(address(dgxPrice)), 1);
+        assertEq(pit.wards(address(spotter)), 1);
 
-        // spotters
-        assertEq(ethPrice.wards(address(dssDeploy)), 1);
-        assertEq(ethPrice.wards(address(mom)), 1);
-
-        assertEq(dgxPrice.wards(address(dssDeploy)), 1);
-        assertEq(dgxPrice.wards(address(mom)), 1);
+        // spotter
+        assertEq(spotter.wards(address(dssDeploy)), 1);
+        assertEq(spotter.wards(address(mom)), 1);
 
         // drip
         assertEq(drip.wards(address(dssDeploy)), 1);

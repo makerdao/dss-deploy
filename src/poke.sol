@@ -1,5 +1,7 @@
 pragma solidity >=0.5.0;
 
+import "ds-math/math.sol";
+
 contract PitLike {
     function file(bytes32, bytes32, uint) public;
 }
@@ -8,10 +10,10 @@ contract PipLike {
     function peek() public returns (bytes32, bool);
 }
 
-contract Spotter {
+contract Spotter is DSMath {
     PitLike public pit;
     mapping (bytes32 => Ilk) public ilks;
-    uint256 public par = 10 ** 27; // dai per usd
+    uint256 public par = RAY; // usd per dai
 
     struct Ilk {
         PipLike pip;
@@ -27,11 +29,6 @@ contract Spotter {
     constructor(address pit_) public {
         wards[msg.sender] = 1;
         pit = PitLike(pit_);
-    }
-
-    // --- Math ---
-    function mul(uint x, uint y) internal pure returns (uint z) {
-        require(y == 0 || (z = x * y) / y == x);
     }
 
     // --- Administration ---
@@ -51,7 +48,7 @@ contract Spotter {
     function poke(bytes32 ilk) public {
         (bytes32 val, bool zzz) = ilks[ilk].pip.peek();
         if (zzz) {
-            pit.file(ilk, "spot", mul(mul(uint(val), 10 ** 9), par) / ilks[ilk].mat);
+            pit.file(ilk, "spot", rdiv(rdiv(mul(uint(val), 10 ** 9), par), ilks[ilk].mat));
         }
     }
 }

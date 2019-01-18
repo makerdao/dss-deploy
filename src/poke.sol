@@ -13,7 +13,7 @@ contract PipLike {
 contract Spotter is DSMath {
     PitLike public pit;
     mapping (bytes32 => Ilk) public ilks;
-    uint256 public par = RAY; // usd per dai
+    uint256 public par = RAY; // ref per dai
 
     struct Ilk {
         PipLike pip;

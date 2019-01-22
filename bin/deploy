@@ -5,7 +5,7 @@ export ETH_GAS=${ETH_GAS:-"7000000"}
 export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
 export SOLC_FLAGS="--optimize"
 
-test -z "$SKIP_BUILD" && dapp --use solc:0.5.0 build
+test -z "$SKIP_BUILD" && dapp --use solc:0.5.2 build
 
 # Check all fabs are defined
 { test -z "$VAT_FAB" || test -z "$PIT_FAB" || test -z "$DRIP_FAB" || test -z "$VOW_FAB" || test -z "$CAT_FAB" || test -z "$TOKEN_FAB" || test -z "$GUARD_FAB" || test -z "$MCD_JOIN_FAB" || test -z "$MCD_MOVE_FAB" ||test -z "$FLAP_FAB" || test -z "$FLOP_FAB" || test -z "$FLIP_FAB" || test -z "$SPOT_FAB" || test -z "$PROXY_FAB"; } && exit 1
@@ -15,6 +15,9 @@ test -z "$MCD_GOV" && MCD_GOV=$(dapp create DSToken "$(seth --to-bytes32 "$(seth
 
 # Create deploy contract
 MCD_DEPLOY=$(dapp create DssDeploy "$VAT_FAB" "$PIT_FAB" "$DRIP_FAB" "$VOW_FAB" "$CAT_FAB" "$TOKEN_FAB" "$GUARD_FAB" "$MCD_JOIN_FAB" "$MCD_MOVE_FAB" "$FLAP_FAB" "$FLOP_FAB" "$FLIP_FAB" "$SPOT_FAB" "$PROXY_FAB")
+
+# Add extra fabs
+seth send "$MCD_DEPLOY" "addExtraFabs(address)" "$POT_FAB"
 
 # If there is not Authorty defined, create one
 if [ -z "$MCD_ADM" ]
@@ -60,6 +63,7 @@ export MCD_MOVE_DAI=0x$(seth call "$MCD_DEPLOY" "daiMove()(address)")
 export MCD_FLAP=0x$(seth call "$MCD_DEPLOY" "flap()(address)")
 export MCD_FLOP=0x$(seth call "$MCD_DEPLOY" "flop()(address)")
 export MCD_SPOT=0x$(seth call "$MCD_DEPLOY" "spotter()(address)")
+export MCD_POT=0x$(seth call "$MCD_DEPLOY" "pot()(address)")
 export MCD_MOM=0x$(seth call "$MCD_DEPLOY" "mom()(address)")
 export MCD_DAI=0x$(seth call "$MCD_DEPLOY" "dai()(address)")
 export MCD_DAI_GUARD=0x$(seth call "$MCD_DEPLOY" "guard()(address)")

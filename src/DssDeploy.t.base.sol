@@ -78,6 +78,7 @@ contract DssDeployTestBase is DSTest {
     FlopFab flopFab;
     FlipFab flipFab;
     SpotFab spotFab;
+    PotFab potFab;
     ProxyFab proxyFab;
 
     DssDeploy dssDeploy;
@@ -103,6 +104,7 @@ contract DssDeployTestBase is DSTest {
     DaiJoin daiJoin;
     DaiMove daiMove;
     Spotter spotter;
+    Pot pot;
 
     DSProxy mom;
 
@@ -137,30 +139,28 @@ contract DssDeployTestBase is DSTest {
         daiMoveFab = new DaiMoveFab();
         flapFab = new FlapFab();
         flopFab = new FlopFab();
-        proxyFab = new ProxyFab();
-
         flipFab = new FlipFab();
         spotFab = new SpotFab();
+        proxyFab = new ProxyFab();
+        potFab = new PotFab();
 
-        uint startGas = gasleft();
         dssDeploy = new DssDeploy(
             vatFab,
             pitFab,
-            DripFab(dripFab),
+            dripFab,
             vowFab,
             catFab,
             tokenFab,
             guardFab,
             daiJoinFab,
             daiMoveFab,
-            FlapFab(flapFab),
-            FlopFab(flopFab),
-            FlipFab(flipFab),
+            flapFab,
+            flopFab,
+            flipFab,
             spotFab,
             proxyFab
         );
-        uint endGas = gasleft();
-        emit log_named_uint("Deploy DssDeploy", startGas - endGas);
+        dssDeploy.addExtraFabs(potFab);
 
         gov = new DSToken("GOV");
         gov.setAuthority(new DSGuard());
@@ -205,6 +205,7 @@ contract DssDeployTestBase is DSTest {
         daiJoin = dssDeploy.daiJoin();
         daiMove = dssDeploy.daiMove();
         spotter = dssDeploy.spotter();
+        pot = dssDeploy.pot();
         guard = dssDeploy.guard();
         mom = dssDeploy.mom();
 

@@ -2,10 +2,8 @@
 
 This repository contains the smart contract code and bash scripts for deploying the whole `dss` system and provides an initial set up.
 
-
 ### TODO
 
-- Add Dai Saving Rates Module
 - Add Cage Module
 
 ## Additional Documentation

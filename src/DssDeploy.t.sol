@@ -280,6 +280,21 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(dai.balanceOf(address(user1)), 0.05 ether);
     }
 
+    function testDsr() public {
+        deploy();
+        this.file(address(drip), bytes32("ETH"), bytes32("tax"), uint(1.1 * 10 ** 27));
+        this.file(address(pot), "dsr", uint(1.05 * 10 ** 27));
+        ethJoin.join.value(0.5 ether)(bytes32(bytes20(address(this))));
+        pit.frob("ETH", bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), 0.1 ether, 10 ether);
+        assertEq(vat.dai(bytes32(bytes20(address(this)))), mul(10 ether, ONE));
+        pot.save(10 ether);
+        hevm.warp(now + 1);
+        drip.drip("ETH");
+        pot.drip();
+        pot.save(-int(10 ether));
+        assertEq(vat.dai(bytes32(bytes20(address(this)))), mul(10.5 ether, ONE));
+    }
+
     function testAuth() public {
         deploy();
 

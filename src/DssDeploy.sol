@@ -31,6 +31,8 @@ import {Flapper} from "dss/flap.sol";
 import {Flopper} from "dss/flop.sol";
 import {Flipper} from "dss/flip.sol";
 
+import {Pot} from "dsr/dsr.sol";
+
 import {Spotter} from "./poke.sol";
 
 contract VatFab {
@@ -127,6 +129,14 @@ contract SpotFab {
     }
 }
 
+contract PotFab {
+    function newPot(Vat vat) public returns (Pot pot) {
+        pot = new Pot(address(vat));
+        pot.rely(msg.sender);
+        pot.deny(address(this));
+    }
+}
+
 contract ProxyFab {
     function newProxy() public returns (DSProxy proxy) {
         proxy = new DSProxy(address(new DSProxyCache()));
@@ -148,6 +158,7 @@ contract DssDeploy is DSAuth {
     FlopFab    public flopFab;
     FlipFab    public flipFab;
     SpotFab    public spotFab;
+    PotFab     public potFab;
     ProxyFab   public proxyFab;
 
     Vat     public vat;
@@ -162,6 +173,7 @@ contract DssDeploy is DSAuth {
     Flapper public flap;
     Flopper public flop;
     Spotter public spotter;
+    Pot     public pot;
     DSProxy public mom;
 
     mapping(bytes32 => Ilk) public ilks;
@@ -208,7 +220,12 @@ contract DssDeploy is DSAuth {
         proxyFab = proxyFab_;
     }
 
+    function addExtraFabs(PotFab potFab_) public auth {
+        potFab = potFab_;
+    }
+
     function deployVat() public auth {
+        require(address(potFab) != address(0), "addExtraFabs not executed");
         require(address(vat) == address(0), "VAT already deployed");
         vat = vatFab.newVat();
     }
@@ -249,16 +266,19 @@ contract DssDeploy is DSAuth {
         // Deploy
         vow = vowFab.newVow();
         drip = dripFab.newDrip(vat);
+        pot = potFab.newPot(vat);
         flap = flapFab.newFlap(address(daiMove), gov);
 
         // Internal references set up
         vow.file("vat", address(vat));
         vow.file("flap", address(flap));
         drip.file("vow", bytes32(bytes20(address(vow))));
+        pot.file("vow", bytes32(bytes20(address(vow))));
 
         // Internal auth
         vat.rely(address(vow));
         vat.rely(address(drip));
+        vat.rely(address(pot));
     }
 
     function deployLiquidation(address gov) public auth {
@@ -294,6 +314,7 @@ contract DssDeploy is DSAuth {
         cat.rely(address(mom));
         vow.rely(address(mom));
         drip.rely(address(mom));
+        pot.rely(address(mom));
         spotter.rely(address(mom));
         mom.setAuthority(authority);
         mom.setOwner(address(0));

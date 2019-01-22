@@ -4,11 +4,12 @@ set -ex
 export ETH_GAS=${ETH_GAS:-"7000000"}
 export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
 
+eth=$(seth --to-bytes32 "$(seth --from-ascii "ETH")")
+
 # update price
-seth send "$MCD_SPOT_ETH" 'poke()'
+seth send "$MCD_SPOT" 'poke(bytes32)' "$eth"
 
 # 10M debt ceiling
-eth=$(seth --to-bytes32 "$(seth --from-ascii "ETH")")
 Line=$(seth --to-bytes32 "$(seth --from-ascii "Line")")
 line=$(seth --to-bytes32 "$(seth --from-ascii "line")")
 seth send "$MCD_MOM" 'file(address,bytes32,bytes32,uint256)' "$MCD_PIT" "$eth" "$line" "$(sai wad 10000000.0)"

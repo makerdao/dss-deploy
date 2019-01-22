@@ -15,9 +15,8 @@ MCD_VAT=0x$(seth call "$MCD_DEPLOY" "vat()(address)")
 MCD_JOIN_REP=$(dapp create GemJoin "$MCD_VAT" "$(seth --to-bytes32 "$(seth --from-ascii "REP")")" "$REP")
 MCD_MOVE_REP=$(dapp create GemMove "$MCD_VAT" "$(seth --to-bytes32 "$(seth --from-ascii "REP")")")
 seth send "$MCD_DEPLOY" "deployCollateral(bytes32,address,address,address)" "$(seth --to-bytes32 "$(seth --from-ascii "REP")")" "$MCD_JOIN_REP" "$MCD_MOVE_REP" "$PIP_REP"
-while IFS=$'\n' read -r line; do ilk+=("$line"); done < <(seth call "$MCD_DEPLOY" "ilks(bytes32)(address,address,address,address)" "$(seth --to-bytes32 "$(seth --from-ascii "REP")")")
+while IFS=$'\n' read -r line; do ilk+=("$line"); done < <(seth call "$MCD_DEPLOY" "ilks(bytes32)(address,address,address)" "$(seth --to-bytes32 "$(seth --from-ascii "REP")")")
 MCD_FLIP_REP=0x${ilk[0]}
-MCD_SPOT_REP=0x${ilk[3]}
 
 cat > load-ilk-rep-"$(seth chain)" << EOF
 #!/bin/bash
@@ -29,5 +28,4 @@ export REP=$REP
 export MCD_JOIN_REP=$MCD_JOIN_REP
 export MCD_MOVE_REP=$MCD_MOVE_REP
 export MCD_FLIP_REP=$MCD_FLIP_REP
-export MCD_SPOT_REP=$MCD_SPOT_REP
 EOF

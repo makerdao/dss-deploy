@@ -102,16 +102,15 @@ contract DssDeployTestBase is DSTest {
     DSToken dai;
     DaiJoin daiJoin;
     DaiMove daiMove;
+    Spotter spotter;
 
     DSProxy mom;
 
     GemMove ethMove;
-    Spotter ethPrice;
     Flipper ethFlip;
 
     DSToken dgx;
     GemMove dgxMove;
-    Spotter dgxPrice;
     Flipper dgxFlip;
 
     FakeUser user1;
@@ -179,10 +178,6 @@ contract DssDeployTestBase is DSTest {
         hevm.warp(0);
     }
 
-    function file(address, uint) external {
-        mom.execute(address(momLib), msg.data);
-    }
-
     function file(address, bytes32, uint) external {
         mom.execute(address(momLib), msg.data);
     }
@@ -209,6 +204,7 @@ contract DssDeployTestBase is DSTest {
         dai = dssDeploy.dai();
         daiJoin = dssDeploy.daiJoin();
         daiMove = dssDeploy.daiMove();
+        spotter = dssDeploy.spotter();
         guard = dssDeploy.guard();
         mom = dssDeploy.mom();
 
@@ -229,12 +225,12 @@ contract DssDeployTestBase is DSTest {
 
         pipETH.poke(bytes32(uint(300 * 10 ** 18))); // Price 300 DAI = 1 ETH (precision 18)
         pipDGX.poke(bytes32(uint(45 * 10 ** 18))); // Price 45 DAI = 1 DGX (precision 18)
-        (ethFlip,,, ethPrice) = dssDeploy.ilks("ETH");
-        (dgxFlip,,, dgxPrice) = dssDeploy.ilks("DGX");
-        this.file(address(ethPrice), uint(1500000000 ether)); // Liquidation ratio 150%
-        this.file(address(dgxPrice), uint(1100000000 ether)); // Liquidation ratio 110%
-        ethPrice.poke();
-        dgxPrice.poke();
+        (ethFlip,,) = dssDeploy.ilks("ETH");
+        (dgxFlip,,) = dssDeploy.ilks("DGX");
+        this.file(address(spotter), "ETH", "mat", uint(1500000000 ether)); // Liquidation ratio 150%
+        this.file(address(spotter), "DGX", "mat", uint(1100000000 ether)); // Liquidation ratio 110%
+        spotter.poke("ETH");
+        spotter.poke("DGX");
         (uint spot, ) = pit.ilks("ETH");
         assertEq(spot, 300 * ONE * ONE / 1500000000 ether);
         (spot, ) = pit.ilks("DGX");

@@ -362,5 +362,7 @@ contract DssDeploy is DSAuth {
         vow.rely(dev);
         flop.rely(dev);
         drip.rely(dev);
+        pot.rely(dev);
+        spotter.rely(dev);
     }
 }

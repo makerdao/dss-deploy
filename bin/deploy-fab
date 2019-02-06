@@ -12,7 +12,7 @@ export SETH_ASYNC=yes
 ETH_NONCE=$(seth nonce "$ETH_FROM")
 VAT_FABtx=$(ETH_NONCE=$ETH_NONCE dapp create VatFab)
 PIT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 1)) dapp create PitFab)
-DRIP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 2)) dapp create DripFab)
+JUG_FABtx=$(ETH_NONCE=$((ETH_NONCE + 2)) dapp create JugFab)
 VOW_FABtx=$(ETH_NONCE=$((ETH_NONCE + 3)) dapp create VowFab)
 CAT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 4)) dapp create CatFab)
 TOKEN_FABtx=$(ETH_NONCE=$((ETH_NONCE + 5)) dapp create TokenFab)
@@ -30,7 +30,7 @@ export SETH_ASYNC=no
 
 test "$(seth receipt "$VAT_FABtx" status)" -eq 0 && exit 1
 test "$(seth receipt "$PIT_FABtx" status)" -eq 0 && exit 1
-test "$(seth receipt "$DRIP_FABtx" status)" -eq 0 && exit 1
+test "$(seth receipt "$JUG_FABtx" status)" -eq 0 && exit 1
 test "$(seth receipt "$VOW_FABtx" status)" -eq 0 && exit 1
 test "$(seth receipt "$CAT_FABtx" status)" -eq 0 && exit 1
 test "$(seth receipt "$TOKEN_FABtx" status)" -eq 0 && exit 1
@@ -46,7 +46,7 @@ test "$(seth receipt "$POT_FABtx" status)" -eq 0 && exit 1
 
 VAT_FAB=$(seth receipt "$VAT_FABtx" contractAddress)
 PIT_FAB=$(seth receipt "$PIT_FABtx" contractAddress)
-DRIP_FAB=$(seth receipt "$DRIP_FABtx" contractAddress)
+JUG_FAB=$(seth receipt "$JUG_FABtx" contractAddress)
 VOW_FAB=$(seth receipt "$VOW_FABtx" contractAddress)
 CAT_FAB=$(seth receipt "$CAT_FABtx" contractAddress)
 TOKEN_FAB=$(seth receipt "$TOKEN_FABtx" contractAddress)
@@ -68,7 +68,7 @@ cat > load-fab-"$(seth chain)" << EOF
 
 export VAT_FAB=$VAT_FAB
 export PIT_FAB=$PIT_FAB
-export DRIP_FAB=$DRIP_FAB
+export JUG_FAB=$JUG_FAB
 export VOW_FAB=$VOW_FAB
 export CAT_FAB=$CAT_FAB
 export TOKEN_FAB=$TOKEN_FAB

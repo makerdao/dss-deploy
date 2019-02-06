@@ -247,12 +247,12 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testFlap() public {
         deploy();
-        this.file(address(drip), bytes32("ETH"), bytes32("tax"), uint(1.05 * 10 ** 27));
+        this.file(address(jug), bytes32("ETH"), bytes32("tax"), uint(1.05 * 10 ** 27));
         ethJoin.join.value(0.5 ether)(bytes32(bytes20(address(this))));
         pit.frob("ETH", bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), 0.1 ether, 10 ether);
         hevm.warp(now + 1);
         assertEq(vow.Joy(), 0);
-        drip.drip("ETH");
+        jug.drip("ETH");
         assertEq(vow.Joy(), 10 * 0.05 * 10 ** 18);
         this.file(address(vow), bytes32("bump"), uint(0.05 ether));
         uint batchId = vow.flap();
@@ -282,14 +282,14 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testDsr() public {
         deploy();
-        this.file(address(drip), bytes32("ETH"), bytes32("tax"), uint(1.1 * 10 ** 27));
+        this.file(address(jug), bytes32("ETH"), bytes32("tax"), uint(1.1 * 10 ** 27));
         this.file(address(pot), "dsr", uint(1.05 * 10 ** 27));
         ethJoin.join.value(0.5 ether)(bytes32(bytes20(address(this))));
         pit.frob("ETH", bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), 0.1 ether, 10 ether);
         assertEq(vat.dai(bytes32(bytes20(address(this)))), mul(10 ether, ONE));
         pot.save(10 ether);
         hevm.warp(now + 1);
-        drip.drip("ETH");
+        jug.drip("ETH");
         pot.drip();
         pot.save(-int(10 ether));
         assertEq(vat.dai(bytes32(bytes20(address(this)))), mul(10.5 ether, ONE));
@@ -313,7 +313,7 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(vat.wards(address(vow)), 1);
         assertEq(vat.wards(address(cat)), 1);
         assertEq(vat.wards(address(pit)), 1);
-        assertEq(vat.wards(address(drip)), 1);
+        assertEq(vat.wards(address(jug)), 1);
 
         // dai
         assertEq(address(dai.authority()), address(guard));
@@ -342,9 +342,9 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(spotter.wards(address(dssDeploy)), 1);
         assertEq(spotter.wards(address(mom)), 1);
 
-        // drip
-        assertEq(drip.wards(address(dssDeploy)), 1);
-        assertEq(drip.wards(address(mom)), 1);
+        // jug
+        assertEq(jug.wards(address(dssDeploy)), 1);
+        assertEq(jug.wards(address(mom)), 1);
 
         // mom
         assertEq(address(mom.authority()), address(authority));

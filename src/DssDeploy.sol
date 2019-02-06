@@ -20,11 +20,11 @@ import {DSAuth, DSAuthority} from "ds-auth/auth.sol";
 import {DSGuard} from "ds-guard/guard.sol";
 import {DSProxy, DSProxyCache} from "ds-proxy/proxy.sol";
 
-import {Vat} from "dss/tune.sol";
-import {Pit} from "dss/frob.sol";
-import {Drip} from "dss/drip.sol";
-import {Vow} from "dss/heal.sol";
-import {Cat} from "dss/bite.sol";
+import {Vat} from "dss/vat.sol";
+import {Pit} from "dss/pit.sol";
+import {Jug} from "dss/jug.sol";
+import {Vow} from "dss/vow.sol";
+import {Cat} from "dss/cat.sol";
 import {DaiJoin} from "dss/join.sol";
 import {DaiMove} from "dss/move.sol";
 import {Flapper} from "dss/flap.sol";
@@ -51,11 +51,11 @@ contract PitFab {
     }
 }
 
-contract DripFab {
-    function newDrip(Vat vat) public returns (Drip drip) {
-        drip = new Drip(address(vat));
-        drip.rely(msg.sender);
-        drip.deny(address(this));
+contract JugFab {
+    function newJug(Vat vat) public returns (Jug jug) {
+        jug = new Jug(address(vat));
+        jug.rely(msg.sender);
+        jug.deny(address(this));
     }
 }
 
@@ -147,7 +147,7 @@ contract ProxyFab {
 contract DssDeploy is DSAuth {
     VatFab     public vatFab;
     PitFab     public pitFab;
-    DripFab    public dripFab;
+    JugFab     public jugFab;
     VowFab     public vowFab;
     CatFab     public catFab;
     TokenFab   public tokenFab;
@@ -163,7 +163,7 @@ contract DssDeploy is DSAuth {
 
     Vat     public vat;
     Pit     public pit;
-    Drip    public drip;
+    Jug     public jug;
     Vow     public vow;
     Cat     public cat;
     DSToken public dai;
@@ -191,7 +191,7 @@ contract DssDeploy is DSAuth {
     constructor(
         VatFab vatFab_,
         PitFab pitFab_,
-        DripFab dripFab_,
+        JugFab jugFab_,
         VowFab vowFab_,
         CatFab catFab_,
         TokenFab tokenFab_,
@@ -206,7 +206,7 @@ contract DssDeploy is DSAuth {
     ) public {
         vatFab = vatFab_;
         pitFab = pitFab_;
-        dripFab = dripFab_;
+        jugFab = jugFab_;
         vowFab = vowFab_;
         catFab = catFab_;
         tokenFab = tokenFab_;
@@ -265,19 +265,19 @@ contract DssDeploy is DSAuth {
 
         // Deploy
         vow = vowFab.newVow();
-        drip = dripFab.newDrip(vat);
+        jug = jugFab.newJug(vat);
         pot = potFab.newPot(vat);
         flap = flapFab.newFlap(address(daiMove), gov);
 
         // Internal references set up
         vow.file("vat", address(vat));
         vow.file("flap", address(flap));
-        drip.file("vow", bytes32(bytes20(address(vow))));
+        jug.file("vow", bytes32(bytes20(address(vow))));
         pot.file("vow", bytes32(bytes20(address(vow))));
 
         // Internal auth
         vat.rely(address(vow));
-        vat.rely(address(drip));
+        vat.rely(address(jug));
         vat.rely(address(pot));
     }
 
@@ -304,7 +304,7 @@ contract DssDeploy is DSAuth {
     function deployMom(DSAuthority authority) public auth {
         require(address(pit) != address(0), "Missing PIT deployment");
         require(address(vow) != address(0), "Missing VOW deployment");
-        require(address(drip) != address(0), "Missing DRIP deployment");
+        require(address(jug) != address(0), "Missing JUG deployment");
         require(address(cat) != address(0), "Missing CAT deployment");
 
         // Auth
@@ -313,7 +313,7 @@ contract DssDeploy is DSAuth {
         pit.rely(address(mom));
         cat.rely(address(mom));
         vow.rely(address(mom));
-        drip.rely(address(mom));
+        jug.rely(address(mom));
         pot.rely(address(mom));
         spotter.rely(address(mom));
         mom.setAuthority(authority);
@@ -344,7 +344,7 @@ contract DssDeploy is DSAuth {
         cat.file(ilk, "lump", uint(10000 ether)); // 10000 DAI per batch
         cat.file(ilk, "chop", ONE);
         vat.init(ilk);
-        drip.init(ilk);
+        jug.init(ilk);
 
         // Internal auth
         vat.rely(adapter);
@@ -361,7 +361,7 @@ contract DssDeploy is DSAuth {
         cat.rely(dev);
         vow.rely(dev);
         flop.rely(dev);
-        drip.rely(dev);
+        jug.rely(dev);
         pot.rely(dev);
         spotter.rely(dev);
     }

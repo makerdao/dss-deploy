@@ -67,7 +67,7 @@ contract DssDeployTestBase is DSTest {
 
     VatFab vatFab;
     PitFab pitFab;
-    DripFab dripFab;
+    JugFab jugFab;
     VowFab vowFab;
     CatFab catFab;
     TokenFab tokenFab;
@@ -95,7 +95,7 @@ contract DssDeployTestBase is DSTest {
 
     Vat vat;
     Pit pit;
-    Drip drip;
+    Jug jug;
     Vow vow;
     Cat cat;
     Flapper flap;
@@ -130,7 +130,7 @@ contract DssDeployTestBase is DSTest {
     function setUp() public {
         vatFab = new VatFab();
         pitFab = new PitFab();
-        dripFab = new DripFab();
+        jugFab = new JugFab();
         vowFab = new VowFab();
         catFab = new CatFab();
         tokenFab = new TokenFab();
@@ -147,7 +147,7 @@ contract DssDeployTestBase is DSTest {
         dssDeploy = new DssDeploy(
             vatFab,
             pitFab,
-            dripFab,
+            jugFab,
             vowFab,
             catFab,
             tokenFab,
@@ -196,7 +196,7 @@ contract DssDeployTestBase is DSTest {
 
         vat = dssDeploy.vat();
         pit = dssDeploy.pit();
-        drip = dssDeploy.drip();
+        jug = dssDeploy.jug();
         vow = dssDeploy.vow();
         cat = dssDeploy.cat();
         flap = dssDeploy.flap();

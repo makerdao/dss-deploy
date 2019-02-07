@@ -5,7 +5,7 @@ export ETH_GAS=${ETH_GAS:-"7000000"}
 export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
 unset SOLC_FLAGS
 
-test -z "$SKIP_BUILD" && dapp --use solc:0.5.2 build
+test -z "$SKIP_BUILD" && dapp build
 
 # Deploy DGX ilk (adapter, mover, spotter, flip and init variables)
 test -z "$MCD_DEPLOY" && exit 1

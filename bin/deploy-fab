@@ -5,7 +5,7 @@ export ETH_GAS=${ETH_GAS:-"3500000"}
 export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
 unset SOLC_FLAGS
 
-test -z "$SKIP_BUILD" && dapp --use solc:0.5.2 build
+test -z "$SKIP_BUILD" && dapp build
 
 export SETH_ASYNC=yes
 

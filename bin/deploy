@@ -5,7 +5,7 @@ export ETH_GAS=${ETH_GAS:-"7000000"}
 export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
 export SOLC_FLAGS="--optimize"
 
-test -z "$SKIP_BUILD" && dapp --use solc:0.5.2 build
+test -z "$SKIP_BUILD" && dapp build
 
 # Check all fabs are defined
 { test -z "$VAT_FAB" || test -z "$PIT_FAB" || test -z "$JUG_FAB" || test -z "$VOW_FAB" || test -z "$CAT_FAB" || test -z "$TOKEN_FAB" || test -z "$GUARD_FAB" || test -z "$MCD_JOIN_FAB" || test -z "$MCD_MOVE_FAB" ||test -z "$FLAP_FAB" || test -z "$FLOP_FAB" || test -z "$FLIP_FAB" || test -z "$SPOT_FAB" || test -z "$PROXY_FAB"; } && exit 1

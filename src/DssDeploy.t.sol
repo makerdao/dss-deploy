@@ -287,11 +287,11 @@ contract DssDeployTest is DssDeployTestBase {
         ethJoin.join.value(0.5 ether)(bytes32(bytes20(address(this))));
         pit.frob("ETH", bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), 0.1 ether, 10 ether);
         assertEq(vat.dai(bytes32(bytes20(address(this)))), mul(10 ether, ONE));
-        pot.save(10 ether);
+        pot.save(bytes32(bytes20(address(this))), 10 ether);
         hevm.warp(now + 1);
         jug.drip("ETH");
         pot.drip();
-        pot.save(-int(10 ether));
+        pot.save(bytes32(bytes20(address(this))), -int(10 ether));
         assertEq(vat.dai(bytes32(bytes20(address(this)))), mul(10.5 ether, ONE));
     }
 

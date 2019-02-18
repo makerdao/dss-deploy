@@ -330,7 +330,7 @@ contract DssDeploy is DSAuth {
         require(mover   != address(0), "Missing mover address");
         require(pip != address(0), "Missing PIP address");
         require(address(vat) != address(0), "Missing VAT deployment");
-        require(address(cat) != address(0), "Missing VAT deployment");
+        require(address(cat) != address(0), "Missing CAT deployment");
 
         // Deploy
         ilks[ilk].flip = flipFab.newFlip(address(daiMove), mover);

@@ -25,3 +25,6 @@
 [submodule "lib/dsr"]
 	path = lib/dsr
 	url = https://github.com/makerdao/dsr
+[submodule "lib/ds-weth"]
+	path = lib/ds-weth
+	url = https://github.com/dapphub/ds-weth

@@ -4,7 +4,8 @@ import {DSTest} from "ds-test/test.sol";
 import {DSValue} from "ds-value/value.sol";
 import {DSRoles} from "ds-roles/roles.sol";
 
-import {GemJoin, ETHJoin} from "dss/join.sol";
+import {GemJoin} from "dss/join.sol";
+import {WETH9_} from "ds-weth/weth9.sol";
 import {GemMove} from 'dss/move.sol';
 
 import "./DssDeploy.sol";
@@ -34,8 +35,10 @@ contract FakeUser {
         obj.exit(urn, guy, wad);
     }
 
-    function doEthJoin(ETHJoin obj, bytes32 addr, uint wad) public {
-        obj.join.value(wad)(addr);
+    function doEthJoin(WETH9_ obj, GemJoin gem, bytes32 addr, uint wad) public {
+        obj.deposit.value(wad)();
+        obj.approve(address(gem), uint(-1));
+        gem.join(addr, wad);
     }
 
     function doFrob(Pit obj, bytes32 ilk, bytes32 urn, bytes32 gem, bytes32 dai, int dink, int dart) public {
@@ -90,7 +93,8 @@ contract DssDeployTestBase is DSTest {
     DSRoles authority;
     DSGuard guard;
 
-    ETHJoin ethJoin;
+    WETH9_ weth;
+    GemJoin ethJoin;
     GemJoin dgxJoin;
 
     Vat vat;
@@ -209,7 +213,8 @@ contract DssDeployTestBase is DSTest {
         guard = dssDeploy.guard();
         mom = dssDeploy.mom();
 
-        ethJoin = new ETHJoin(address(vat), "ETH");
+        weth = new WETH9_();
+        ethJoin = new GemJoin(address(vat), "ETH", address(weth));
         ethMove = new GemMove(address(vat), "ETH");
         dssDeploy.deployCollateral("ETH", address(ethJoin), address(ethMove), address(pipETH));
 

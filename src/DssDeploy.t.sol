@@ -270,7 +270,6 @@ contract DssDeployTest is DssDeployTestBase {
     function testFlap() public {
         deploy();
         this.file(address(jug), bytes32("ETH"), bytes32("tax"), uint(1.05 * 10 ** 27));
-        ethJoin.join.value(0.5 ether)(bytes32(bytes20(address(this))));
         weth.deposit.value(0.5 ether)();
         weth.approve(address(ethJoin), uint(-1));
         ethJoin.join(bytes32(bytes20(address(this))), 0.5 ether);
@@ -309,7 +308,9 @@ contract DssDeployTest is DssDeployTestBase {
         deploy();
         this.file(address(jug), bytes32("ETH"), bytes32("tax"), uint(1.1 * 10 ** 27));
         this.file(address(pot), "dsr", uint(1.05 * 10 ** 27));
-        ethJoin.join.value(0.5 ether)(bytes32(bytes20(address(this))));
+        weth.deposit.value(0.5 ether)();
+        weth.approve(address(ethJoin), uint(-1));
+        ethJoin.join(bytes32(bytes20(address(this))), 0.5 ether);
         pit.frob("ETH", bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), bytes32(bytes20(address(this))), 0.1 ether, 10 ether);
         assertEq(vat.dai(bytes32(bytes20(address(this)))), mul(10 ether, ONE));
         pot.save(bytes32(bytes20(address(this))), 10 ether);

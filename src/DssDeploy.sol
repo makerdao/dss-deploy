@@ -21,7 +21,6 @@ import {DSGuard} from "ds-guard/guard.sol";
 import {DSProxy, DSProxyCache} from "ds-proxy/proxy.sol";
 
 import {Vat} from "dss/vat.sol";
-import {Pit} from "dss/pit.sol";
 import {Jug} from "dss/jug.sol";
 import {Vow} from "dss/vow.sol";
 import {Cat} from "dss/cat.sol";
@@ -40,14 +39,6 @@ contract VatFab {
         vat = new Vat();
         vat.rely(msg.sender);
         vat.deny(address(this));
-    }
-}
-
-contract PitFab {
-    function newPit(Vat vat) public returns (Pit pit) {
-        pit = new Pit(address(vat));
-        pit.rely(msg.sender);
-        pit.deny(address(this));
     }
 }
 
@@ -122,8 +113,8 @@ contract FlipFab {
 }
 
 contract SpotFab {
-    function newSpotter(Pit pit) public returns (Spotter spotter) {
-        spotter = new Spotter(address(pit));
+    function newSpotter(Vat vat) public returns (Spotter spotter) {
+        spotter = new Spotter(address(vat));
         spotter.rely(msg.sender);
         spotter.deny(address(this));
     }
@@ -146,7 +137,6 @@ contract ProxyFab {
 
 contract DssDeploy is DSAuth {
     VatFab     public vatFab;
-    PitFab     public pitFab;
     JugFab     public jugFab;
     VowFab     public vowFab;
     CatFab     public catFab;
@@ -162,7 +152,6 @@ contract DssDeploy is DSAuth {
     ProxyFab   public proxyFab;
 
     Vat     public vat;
-    Pit     public pit;
     Jug     public jug;
     Vow     public vow;
     Cat     public cat;
@@ -190,7 +179,6 @@ contract DssDeploy is DSAuth {
 
     constructor(
         VatFab vatFab_,
-        PitFab pitFab_,
         JugFab jugFab_,
         VowFab vowFab_,
         CatFab catFab_,
@@ -205,7 +193,6 @@ contract DssDeploy is DSAuth {
         ProxyFab proxyFab_
     ) public {
         vatFab = vatFab_;
-        pitFab = pitFab_;
         jugFab = jugFab_;
         vowFab = vowFab_;
         catFab = catFab_;
@@ -228,16 +215,10 @@ contract DssDeploy is DSAuth {
         require(address(potFab) != address(0), "addExtraFabs not executed");
         require(address(vat) == address(0), "VAT already deployed");
         vat = vatFab.newVat();
-    }
-
-    function deployPit() public auth {
-        require(address(vat) != address(0), "Missing VAT deployment");
-        pit = pitFab.newPit(vat);
-        spotter = spotFab.newSpotter(pit);
+        spotter = spotFab.newSpotter(vat);
 
         // Internal auth
-        vat.rely(address(pit));
-        pit.rely(address(spotter));
+        vat.rely(address(spotter));
     }
 
     function deployDai() public auth {
@@ -261,7 +242,6 @@ contract DssDeploy is DSAuth {
     function deployTaxation(address gov) public auth {
         require(gov != address(0), "Missing GOV address");
         require(address(vat) != address(0), "Missing VAT deployment");
-        require(address(pit) != address(0), "Missing PIT deployment");
 
         // Deploy
         vow = vowFab.newVow();
@@ -283,13 +263,11 @@ contract DssDeploy is DSAuth {
 
     function deployLiquidation(address gov) public auth {
         require(address(vat) != address(0), "Missing VAT deployment");
-        require(address(pit) != address(0), "Missing PIT deployment");
         require(address(vow) != address(0), "Missing VOW deployment");
 
         // Deploy
         cat = catFab.newCat(vat);
         cat.file("vow", address(vow));
-        cat.file("pit", address(pit));
         flop = flopFab.newFlop(address(daiMove), gov);
 
         // Internal references set up
@@ -302,7 +280,6 @@ contract DssDeploy is DSAuth {
     }
 
     function deployMom(DSAuthority authority) public auth {
-        require(address(pit) != address(0), "Missing PIT deployment");
         require(address(vow) != address(0), "Missing VOW deployment");
         require(address(jug) != address(0), "Missing JUG deployment");
         require(address(cat) != address(0), "Missing CAT deployment");
@@ -310,7 +287,6 @@ contract DssDeploy is DSAuth {
         // Auth
         mom = proxyFab.newProxy();
         vat.rely(address(mom));
-        pit.rely(address(mom));
         cat.rely(address(mom));
         vow.rely(address(mom));
         jug.rely(address(mom));
@@ -357,7 +333,6 @@ contract DssDeploy is DSAuth {
     // developer backdoor
     function rely(address dev) public auth {
         vat.rely(dev);
-        pit.rely(dev);
         cat.rely(dev);
         vow.rely(dev);
         flop.rely(dev);

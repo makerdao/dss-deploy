@@ -12,5 +12,5 @@ seth send "$MCD_SPOT" 'poke(bytes32)' "$eth"
 # 10M debt ceiling
 Line=$(seth --to-bytes32 "$(seth --from-ascii "Line")")
 line=$(seth --to-bytes32 "$(seth --from-ascii "line")")
-seth send "$MCD_MOM" 'file(address,bytes32,bytes32,uint256)' "$MCD_PIT" "$eth" "$line" "$(sai wad 10000000.0)"
-seth send "$MCD_MOM" 'file(address,bytes32,uint256)' "$MCD_PIT" "$Line" "$(sai wad 10000000.0)"
+seth send "$MCD_MOM" 'file(address,bytes32,bytes32,uint256)' "$MCD_PIT" "$eth" "$line" "$(seth --to-uint256 "$(echo 10000000*10^45 | bc)")"
+seth send "$MCD_MOM" 'file(address,bytes32,uint256)' "$MCD_PIT" "$Line" "$(seth --to-uint256 "$(echo 10000000*10^45 | bc)")"

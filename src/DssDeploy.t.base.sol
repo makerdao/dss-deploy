@@ -41,7 +41,7 @@ contract FakeUser {
         gem.join(addr, wad);
     }
 
-    function doFrob(Pit obj, bytes32 ilk, bytes32 urn, bytes32 gem, bytes32 dai, int dink, int dart) public {
+    function doFrob(Vat obj, bytes32 ilk, bytes32 urn, bytes32 gem, bytes32 dai, int dink, int dart) public {
         obj.frob(ilk, urn, gem, dai, dink, dart);
     }
 
@@ -69,7 +69,6 @@ contract DssDeployTestBase is DSTest {
     Hevm hevm;
 
     VatFab vatFab;
-    PitFab pitFab;
     JugFab jugFab;
     VowFab vowFab;
     CatFab catFab;
@@ -98,7 +97,6 @@ contract DssDeployTestBase is DSTest {
     GemJoin dgxJoin;
 
     Vat vat;
-    Pit pit;
     Jug jug;
     Vow vow;
     Cat cat;
@@ -133,7 +131,6 @@ contract DssDeployTestBase is DSTest {
 
     function setUp() public {
         vatFab = new VatFab();
-        pitFab = new PitFab();
         jugFab = new JugFab();
         vowFab = new VowFab();
         catFab = new CatFab();
@@ -150,7 +147,6 @@ contract DssDeployTestBase is DSTest {
 
         dssDeploy = new DssDeploy(
             vatFab,
-            pitFab,
             jugFab,
             vowFab,
             catFab,
@@ -192,14 +188,12 @@ contract DssDeployTestBase is DSTest {
 
     function deploy() public {
         dssDeploy.deployVat();
-        dssDeploy.deployPit();
         dssDeploy.deployDai();
         dssDeploy.deployTaxation(address(gov));
         dssDeploy.deployLiquidation(address(gov));
         dssDeploy.deployMom(authority);
 
         vat = dssDeploy.vat();
-        pit = dssDeploy.pit();
         jug = dssDeploy.jug();
         vow = dssDeploy.vow();
         cat = dssDeploy.cat();
@@ -225,9 +219,9 @@ contract DssDeployTestBase is DSTest {
 
         // Set Params
         momLib = new MomLib();
-        this.file(address(pit), bytes32("Line"), uint(10000 ether));
-        this.file(address(pit), bytes32("ETH"), bytes32("line"), uint(10000 ether));
-        this.file(address(pit), bytes32("DGX"), bytes32("line"), uint(10000 ether));
+        this.file(address(vat), bytes32("Line"), uint(10000 * 10 ** 45));
+        this.file(address(vat), bytes32("ETH"), bytes32("line"), uint(10000 * 10 ** 45));
+        this.file(address(vat), bytes32("DGX"), bytes32("line"), uint(10000 * 10 ** 45));
 
         pipETH.poke(bytes32(uint(300 * 10 ** 18))); // Price 300 DAI = 1 ETH (precision 18)
         pipDGX.poke(bytes32(uint(45 * 10 ** 18))); // Price 45 DAI = 1 DGX (precision 18)
@@ -237,9 +231,9 @@ contract DssDeployTestBase is DSTest {
         this.file(address(spotter), "DGX", "mat", uint(1100000000 ether)); // Liquidation ratio 110%
         spotter.poke("ETH");
         spotter.poke("DGX");
-        (uint spot, ) = pit.ilks("ETH");
+        (,,uint spot,,) = vat.ilks("ETH");
         assertEq(spot, 300 * ONE * ONE / 1500000000 ether);
-        (spot, ) = pit.ilks("DGX");
+        (,, spot,,) = vat.ilks("DGX");
         assertEq(spot, 45 * ONE * ONE / 1100000000 ether);
 
         DSGuard(address(gov.authority())).permit(address(flop), address(gov), bytes4(keccak256("mint(address,uint256)")));

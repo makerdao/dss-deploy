@@ -22,31 +22,39 @@ contract AuctionLike {
     function deal(uint) public;
 }
 
+contract HopeLike {
+    function hope(address guy) public;
+}
+
 contract FakeUser {
-    function doApprove(DSToken token, address guy) public {
-        token.approve(guy);
+    function doApprove(address token, address guy) public {
+        DSToken(token).approve(guy);
     }
 
-    function doDaiJoin(DaiJoin obj, bytes32 urn, uint wad) public {
-        obj.join(urn, wad);
+    function doDaiJoin(address obj, bytes32 urn, uint wad) public {
+        DaiJoin(obj).join(urn, wad);
     }
 
-    function doDaiExit(DaiJoin obj, bytes32 urn, address guy, uint wad) public {
-        obj.exit(urn, guy, wad);
+    function doDaiExit(address obj, bytes32 urn, address guy, uint wad) public {
+        DaiJoin(obj).exit(urn, guy, wad);
     }
 
-    function doEthJoin(WETH9_ obj, GemJoin gem, bytes32 addr, uint wad) public {
-        obj.deposit.value(wad)();
-        obj.approve(address(gem), uint(-1));
-        gem.join(addr, wad);
+    function doEthJoin(address payable obj, address gem, bytes32 addr, uint wad) public {
+        WETH9_(obj).deposit.value(wad)();
+        WETH9_(obj).approve(address(gem), uint(-1));
+        GemJoin(gem).join(addr, wad);
     }
 
-    function doFrob(Vat obj, bytes32 ilk, bytes32 urn, bytes32 gem, bytes32 dai, int dink, int dart) public {
-        obj.frob(ilk, urn, gem, dai, dink, dart);
+    function doFrob(address obj, bytes32 ilk, bytes32 urn, bytes32 gem, bytes32 dai, int dink, int dart) public {
+        Vat(obj).frob(ilk, urn, gem, dai, dink, dart);
     }
 
-    function doHope(DaiMove obj, address guy) public {
-        obj.hope(guy);
+    function doFork(address obj, bytes32 ilk, bytes32 src, bytes32 dst, int dink, int dart) public {
+        Vat(obj).fork(ilk, src, dst, dink, dart);
+    }
+
+    function doHope(address obj, address guy) public {
+        HopeLike(obj).hope(guy);
     }
 
     function doTend(address obj, uint id, uint lot, uint bid) public {
@@ -122,6 +130,8 @@ contract DssDeployTestBase is DSTest {
 
     MomLib momLib;
 
+    bytes32 urn;
+
     // --- Math ---
     uint256 constant ONE = 10 ** 27;
 
@@ -176,6 +186,8 @@ contract DssDeployTestBase is DSTest {
 
         hevm = Hevm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
         hevm.warp(0);
+
+        urn = bytes32(bytes20(address(this)));
     }
 
     function file(address, bytes32, uint) external {

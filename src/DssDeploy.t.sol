@@ -152,6 +152,16 @@ contract DssDeployTest is DssDeployTestBase {
         user1.doFrob(address(vat), "ETH", urn, urn, urn, 0.5 ether, 60 ether);
     }
 
+    function testFailFrobDust() public {
+        deploy();
+        weth.deposit.value(100 ether)(); // Big number just to make sure to avoid unsafe situation
+        weth.approve(address(ethJoin), uint(-1));
+        ethJoin.join(urn, 100 ether);
+
+        this.file(address(vat), "ETH", "dust", mul(ONE, 20 ether));
+        vat.frob("ETH", urn, urn, urn, 100 ether, 19 ether);
+    }
+
     function testFailFrobFromAnotherUser() public {
         deploy();
         weth.deposit.value(1 ether)();
@@ -439,6 +449,32 @@ contract DssDeployTest is DssDeployTestBase {
         vat.frob("ETH", urn, urn, urn, 1 ether, 60 ether);
         bytes32 notOwnedUrn = bytes32(bytes20(address(user1)));
         vat.fork("ETH", urn, notOwnedUrn, 0.1 ether, 59 ether);
+    }
+
+    function testFailForkDustSrc() public {
+        deploy();
+        weth.deposit.value(100 ether)(); // Big number just to make sure to avoid unsafe situation
+        weth.approve(address(ethJoin), uint(-1));
+        ethJoin.join(urn, 100 ether);
+
+        this.file(address(vat), "ETH", "dust", mul(ONE, 20 ether));
+        vat.frob("ETH", urn, urn, urn, 100 ether, 60 ether);
+
+        bytes32 otherOwnedUrn = bytes32(uint(address(this)) * 2 ** (12 * 8) + uint96(1));
+        vat.fork("ETH", urn, otherOwnedUrn, 50 ether, 19 ether);
+    }
+
+    function testFailForkDustDst() public {
+        deploy();
+        weth.deposit.value(100 ether)(); // Big number just to make sure to avoid unsafe situation
+        weth.approve(address(ethJoin), uint(-1));
+        ethJoin.join(urn, 100 ether);
+
+        this.file(address(vat), "ETH", "dust", mul(ONE, 20 ether));
+        vat.frob("ETH", urn, urn, urn, 100 ether, 60 ether);
+
+        bytes32 otherOwnedUrn = bytes32(uint(address(this)) * 2 ** (12 * 8) + uint96(1));
+        vat.fork("ETH", urn, otherOwnedUrn, 50 ether, 41 ether);
     }
 
     function testAuth() public {

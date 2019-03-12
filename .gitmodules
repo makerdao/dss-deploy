@@ -25,3 +25,6 @@
 [submodule "lib/ds-weth"]
 	path = lib/ds-weth
 	url = https://github.com/dapphub/ds-weth
+[submodule "lib/tokens"]
+	path = lib/tokens
+	url = git@github.com:mrchico/tokens

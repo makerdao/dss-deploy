@@ -110,7 +110,7 @@ contract DssDeployTestBase is DSTest {
     Cat cat;
     Flapper flap;
     Flopper flop;
-    DSToken dai;
+    ERC20   dai;
     DaiJoin daiJoin;
     DaiMove daiMove;
     Spotter spotter;
@@ -201,6 +201,7 @@ contract DssDeployTestBase is DSTest {
     function deploy() public {
         dssDeploy.deployVat();
         dssDeploy.deployDai();
+        dssDeploy.deployGuard();
         dssDeploy.deployTaxation(address(gov));
         dssDeploy.deployLiquidation(address(gov));
         dssDeploy.deployMom(authority);

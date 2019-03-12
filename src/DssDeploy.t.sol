@@ -498,9 +498,7 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(vat.wards(address(spotter)), 1);
 
         // dai
-        assertEq(address(dai.authority()), address(guard));
-        assertTrue(guard.canCall(address(daiJoin), address(dai), bytes4(keccak256("mint(address,uint256)"))));
-        assertTrue(guard.canCall(address(daiJoin), address(dai), bytes4(keccak256("burn(address,uint256)"))));
+        assertEq(dai.wards(address(daiJoin)), 1);
 
         // flop
         assertEq(flop.wards(address(dssDeploy)), 1);

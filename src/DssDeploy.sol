@@ -16,6 +16,7 @@
 pragma solidity >=0.5.0;
 
 import {DSToken} from "ds-token/token.sol";
+import {ERC20} from "tokens/erc20.sol";
 import {DSAuth, DSAuthority} from "ds-auth/auth.sol";
 import {DSGuard} from "ds-guard/guard.sol";
 import {DSProxy, DSProxyCache} from "ds-proxy/proxy.sol";
@@ -67,9 +68,10 @@ contract CatFab {
 }
 
 contract TokenFab {
-    function newToken(bytes32 symbol) public returns (DSToken token) {
-        token = new DSToken(symbol);
-        token.setOwner(msg.sender);
+    function newToken(string memory symbol, string memory name) public returns (ERC20 token) {
+        token = new ERC20(symbol, name);
+        token.rely(msg.sender);
+        token.deny(address(this));
     }
 }
 
@@ -155,7 +157,7 @@ contract DssDeploy is DSAuth {
     Jug     public jug;
     Vow     public vow;
     Cat     public cat;
-    DSToken public dai;
+    ERC20   public dai;
     DSGuard public guard;
     DaiJoin public daiJoin;
     DaiMove public daiMove;
@@ -221,17 +223,17 @@ contract DssDeploy is DSAuth {
         vat.rely(address(spotter));
     }
 
+    function deployGuard() public auth {
+        guard = guardFab.newGuard();
+    }
+
     function deployDai() public auth {
         require(address(vat) != address(0), "Missing VAT deployment");
 
         // Deploy
-        dai     = tokenFab.newToken("DAI");
+        dai     = tokenFab.newToken("DAI", "DAI");
         daiJoin = daiJoinFab.newDaiJoin(vat, address(dai));
-        guard = guardFab.newGuard();
-        guard.permit(address(daiJoin), address(dai), bytes4(keccak256("mint(address,uint256)")));
-        guard.permit(address(daiJoin), address(dai), bytes4(keccak256("burn(address,uint256)")));
-        dai.setAuthority(guard);
-        dai.setOwner(address(0));
+        dai.rely(address(daiJoin));
         daiMove = daiMoveFab.newDaiMove(vat);
 
         // Internal auth

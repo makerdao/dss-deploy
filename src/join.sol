@@ -19,14 +19,14 @@ pragma solidity >=0.5.0;
 
 import "ds-note/note.sol";
 
-contract Token3Like {
+contract Gem2TokenLike {
     function transfer(address,uint) public;
     function transferFrom(address,address,uint) public;
     function balanceOf(address) public view returns (uint);
     function allowance(address,address) public view returns (uint);
 }
 
-contract Token5Like {
+contract Gem3TokenLike {
     function decimals() public returns (uint);
     function transfer(address,uint) public returns (bool);
     function transferFrom(address,address,uint) public returns (bool);
@@ -41,9 +41,8 @@ contract VatLike {
     token implementations, creating a bounded context for the Vat. The
     adapters here are provided as working examples:
 
-        - `Token3Join`: For a token that does not return a bool on transfer or
-                    transferFrom
-        - `Token5Join`: For a token that has a lower precision
+        - `GemJoin2`: For a token that does not return a bool on transfer or transferFrom (like Token3)
+        - `GemJoin3`: For a token that has a lower precision than 18 (like Token5)
 
     In practice, adapter implementations will be varied and specific to
     individual collateral types, accounting for different transfer
@@ -57,14 +56,14 @@ contract VatLike {
 */
 
 // This is one way of doing it. Check the balances before and after calling a transfer
-contract Token3Join is DSNote {
+contract GemJoin2 is DSNote {
     VatLike public vat;
     bytes32 public ilk;
-    Token3Like public gem;
+    Gem2TokenLike public gem;
     constructor(address vat_, bytes32 ilk_, address gem_) public {
         vat = VatLike(vat_);
         ilk = ilk_;
-        gem = Token3Like(gem_);
+        gem = Gem2TokenLike(gem_);
     }
     function join(bytes32 urn, uint wad) public note {
         require(int(wad) >= 0, "");
@@ -96,14 +95,14 @@ contract Token3Join is DSNote {
     }
 }
 
-contract Token5Join is DSNote {
+contract GemJoin3 is DSNote {
     VatLike public vat;
     bytes32 public ilk;
-    Token5Like public gem;
+    Gem3TokenLike public gem;
     constructor(address vat_, bytes32 ilk_, address gem_) public {
         vat = VatLike(vat_);
         ilk = ilk_;
-        gem = Token5Like(gem_);
+        gem = Gem3TokenLike(gem_);
         require(gem.decimals() < 18, "");
     }
     function join(bytes32 urn, uint wad) public note {

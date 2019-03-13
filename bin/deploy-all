@@ -40,8 +40,48 @@ source "${SCRIPT_DIR}/../load-mcd-$(seth chain)"
 
 message DEPLOYING ETH
 
-"${SCRIPT_DIR}/deploy-ilk" "ETH-A" "GemJoin" "ETH" "Weth9_"
+"${SCRIPT_DIR}/deploy-ilk-eth"
 # shellcheck source=/dev/null
 source "${SCRIPT_DIR}/../load-ilk-eth-a-$(seth chain)"
+
+# -----------------------------------------------------------------------------------------
+
+message DEPLOYING COL1
+
+"${SCRIPT_DIR}/deploy-ilk-col1"
+# shellcheck source=/dev/null
+source "${SCRIPT_DIR}/../load-ilk-col1-a-$(seth chain)"
+
+# -----------------------------------------------------------------------------------------
+
+message DEPLOYING COL2
+
+"${SCRIPT_DIR}/deploy-ilk-col2"
+# shellcheck source=/dev/null
+source "${SCRIPT_DIR}/../load-ilk-col2-a-$(seth chain)"
+
+# -----------------------------------------------------------------------------------------
+
+message DEPLOYING COL3
+
+"${SCRIPT_DIR}/deploy-ilk-col3"
+# shellcheck source=/dev/null
+source "${SCRIPT_DIR}/../load-ilk-col3-a-$(seth chain)"
+
+# -----------------------------------------------------------------------------------------
+
+message DEPLOYING COL4
+
+"${SCRIPT_DIR}/deploy-ilk-col4"
+# shellcheck source=/dev/null
+source "${SCRIPT_DIR}/../load-ilk-col4-a-$(seth chain)"
+
+# -----------------------------------------------------------------------------------------
+
+message DEPLOYING COL5
+
+"${SCRIPT_DIR}/deploy-ilk-col5"
+# shellcheck source=/dev/null
+source "${SCRIPT_DIR}/../load-ilk-col5-a-$(seth chain)"
 
 # -----------------------------------------------------------------------------------------

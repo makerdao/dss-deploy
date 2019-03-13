@@ -2,6 +2,14 @@ pragma solidity >=0.5.0;
 
 import "./DssDeploy.t.base.sol";
 
+import "./join.sol";
+
+import "./token1.sol";
+import "./token2.sol";
+import "./token3.sol";
+import "./token4.sol";
+import "./token5.sol";
+
 contract DssDeployTest is DssDeployTestBase {
     function testDeploy() public {
         deploy();
@@ -37,13 +45,13 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testJoinGem() public {
         deploy();
-        dgx.mint(1 ether);
-        assertEq(dgx.balanceOf(address(this)), 1 ether);
-        assertEq(vat.gem("DGX", urn), 0);
-        dgx.approve(address(dgxJoin), 1 ether);
-        dgxJoin.join(urn, 1 ether);
-        assertEq(dgx.balanceOf(address(this)), 0);
-        assertEq(vat.gem("DGX", urn), 1 ether);
+        col.mint(1 ether);
+        assertEq(col.balanceOf(address(this)), 1 ether);
+        assertEq(vat.gem("COL", urn), 0);
+        col.approve(address(colJoin), 1 ether);
+        colJoin.join(urn, 1 ether);
+        assertEq(col.balanceOf(address(this)), 0);
+        assertEq(vat.gem("COL", urn), 1 ether);
     }
 
     function testExitETH() public {
@@ -57,12 +65,12 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testExitGem() public {
         deploy();
-        dgx.mint(1 ether);
-        dgx.approve(address(dgxJoin), 1 ether);
-        dgxJoin.join(urn, 1 ether);
-        dgxJoin.exit(urn, address(this), 1 ether);
-        assertEq(dgx.balanceOf(address(this)), 1 ether);
-        assertEq(vat.gem("DGX", urn), 0);
+        col.mint(1 ether);
+        col.approve(address(colJoin), 1 ether);
+        colJoin.join(urn, 1 ether);
+        colJoin.exit(urn, address(this), 1 ether);
+        assertEq(col.balanceOf(address(this)), 1 ether);
+        assertEq(vat.gem("COL", urn), 0);
     }
 
     function testFrobDrawDai() public {
@@ -84,11 +92,11 @@ contract DssDeployTest is DssDeployTestBase {
     function testFrobDrawDaiGem() public {
         deploy();
         assertEq(dai.balanceOf(address(this)), 0);
-        dgx.mint(1 ether);
-        dgx.approve(address(dgxJoin), 1 ether);
-        dgxJoin.join(urn, 1 ether);
+        col.mint(1 ether);
+        col.approve(address(colJoin), 1 ether);
+        colJoin.join(urn, 1 ether);
 
-        vat.frob("DGX", urn, urn, urn, 0.5 ether, 20 ether);
+        vat.frob("COL", urn, urn, urn, 0.5 ether, 20 ether);
 
         daiJoin.exit(urn, address(this), 20 ether);
         assertEq(dai.balanceOf(address(this)), 20 ether);
@@ -104,10 +112,10 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testFrobDrawDaiGemLimit() public {
         deploy();
-        dgx.mint(1 ether);
-        dgx.approve(address(dgxJoin), 1 ether);
-        dgxJoin.join(urn, 1 ether);
-        vat.frob("DGX", urn, urn, urn, 0.5 ether, 20.454545454545454545 ether); // 0.5 * 45 / 1.1 = 20.454545454545454545 DAI max
+        col.mint(1 ether);
+        col.approve(address(colJoin), 1 ether);
+        colJoin.join(urn, 1 ether);
+        vat.frob("COL", urn, urn, urn, 0.5 ether, 20.454545454545454545 ether); // 0.5 * 45 / 1.1 = 20.454545454545454545 DAI max
     }
 
     function testFailFrobDrawDaiLimit() public {
@@ -120,10 +128,10 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testFailFrobDrawDaiGemLimit() public {
         deploy();
-        dgx.mint(1 ether);
-        dgx.approve(address(dgxJoin), 1 ether);
-        dgxJoin.join(urn, 1 ether);
-        vat.frob("DGX", urn, urn, urn, 0.5 ether, 20.454545454545454545 ether + 1);
+        col.mint(1 ether);
+        col.approve(address(colJoin), 1 ether);
+        colJoin.join(urn, 1 ether);
+        vat.frob("COL", urn, urn, urn, 0.5 ether, 20.454545454545454545 ether + 1);
     }
 
     function testFrobPaybackDai() public {
@@ -477,6 +485,62 @@ contract DssDeployTest is DssDeployTestBase {
         vat.fork("ETH", urn, otherOwnedUrn, 50 ether, 41 ether);
     }
 
+    function testTokens() public {
+        deploy();
+        DSValue pip = new DSValue();
+        Token1 token1 = new Token1(100 ether);
+        GemJoin col1Join = new GemJoin(address(vat), "COL1", address(token1));
+        Token2 token2 = new Token2(100 ether);
+        GemJoin col2Join = new GemJoin(address(vat), "COL2", address(token2));
+        Token3 token3 = new Token3(100 ether);
+        GemJoin2 col3Join = new GemJoin2(address(vat), "COL3", address(token3));
+        Token4 token4 = new Token4(100 ether);
+        GemJoin col4Join = new GemJoin(address(vat), "COL4", address(token4));
+        Token5 token5 = new Token5(100 ether);
+        GemJoin3 col5Join = new GemJoin3(address(vat), "COL5", address(token5));
+
+        dssDeploy.deployCollateral("COL1", address(col1Join), address(1), address(pip));
+        dssDeploy.deployCollateral("COL2", address(col2Join), address(1), address(pip));
+        dssDeploy.deployCollateral("COL3", address(col3Join), address(1), address(pip));
+        dssDeploy.deployCollateral("COL4", address(col4Join), address(1), address(pip));
+        dssDeploy.deployCollateral("COL5", address(col5Join), address(1), address(pip));
+
+        token1.approve(address(col1Join), uint(-1));
+        assertEq(token1.balanceOf(address(col1Join)), 0);
+        assertEq(vat.gem("COL1", urn), 0);
+        col1Join.join(urn, 10);
+        assertEq(token1.balanceOf(address(col1Join)), 10);
+        assertEq(vat.gem("COL1", urn), 10);
+
+        token2.approve(address(col2Join), uint(-1));
+        assertEq(token2.balanceOf(address(col2Join)), 0);
+        assertEq(vat.gem("COL2", urn), 0);
+        col2Join.join(urn, 10);
+        assertEq(token2.balanceOf(address(col2Join)), 10);
+        assertEq(vat.gem("COL2", urn), 10);
+
+        token3.approve(address(col3Join), uint(-1));
+        assertEq(token3.balanceOf(address(col3Join)), 0);
+        assertEq(vat.gem("COL3", urn), 0);
+        col3Join.join(urn, 10);
+        assertEq(token3.balanceOf(address(col3Join)), 10);
+        assertEq(vat.gem("COL3", urn), 10);
+
+        token4.approve(address(col4Join), uint(-1));
+        assertEq(token1.balanceOf(address(col4Join)), 0);
+        assertEq(vat.gem("COL4", urn), 0);
+        col4Join.join(urn, 10);
+        assertEq(token4.balanceOf(address(col4Join)), 10);
+        assertEq(vat.gem("COL4", urn), 10);
+
+        token5.approve(address(col5Join), uint(-1));
+        assertEq(token1.balanceOf(address(col5Join)), 0);
+        assertEq(vat.gem("COL5", urn), 0);
+        col5Join.join(urn, 10);
+        assertEq(token5.balanceOf(address(col5Join)), 10);
+        assertEq(vat.gem("COL5", urn), 10 * 10 ** 9);
+    }
+
     function testAuth() public {
         deploy();
 
@@ -486,8 +550,8 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(vat.wards(address(ethJoin)), 1);
         assertEq(vat.wards(address(ethMove)), 1);
 
-        assertEq(vat.wards(address(dgxJoin)), 1);
-        assertEq(vat.wards(address(dgxMove)), 1);
+        assertEq(vat.wards(address(colJoin)), 1);
+        assertEq(vat.wards(address(colMove)), 1);
 
         assertEq(vat.wards(address(daiJoin)), 1);
         assertEq(vat.wards(address(daiMove)), 1);

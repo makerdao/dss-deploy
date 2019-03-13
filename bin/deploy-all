@@ -38,26 +38,10 @@ source "${SCRIPT_DIR}/../load-mcd-$(seth chain)"
 
 # -----------------------------------------------------------------------------------------
 
-message DEPLOYING REP
-
-"${SCRIPT_DIR}/deploy-rep"
-# shellcheck source=/dev/null
-source "${SCRIPT_DIR}/../load-ilk-rep-$(seth chain)"
-
-# -----------------------------------------------------------------------------------------
-
-message DEPLOYING DGX
-
-"${SCRIPT_DIR}/deploy-dgx"
-# shellcheck source=/dev/null
-source "${SCRIPT_DIR}/../load-ilk-dgx-$(seth chain)"
-
-# -----------------------------------------------------------------------------------------
-
 message DEPLOYING ETH
 
-"${SCRIPT_DIR}/deploy-eth"
+"${SCRIPT_DIR}/deploy-ilk" "ETH-A" "GemJoin" "ETH" "Weth9_"
 # shellcheck source=/dev/null
-source "${SCRIPT_DIR}/../load-ilk-eth-$(seth chain)"
+source "${SCRIPT_DIR}/../load-ilk-eth-a-$(seth chain)"
 
 # -----------------------------------------------------------------------------------------

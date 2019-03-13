@@ -95,14 +95,14 @@ contract DssDeployTestBase is DSTest {
 
     DSToken gov;
     DSValue pipETH;
-    DSValue pipDGX;
+    DSValue pipCOL;
 
     DSRoles authority;
     DSGuard guard;
 
     WETH9_ weth;
     GemJoin ethJoin;
-    GemJoin dgxJoin;
+    GemJoin colJoin;
 
     Vat vat;
     Jug jug;
@@ -121,9 +121,9 @@ contract DssDeployTestBase is DSTest {
     GemMove ethMove;
     Flipper ethFlip;
 
-    DSToken dgx;
-    GemMove dgxMove;
-    Flipper dgxFlip;
+    DSToken col;
+    GemMove colMove;
+    Flipper colFlip;
 
     FakeUser user1;
     FakeUser user2;
@@ -175,7 +175,7 @@ contract DssDeployTestBase is DSTest {
         gov = new DSToken("GOV");
         gov.setAuthority(new DSGuard());
         pipETH = new DSValue();
-        pipDGX = new DSValue();
+        pipCOL = new DSValue();
         authority = new DSRoles();
         authority.setRootUser(address(this), true);
 
@@ -224,28 +224,28 @@ contract DssDeployTestBase is DSTest {
         ethMove = new GemMove(address(vat), "ETH");
         dssDeploy.deployCollateral("ETH", address(ethJoin), address(ethMove), address(pipETH));
 
-        dgx = new DSToken("DGX");
-        dgxJoin = new GemJoin(address(vat), "DGX", address(dgx));
-        dgxMove = new GemMove(address(vat), "DGX");
-        dssDeploy.deployCollateral("DGX", address(dgxJoin), address(dgxMove), address(pipDGX));
+        col = new DSToken("COL");
+        colJoin = new GemJoin(address(vat), "COL", address(col));
+        colMove = new GemMove(address(vat), "COL");
+        dssDeploy.deployCollateral("COL", address(colJoin), address(colMove), address(pipCOL));
 
         // Set Params
         momLib = new MomLib();
         this.file(address(vat), bytes32("Line"), uint(10000 * 10 ** 45));
         this.file(address(vat), bytes32("ETH"), bytes32("line"), uint(10000 * 10 ** 45));
-        this.file(address(vat), bytes32("DGX"), bytes32("line"), uint(10000 * 10 ** 45));
+        this.file(address(vat), bytes32("COL"), bytes32("line"), uint(10000 * 10 ** 45));
 
         pipETH.poke(bytes32(uint(300 * 10 ** 18))); // Price 300 DAI = 1 ETH (precision 18)
-        pipDGX.poke(bytes32(uint(45 * 10 ** 18))); // Price 45 DAI = 1 DGX (precision 18)
+        pipCOL.poke(bytes32(uint(45 * 10 ** 18))); // Price 45 DAI = 1 COL (precision 18)
         (ethFlip,,) = dssDeploy.ilks("ETH");
-        (dgxFlip,,) = dssDeploy.ilks("DGX");
+        (colFlip,,) = dssDeploy.ilks("COL");
         this.file(address(spotter), "ETH", "mat", uint(1500000000 ether)); // Liquidation ratio 150%
-        this.file(address(spotter), "DGX", "mat", uint(1100000000 ether)); // Liquidation ratio 110%
+        this.file(address(spotter), "COL", "mat", uint(1100000000 ether)); // Liquidation ratio 110%
         spotter.poke("ETH");
-        spotter.poke("DGX");
+        spotter.poke("COL");
         (,,uint spot,,) = vat.ilks("ETH");
         assertEq(spot, 300 * ONE * ONE / 1500000000 ether);
-        (,, spot,,) = vat.ilks("DGX");
+        (,, spot,,) = vat.ilks("COL");
         assertEq(spot, 45 * ONE * ONE / 1100000000 ether);
 
         DSGuard(address(gov.authority())).permit(address(flop), address(gov), bytes4(keccak256("mint(address,uint256)")));

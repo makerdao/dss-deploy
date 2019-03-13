@@ -3,7 +3,7 @@
 // approve does not return bool
 pragma solidity >=0.5.0;
 
-contract COL3Token {
+contract Token3 {
 
     function add(uint x, uint y) internal pure returns (uint z) {
         require((z = x + y) >= x, "ds-math-add-overflow");
@@ -14,8 +14,8 @@ contract COL3Token {
     event Approval(address indexed src, address indexed guy, uint wad);
     event Transfer(address indexed src, address indexed dst, uint wad);
     
-    string  public  name = "COL3";
-    string  public  symbol = "COL3";
+    string  public  name = "TOK3";
+    string  public  symbol = "TOK3";
     uint256  public  decimals = 18;
     uint256                                            _supply;
     mapping (address => uint256)                       _balances;

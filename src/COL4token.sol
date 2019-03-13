@@ -1,7 +1,7 @@
 // standard, well behaved ERC20
 pragma solidity >=0.5.0;
 
-contract COL4Token {
+contract Token4 {
 
     function add(uint x, uint y) internal pure returns (uint z) {
         require((z = x + y) >= x, "ds-math-add-overflow");
@@ -12,8 +12,8 @@ contract COL4Token {
     event Approval(address indexed src, address indexed guy, uint wad);
     event Transfer(address indexed src, address indexed dst, uint wad);
     
-    string  public  name = "COL4";
-    string  public  symbol = "COL4";
+    string  public  name = "TOK4";
+    string  public  symbol = "TOK4";
     uint256  public  decimals = 18;
     uint256                                            _supply;
     mapping (address => uint256)                       _balances;

@@ -9,11 +9,10 @@ test -z "$SKIP_BUILD" && dapp build
 
 { test -z "$1" || test -z "$2" || test -z "$3"; } && exit 1
 
-ilk=$1
-ilkJoin=$2 # adapter contract name
-tok=$3
-
-ilkVar=$(echo "$ilk" | tr '-' '_')
+tok=$1
+ilk="${1}-${2}"
+ilkVar="${1}_${2}"
+ilkJoin=$3 # adapter contract name
 
 # Deploy ETH ilk (adapter, spotter, flip and init variables)
 test -z "$MCD_DEPLOY" && exit 1

@@ -13,4 +13,4 @@ export COL2
 export PIP_COL2
 
 # shellcheck source=/dev/null
-source "./bin/deploy-ilk" "COL2-${1:-"A"}" "GemJoin" "COL2"
+source "$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )/deploy-ilk" "COL2" "${1:-"A"}" "GemJoin"

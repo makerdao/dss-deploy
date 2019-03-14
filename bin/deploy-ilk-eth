@@ -13,4 +13,4 @@ export ETH
 export PIP_ETH
 
 # shellcheck source=/dev/null
-source "./bin/deploy-ilk" "ETH-${1:-"A"}" "GemJoin" "ETH"
+source "$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )/deploy-ilk" "ETH" "${1:-"A"}" "GemJoin"

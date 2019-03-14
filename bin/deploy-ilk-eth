@@ -7,7 +7,7 @@ unset SOLC_FLAGS
 
 test -z "$SKIP_BUILD" && dapp build
 
-test -z "$ETH" && ETH=$(dapp create Weth9_)
+test -z "$ETH" && ETH=$(dapp create WETH9_)
 test -z "$PIP_ETH" && PIP_ETH=$(dapp create DSValue)
 export ETH
 export PIP_ETH

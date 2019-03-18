@@ -62,5 +62,5 @@ export MCD_SPOT=0x$(seth call "$MCD_DEPLOY" "spotter()(address)")
 export MCD_POT=0x$(seth call "$MCD_DEPLOY" "pot()(address)")
 export MCD_MOM=0x$(seth call "$MCD_DEPLOY" "mom()(address)")
 export MCD_DAI=0x$(seth call "$MCD_DEPLOY" "dai()(address)")
-export MCD_DAI_GUARD=0x$(seth call "$MCD_DEPLOY" "guard()(address)")
+export MCD_GUARD=0x$(seth call "$MCD_DEPLOY" "guard()(address)")
 EOF

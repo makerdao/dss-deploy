@@ -25,7 +25,6 @@ import {Jug} from "dss/jug.sol";
 import {Vow} from "dss/vow.sol";
 import {Cat} from "dss/cat.sol";
 import {DaiJoin} from "dss/join.sol";
-import {DaiMove} from "dss/move.sol";
 import {Flapper} from "dss/flap.sol";
 import {Flopper} from "dss/flop.sol";
 import {Flipper} from "dss/flip.sol";
@@ -43,8 +42,8 @@ contract VatFab {
 }
 
 contract JugFab {
-    function newJug(Vat vat) public returns (Jug jug) {
-        jug = new Jug(address(vat));
+    function newJug(address vat) public returns (Jug jug) {
+        jug = new Jug(vat);
         jug.rely(msg.sender);
         jug.deny(address(this));
     }
@@ -59,8 +58,8 @@ contract VowFab {
 }
 
 contract CatFab {
-    function newCat(Vat vat) public returns (Cat cat) {
-        cat = new Cat(address(vat));
+    function newCat(address vat) public returns (Cat cat) {
+        cat = new Cat(vat);
         cat.rely(msg.sender);
         cat.deny(address(this));
     }
@@ -81,48 +80,42 @@ contract GuardFab {
 }
 
 contract DaiJoinFab {
-    function newDaiJoin(Vat vat, address dai) public returns (DaiJoin daiJoin) {
-        daiJoin = new DaiJoin(address(vat), address(dai));
-    }
-}
-
-contract DaiMoveFab {
-    function newDaiMove(Vat vat) public returns (DaiMove daiMove) {
-        daiMove = new DaiMove(address(vat));
+    function newDaiJoin(address vat, address dai) public returns (DaiJoin daiJoin) {
+        daiJoin = new DaiJoin(vat, dai);
     }
 }
 
 contract FlapFab {
-    function newFlap(address dai, address gov) public returns (Flapper flap) {
-        flap = new Flapper(dai, gov);
+    function newFlap(address vat, address gov) public returns (Flapper flap) {
+        flap = new Flapper(vat, gov);
     }
 }
 
 contract FlopFab {
-    function newFlop(address dai, address gov) public returns (Flopper flop) {
-        flop = new Flopper(address(dai), address(gov));
+    function newFlop(address vat, address gov) public returns (Flopper flop) {
+        flop = new Flopper(vat, gov);
         flop.rely(msg.sender);
         flop.deny(address(this));
     }
 }
 
 contract FlipFab {
-    function newFlip(address dai, address gem) public returns (Flipper flop) {
-        flop = new Flipper(address(dai), address(gem));
+    function newFlip(address vat, bytes32 ilk) public returns (Flipper flip) {
+        flip = new Flipper(vat, ilk);
     }
 }
 
 contract SpotFab {
-    function newSpotter(Vat vat) public returns (Spotter spotter) {
-        spotter = new Spotter(address(vat));
+    function newSpotter(address vat) public returns (Spotter spotter) {
+        spotter = new Spotter(vat);
         spotter.rely(msg.sender);
         spotter.deny(address(this));
     }
 }
 
 contract PotFab {
-    function newPot(Vat vat) public returns (Pot pot) {
-        pot = new Pot(address(vat));
+    function newPot(address vat) public returns (Pot pot) {
+        pot = new Pot(vat);
         pot.rely(msg.sender);
         pot.deny(address(this));
     }
@@ -143,7 +136,6 @@ contract DssDeploy is DSAuth {
     TokenFab   public tokenFab;
     GuardFab   public guardFab;
     DaiJoinFab public daiJoinFab;
-    DaiMoveFab public daiMoveFab;
     FlapFab    public flapFab;
     FlopFab    public flopFab;
     FlipFab    public flipFab;
@@ -158,7 +150,6 @@ contract DssDeploy is DSAuth {
     DSToken public dai;
     DSGuard public guard;
     DaiJoin public daiJoin;
-    DaiMove public daiMove;
     Flapper public flap;
     Flopper public flop;
     Spotter public spotter;
@@ -174,7 +165,6 @@ contract DssDeploy is DSAuth {
     struct Ilk {
         Flipper flip;
         address adapter;
-        address mover;
     }
 
     constructor(
@@ -185,12 +175,12 @@ contract DssDeploy is DSAuth {
         TokenFab tokenFab_,
         GuardFab guardFab_,
         DaiJoinFab daiJoinFab_,
-        DaiMoveFab daiMoveFab_,
         FlapFab flapFab_,
         FlopFab flopFab_,
         FlipFab flipFab_,
         SpotFab spotFab_,
-        ProxyFab proxyFab_
+        ProxyFab proxyFab_,
+        PotFab potFab_
     ) public {
         vatFab = vatFab_;
         jugFab = jugFab_;
@@ -199,23 +189,18 @@ contract DssDeploy is DSAuth {
         tokenFab = tokenFab_;
         guardFab = guardFab_;
         daiJoinFab = daiJoinFab_;
-        daiMoveFab = daiMoveFab_;
         flapFab = flapFab_;
         flopFab = flopFab_;
         flipFab = flipFab_;
         spotFab = spotFab_;
         proxyFab = proxyFab_;
-    }
-
-    function addExtraFabs(PotFab potFab_) public auth {
         potFab = potFab_;
     }
 
     function deployVat() public auth {
-        require(address(potFab) != address(0), "addExtraFabs not executed");
         require(address(vat) == address(0), "VAT already deployed");
         vat = vatFab.newVat();
-        spotter = spotFab.newSpotter(vat);
+        spotter = spotFab.newSpotter(address(vat));
 
         // Internal auth
         vat.rely(address(spotter));
@@ -226,17 +211,15 @@ contract DssDeploy is DSAuth {
 
         // Deploy
         dai     = tokenFab.newToken("DAI");
-        daiJoin = daiJoinFab.newDaiJoin(vat, address(dai));
+        daiJoin = daiJoinFab.newDaiJoin(address(vat), address(dai));
         guard = guardFab.newGuard();
         guard.permit(address(daiJoin), address(dai), bytes4(keccak256("mint(address,uint256)")));
         guard.permit(address(daiJoin), address(dai), bytes4(keccak256("burn(address,uint256)")));
         dai.setAuthority(guard);
         dai.setOwner(address(0));
-        daiMove = daiMoveFab.newDaiMove(vat);
 
         // Internal auth
         vat.rely(address(daiJoin));
-        vat.rely(address(daiMove));
     }
 
     function deployTaxation(address gov) public auth {
@@ -245,9 +228,9 @@ contract DssDeploy is DSAuth {
 
         // Deploy
         vow = vowFab.newVow();
-        jug = jugFab.newJug(vat);
-        pot = potFab.newPot(vat);
-        flap = flapFab.newFlap(address(daiMove), gov);
+        jug = jugFab.newJug(address(vat));
+        pot = potFab.newPot(address(vat));
+        flap = flapFab.newFlap(address(vat), gov);
 
         // Internal references set up
         vow.file("vat", address(vat));
@@ -266,9 +249,9 @@ contract DssDeploy is DSAuth {
         require(address(vow) != address(0), "Missing VOW deployment");
 
         // Deploy
-        cat = catFab.newCat(vat);
+        cat = catFab.newCat(address(vat));
         cat.file("vow", address(vow));
-        flop = flopFab.newFlop(address(daiMove), gov);
+        flop = flopFab.newFlop(address(vat), gov);
 
         // Internal references set up
         vow.file("flop", address(flop));
@@ -300,18 +283,16 @@ contract DssDeploy is DSAuth {
         guard.setOwner(msg.sender);
     }
 
-    function deployCollateral(bytes32 ilk, address adapter, address mover, address pip) public auth {
+    function deployCollateral(bytes32 ilk, address adapter, address pip) public auth {
         require(ilk != bytes32(""), "Missing ilk name");
         require(adapter != address(0), "Missing adapter address");
-        require(mover   != address(0), "Missing mover address");
         require(pip != address(0), "Missing PIP address");
         require(address(vat) != address(0), "Missing VAT deployment");
         require(address(cat) != address(0), "Missing CAT deployment");
 
         // Deploy
-        ilks[ilk].flip = flipFab.newFlip(address(daiMove), mover);
+        ilks[ilk].flip = flipFab.newFlip(address(vat), ilk);
         ilks[ilk].adapter = adapter;
-        ilks[ilk].mover = mover;
         Spotter(spotter).file(ilk, address(pip)); // Set pip
         Spotter(spotter).file(ilk, "mat", ONE); // Set mat
 
@@ -324,7 +305,6 @@ contract DssDeploy is DSAuth {
 
         // Internal auth
         vat.rely(adapter);
-        vat.rely(mover);
 
         // Update spotter
         spotter.poke(ilk);

@@ -17,13 +17,12 @@ CAT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 3)) dapp create CatFab)
 TOKEN_FABtx=$(ETH_NONCE=$((ETH_NONCE + 4)) dapp create TokenFab)
 GUARD_FABtx=$(ETH_NONCE=$((ETH_NONCE + 5)) dapp create GuardFab)
 MCD_JOIN_FABtx=$(ETH_NONCE=$((ETH_NONCE + 6)) dapp create DaiJoinFab)
-MCD_MOVE_FABtx=$(ETH_NONCE=$((ETH_NONCE + 7)) dapp create DaiMoveFab)
-FLAP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 8)) dapp create FlapFab)
-FLOP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 9)) dapp create FlopFab)
-FLIP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 10)) dapp create FlipFab)
-SPOT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 11)) dapp create SpotFab)
-PROXY_FABtx=$(ETH_NONCE=$((ETH_NONCE + 12)) dapp create ProxyFab)
-POT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 13)) dapp create PotFab)
+FLAP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 7)) dapp create FlapFab)
+FLOP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 8)) dapp create FlopFab)
+FLIP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 9)) dapp create FlipFab)
+SPOT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 10)) dapp create SpotFab)
+PROXY_FABtx=$(ETH_NONCE=$((ETH_NONCE + 11)) dapp create ProxyFab)
+POT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 12)) dapp create PotFab)
 
 export SETH_ASYNC=no
 
@@ -34,7 +33,6 @@ test "$(seth receipt "$CAT_FABtx" status)" -eq 0 && exit 1
 test "$(seth receipt "$TOKEN_FABtx" status)" -eq 0 && exit 1
 test "$(seth receipt "$GUARD_FABtx" status)" -eq 0 && exit 1
 test "$(seth receipt "$MCD_JOIN_FABtx" status)" -eq 0 && exit 1
-test "$(seth receipt "$MCD_MOVE_FABtx" status)" -eq 0 && exit 1
 test "$(seth receipt "$FLAP_FABtx" status)" -eq 0 && exit 1
 test "$(seth receipt "$FLOP_FABtx" status)" -eq 0 && exit 1
 test "$(seth receipt "$FLIP_FABtx" status)" -eq 0 && exit 1
@@ -49,7 +47,6 @@ CAT_FAB=$(seth receipt "$CAT_FABtx" contractAddress)
 TOKEN_FAB=$(seth receipt "$TOKEN_FABtx" contractAddress)
 GUARD_FAB=$(seth receipt "$GUARD_FABtx" contractAddress)
 MCD_JOIN_FAB=$(seth receipt "$MCD_JOIN_FABtx" contractAddress)
-MCD_MOVE_FAB=$(seth receipt "$MCD_MOVE_FABtx" contractAddress)
 FLAP_FAB=$(seth receipt "$FLAP_FABtx" contractAddress)
 FLOP_FAB=$(seth receipt "$FLOP_FABtx" contractAddress)
 FLIP_FAB=$(seth receipt "$FLIP_FABtx" contractAddress)
@@ -70,7 +67,6 @@ export CAT_FAB=$CAT_FAB
 export TOKEN_FAB=$TOKEN_FAB
 export GUARD_FAB=$GUARD_FAB
 export MCD_JOIN_FAB=$MCD_JOIN_FAB
-export MCD_MOVE_FAB=$MCD_MOVE_FAB
 export FLAP_FAB=$FLAP_FAB
 export FLOP_FAB=$FLOP_FAB
 export FLIP_FAB=$FLIP_FAB

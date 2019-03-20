@@ -6,7 +6,6 @@ import {DSRoles} from "ds-roles/roles.sol";
 
 import {GemJoin} from "dss/join.sol";
 import {WETH9_} from "ds-weth/weth9.sol";
-import {GemMove} from 'dss/move.sol';
 
 import "./DssDeploy.sol";
 
@@ -83,7 +82,6 @@ contract DssDeployTestBase is DSTest {
     TokenFab tokenFab;
     GuardFab guardFab;
     DaiJoinFab daiJoinFab;
-    DaiMoveFab daiMoveFab;
     FlapFab flapFab;
     FlopFab flopFab;
     FlipFab flipFab;
@@ -112,17 +110,14 @@ contract DssDeployTestBase is DSTest {
     Flopper flop;
     DSToken dai;
     DaiJoin daiJoin;
-    DaiMove daiMove;
     Spotter spotter;
     Pot pot;
 
     DSProxy mom;
 
-    GemMove ethMove;
     Flipper ethFlip;
 
     DSToken col;
-    GemMove colMove;
     Flipper colFlip;
 
     FakeUser user1;
@@ -147,7 +142,6 @@ contract DssDeployTestBase is DSTest {
         tokenFab = new TokenFab();
         guardFab = new GuardFab();
         daiJoinFab = new DaiJoinFab();
-        daiMoveFab = new DaiMoveFab();
         flapFab = new FlapFab();
         flopFab = new FlopFab();
         flipFab = new FlipFab();
@@ -163,14 +157,13 @@ contract DssDeployTestBase is DSTest {
             tokenFab,
             guardFab,
             daiJoinFab,
-            daiMoveFab,
             flapFab,
             flopFab,
             flipFab,
             spotFab,
-            proxyFab
+            proxyFab,
+            potFab
         );
-        dssDeploy.addExtraFabs(potFab);
 
         gov = new DSToken("GOV");
         gov.setAuthority(new DSGuard());
@@ -213,7 +206,6 @@ contract DssDeployTestBase is DSTest {
         flop = dssDeploy.flop();
         dai = dssDeploy.dai();
         daiJoin = dssDeploy.daiJoin();
-        daiMove = dssDeploy.daiMove();
         spotter = dssDeploy.spotter();
         pot = dssDeploy.pot();
         guard = dssDeploy.guard();
@@ -221,13 +213,11 @@ contract DssDeployTestBase is DSTest {
 
         weth = new WETH9_();
         ethJoin = new GemJoin(address(vat), "ETH", address(weth));
-        ethMove = new GemMove(address(vat), "ETH");
-        dssDeploy.deployCollateral("ETH", address(ethJoin), address(ethMove), address(pipETH));
+        dssDeploy.deployCollateral("ETH", address(ethJoin), address(pipETH));
 
         col = new DSToken("COL");
         colJoin = new GemJoin(address(vat), "COL", address(col));
-        colMove = new GemMove(address(vat), "COL");
-        dssDeploy.deployCollateral("COL", address(colJoin), address(colMove), address(pipCOL));
+        dssDeploy.deployCollateral("COL", address(colJoin), address(pipCOL));
 
         // Set Params
         momLib = new MomLib();
@@ -237,8 +227,8 @@ contract DssDeployTestBase is DSTest {
 
         pipETH.poke(bytes32(uint(300 * 10 ** 18))); // Price 300 DAI = 1 ETH (precision 18)
         pipCOL.poke(bytes32(uint(45 * 10 ** 18))); // Price 45 DAI = 1 COL (precision 18)
-        (ethFlip,,) = dssDeploy.ilks("ETH");
-        (colFlip,,) = dssDeploy.ilks("COL");
+        (ethFlip,) = dssDeploy.ilks("ETH");
+        (colFlip,) = dssDeploy.ilks("COL");
         this.file(address(spotter), "ETH", "mat", uint(1500000000 ether)); // Liquidation ratio 150%
         this.file(address(spotter), "COL", "mat", uint(1100000000 ether)); // Liquidation ratio 110%
         spotter.poke("ETH");

@@ -19,9 +19,8 @@ test -z "$MCD_DEPLOY" && exit 1
 
 MCD_VAT=0x$(seth call "$MCD_DEPLOY" "vat()(address)")
 eval export "\MCD_JOIN_${ilkVar}=$(dapp create "$ilkJoin" "$MCD_VAT" "$(seth --to-bytes32 "$(seth --from-ascii "$ilk")")" "$(eval echo "\$${tok}")")"
-eval export "\MCD_MOVE_${ilkVar}=$(dapp create GemMove "$MCD_VAT" "$(seth --to-bytes32 "$(seth --from-ascii "$ilk")")")"
-seth send "$MCD_DEPLOY" "deployCollateral(bytes32,address,address,address)" "$(seth --to-bytes32 "$(seth --from-ascii "$ilk")")" "$(eval echo "\$MCD_JOIN_${ilkVar}")" "$(eval echo "\$MCD_MOVE_${ilkVar}")" "$(eval echo "\$PIP_${tok}")"
-while IFS=$'\n' read -r line; do data+=("$line"); done < <(seth call "$MCD_DEPLOY" "ilks(bytes32)(address,address,address)" "$(seth --to-bytes32 "$(seth --from-ascii "$ilk")")")
+seth send "$MCD_DEPLOY" "deployCollateral(bytes32,address,address)" "$(seth --to-bytes32 "$(seth --from-ascii "$ilk")")" "$(eval echo "\$MCD_JOIN_${ilkVar}")" "$(eval echo "\$PIP_${tok}")"
+while IFS=$'\n' read -r line; do data+=("$line"); done < <(seth call "$MCD_DEPLOY" "ilks(bytes32)(address,address)" "$(seth --to-bytes32 "$(seth --from-ascii "$ilk")")")
 eval export "\MCD_FLIP_${ilkVar}=0x${data[0]}"
 
 cat > load-ilk-"$(echo "$ilk" | tr '[:upper:]' '[:lower:]')"-"$(seth chain)" << EOF
@@ -32,6 +31,5 @@ cat > load-ilk-"$(echo "$ilk" | tr '[:upper:]' '[:lower:]')"-"$(seth chain)" << 
 export PIP_${tok}=$(eval echo "\$PIP_${tok}")
 export ${tok}=$(eval echo "\$${tok}")
 export MCD_JOIN_${ilkVar}=$(eval echo "\$MCD_JOIN_${ilkVar}")
-export MCD_MOVE_${ilkVar}=$(eval echo "\$MCD_MOVE_${ilkVar}")
 export MCD_FLIP_${ilkVar}=$(eval echo "\$MCD_FLIP_${ilkVar}")
 EOF

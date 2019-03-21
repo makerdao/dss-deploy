@@ -220,7 +220,7 @@ contract DssDeployTest is DssDeployTestBase {
         spotter.poke("ETH");
         uint nflip = cat.bite("ETH", urn);
         assertEq(vat.gem("ETH", bytes32(bytes20(address(ethFlip)))), 0);
-        uint batchId = cat.flip(nflip, 100 ether);
+        uint batchId = cat.flip(nflip, rad(100 ether));
         assertEq(vat.gem("ETH", bytes32(bytes20(address(ethFlip)))), 0.5 ether);
         address(user1).transfer(10 ether);
         bytes32 user1Urn = bytes32(bytes20(address(user1)));
@@ -235,15 +235,15 @@ contract DssDeployTest is DssDeployTestBase {
         user1.doHope(address(vat), address(ethFlip));
         user2.doHope(address(vat), address(ethFlip));
 
-        user1.doTend(address(ethFlip), batchId, 0.5 ether, 50 ether);
-        user2.doTend(address(ethFlip), batchId, 0.5 ether, 70 ether);
-        user1.doTend(address(ethFlip), batchId, 0.5 ether, 90 ether);
-        user2.doTend(address(ethFlip), batchId, 0.5 ether, 100 ether);
+        user1.doTend(address(ethFlip), batchId, 0.5 ether, rad(50 ether));
+        user2.doTend(address(ethFlip), batchId, 0.5 ether, rad(70 ether));
+        user1.doTend(address(ethFlip), batchId, 0.5 ether, rad(90 ether));
+        user2.doTend(address(ethFlip), batchId, 0.5 ether, rad(100 ether));
 
-        user1.doDent(address(ethFlip), batchId, 0.4 ether, 100 ether);
-        user2.doDent(address(ethFlip), batchId, 0.35 ether, 100 ether);
+        user1.doDent(address(ethFlip), batchId, 0.4 ether, rad(100 ether));
+        user2.doDent(address(ethFlip), batchId, 0.35 ether, rad(100 ether));
         hevm.warp(ethFlip.ttl() - 1);
-        user1.doDent(address(ethFlip), batchId, 0.3 ether, 100 ether);
+        user1.doDent(address(ethFlip), batchId, 0.3 ether, rad(100 ether));
         hevm.warp(now + ethFlip.ttl() + 1);
         user1.doDeal(address(ethFlip), batchId);
     }
@@ -258,7 +258,7 @@ contract DssDeployTest is DssDeployTestBase {
         spotter.poke("ETH");
         uint48 eraBite = uint48(now);
         uint nflip = cat.bite("ETH", urn);
-        uint batchId = cat.flip(nflip, 100 ether);
+        uint batchId = cat.flip(nflip, rad(100 ether));
         address(user1).transfer(10 ether);
         bytes32 user1Urn = bytes32(bytes20(address(user1)));
         user1.doEthJoin(address(weth), address(ethJoin), user1Urn, 10 ether);
@@ -272,31 +272,31 @@ contract DssDeployTest is DssDeployTestBase {
         user1.doHope(address(vat), address(ethFlip));
         user2.doHope(address(vat), address(ethFlip));
 
-        user1.doTend(address(ethFlip), batchId, 0.5 ether, 50 ether);
-        user2.doTend(address(ethFlip), batchId, 0.5 ether, 70 ether);
-        user1.doTend(address(ethFlip), batchId, 0.5 ether, 90 ether);
+        user1.doTend(address(ethFlip), batchId, 0.5 ether, rad(50 ether));
+        user2.doTend(address(ethFlip), batchId, 0.5 ether, rad(70 ether));
+        user1.doTend(address(ethFlip), batchId, 0.5 ether, rad(90 ether));
 
         hevm.warp(now + ethFlip.ttl() + 1);
         user1.doDeal(address(ethFlip), batchId);
 
         vow.flog(eraBite);
-        vow.heal(90 ether);
-        this.file(address(vow), bytes32("sump"), uint(10 ether));
+        vow.heal(rad(90 ether));
+        this.file(address(vow), bytes32("sump"), rad(10 ether));
         batchId = vow.flop();
 
         (uint bid,,,,,) = flop.bids(batchId);
-        assertEq(bid, 10 ether);
+        assertEq(bid, rad(10 ether));
         user1.doHope(address(vat), address(flop));
         user2.doHope(address(vat), address(flop));
-        user1.doDent(address(flop), batchId, 0.3 ether, 10 ether);
+        user1.doDent(address(flop), batchId, 0.3 ether, rad(10 ether));
         hevm.warp(now + flop.ttl() - 1);
-        user2.doDent(address(flop), batchId, 0.1 ether, 10 ether);
-        user1.doDent(address(flop), batchId, 0.08 ether, 10 ether);
+        user2.doDent(address(flop), batchId, 0.1 ether, rad(10 ether));
+        user1.doDent(address(flop), batchId, 0.08 ether, rad(10 ether));
         hevm.warp(now + flop.ttl() + 1);
         uint prevGovSupply = gov.totalSupply();
         user1.doDeal(address(flop), batchId);
         assertEq(gov.totalSupply(), prevGovSupply + 0.08 ether);
-        vow.kiss(10 ether);
+        vow.kiss(rad(10 ether));
         assertEq(vow.Joy(), 0);
         assertEq(vow.Woe(), 0);
         assertEq(vow.Awe(), 0);
@@ -304,7 +304,7 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testFlap() public {
         deploy();
-        this.file(address(jug), bytes32("ETH"), bytes32("tax"), uint(1.05 * 10 ** 27));
+        this.file(address(jug), bytes32("ETH"), bytes32("duty"), uint(1.05 * 10 ** 27));
         weth.deposit.value(0.5 ether)();
         weth.approve(address(ethJoin), uint(-1));
         ethJoin.join(urn, 0.5 ether);
@@ -312,12 +312,12 @@ contract DssDeployTest is DssDeployTestBase {
         hevm.warp(now + 1);
         assertEq(vow.Joy(), 0);
         jug.drip("ETH");
-        assertEq(vow.Joy(), 10 * 0.05 * 10 ** 18);
-        this.file(address(vow), bytes32("bump"), uint(0.05 ether));
+        assertEq(vow.Joy(), rad(10 * 0.05 ether));
+        this.file(address(vow), bytes32("bump"), rad(0.05 ether));
         uint batchId = vow.flap();
 
         (,uint lot,,,,) = flap.bids(batchId);
-        assertEq(lot, 0.05 ether);
+        assertEq(lot, rad(0.05 ether));
         user1.doApprove(address(gov), address(flap));
         user2.doApprove(address(gov), address(flap));
         gov.transfer(address(user1), 1 ether);
@@ -326,9 +326,9 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(dai.balanceOf(address(user1)), 0);
         assertEq(gov.balanceOf(address(0)), 0);
 
-        user1.doTend(address(flap), batchId, 0.05 ether, 0.001 ether);
-        user2.doTend(address(flap), batchId, 0.05 ether, 0.0015 ether);
-        user1.doTend(address(flap), batchId, 0.05 ether, 0.0016 ether);
+        user1.doTend(address(flap), batchId, rad(0.05 ether), 0.001 ether);
+        user2.doTend(address(flap), batchId, rad(0.05 ether), 0.0015 ether);
+        user1.doTend(address(flap), batchId, rad(0.05 ether), 0.0016 ether);
 
         assertEq(gov.balanceOf(address(user1)), 1 ether - 0.0016 ether);
         assertEq(gov.balanceOf(address(user2)), 1 ether);
@@ -342,7 +342,7 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testDsr() public {
         deploy();
-        this.file(address(jug), bytes32("ETH"), bytes32("tax"), uint(1.1 * 10 ** 27));
+        this.file(address(jug), bytes32("ETH"), bytes32("duty"), uint(1.1 * 10 ** 27));
         this.file(address(pot), "dsr", uint(1.05 * 10 ** 27));
         weth.deposit.value(0.5 ether)();
         weth.approve(address(ethJoin), uint(-1));

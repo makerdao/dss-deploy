@@ -183,6 +183,10 @@ contract DssDeployTestBase is DSTest {
         urn = bytes32(bytes20(address(this)));
     }
 
+    function rad(uint wad) internal pure returns (uint) {
+        return wad * 10 ** 27;
+    }
+
     function file(address, bytes32, uint) external {
         mom.execute(address(momLib), msg.data);
     }

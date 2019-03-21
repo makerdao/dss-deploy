@@ -197,6 +197,10 @@ contract DssDeploy is DSAuth {
         potFab = potFab_;
     }
 
+    function rad(uint wad) internal pure returns (uint) {
+        return wad * 10 ** 27;
+    }
+
     function deployVat() public auth {
         require(address(vat) == address(0), "VAT already deployed");
         vat = vatFab.newVat();
@@ -298,7 +302,7 @@ contract DssDeploy is DSAuth {
 
         // Internal references set up
         cat.file(ilk, "flip", address(ilks[ilk].flip));
-        cat.file(ilk, "lump", uint(10000 ether)); // 10000 DAI per batch
+        cat.file(ilk, "lump", rad(10000 ether)); // 10000 DAI per batch
         cat.file(ilk, "chop", ONE);
         vat.init(ilk);
         jug.init(ilk);

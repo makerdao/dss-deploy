@@ -73,9 +73,11 @@ contract GemJoin2 is DSNote {
         require(prevBalance >= wad, "");
         require(gem.allowance(msg.sender, address(this)) >= wad, "");
         
-        address(gem).call(
+        (bool ok, bytes memory data) = address(gem).call(
             abi.encodeWithSignature("transferFrom(address,address,uint256)", msg.sender, address(this), wad)
         );
+        ok;
+        data;
 
         require(prevBalance - wad == gem.balanceOf(msg.sender), "");
     }
@@ -87,9 +89,11 @@ contract GemJoin2 is DSNote {
 
         require(prevBalance >= wad, "");
 
-        address(gem).call(
+        (bool ok, bytes memory data) = address(gem).call(
             abi.encodeWithSignature("transfer(address,uint256)", guy, wad)
         );
+        ok;
+        data;
 
         require(prevBalance - wad == gem.balanceOf(address(this)), "");
     }

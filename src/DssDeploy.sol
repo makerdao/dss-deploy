@@ -309,9 +309,6 @@ contract DssDeploy is DSAuth {
 
         // Internal auth
         vat.rely(adapter);
-
-        // Update spotter
-        spotter.poke(ilk);
     }
 
     // developer backdoor

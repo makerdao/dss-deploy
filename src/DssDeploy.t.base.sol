@@ -88,6 +88,7 @@ contract DssDeployTestBase is DSTest {
     SpotFab spotFab;
     PotFab potFab;
     ProxyFab proxyFab;
+    PauseFab pauseFab;
 
     DssDeploy dssDeploy;
 
@@ -97,6 +98,7 @@ contract DssDeployTestBase is DSTest {
 
     DSRoles authority;
     DSGuard guard;
+    DSPause pause;
 
     WETH9_ weth;
     GemJoin ethJoin;
@@ -127,7 +129,6 @@ contract DssDeployTestBase is DSTest {
 
     // --- Math ---
     uint256 constant ONE = 10 ** 27;
-
     function mul(uint x, uint y) internal pure returns (uint z) {
         require(y == 0 || (z = x * y) / y == x);
     }
@@ -146,6 +147,7 @@ contract DssDeployTestBase is DSTest {
         spotFab = new SpotFab();
         proxyFab = new ProxyFab();
         potFab = new PotFab();
+        pauseFab = new PauseFab();
 
         dssDeploy = new DssDeploy(
             vatFab,
@@ -160,7 +162,8 @@ contract DssDeployTestBase is DSTest {
             flipFab,
             spotFab,
             proxyFab,
-            potFab
+            potFab,
+            pauseFab
         );
 
         gov = new DSToken("GOV");
@@ -197,6 +200,7 @@ contract DssDeployTestBase is DSTest {
         dssDeploy.deployTaxation(address(gov));
         dssDeploy.deployLiquidation(address(gov));
         dssDeploy.deployMom(authority);
+        dssDeploy.deployPause(0, authority);
 
         vat = dssDeploy.vat();
         jug = dssDeploy.jug();
@@ -210,6 +214,8 @@ contract DssDeployTestBase is DSTest {
         pot = dssDeploy.pot();
         guard = dssDeploy.guard();
         mom = dssDeploy.mom();
+        pause = dssDeploy.pause();
+        authority.setRootUser(address(pause), true);
 
         weth = new WETH9_();
         ethJoin = new GemJoin(address(vat), "ETH", address(weth));

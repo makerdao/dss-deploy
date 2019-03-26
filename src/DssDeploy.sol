@@ -19,6 +19,7 @@ import {DSToken} from "ds-token/token.sol";
 import {DSAuth, DSAuthority} from "ds-auth/auth.sol";
 import {DSGuard} from "ds-guard/guard.sol";
 import {DSProxy, DSProxyCache} from "ds-proxy/proxy.sol";
+import {DSPause} from "ds-pause/pause.sol";
 
 import {Vat} from "dss/vat.sol";
 import {Jug} from "dss/jug.sol";
@@ -128,6 +129,12 @@ contract ProxyFab {
     }
 }
 
+contract PauseFab {
+    function newPause(uint delay, address owner, DSAuthority authority) public returns(DSPause pause) {
+        pause = new DSPause(delay, owner, authority);
+    }
+}
+
 contract DssDeploy is DSAuth {
     VatFab     public vatFab;
     JugFab     public jugFab;
@@ -142,6 +149,7 @@ contract DssDeploy is DSAuth {
     SpotFab    public spotFab;
     PotFab     public potFab;
     ProxyFab   public proxyFab;
+    PauseFab   public pauseFab;
 
     Vat     public vat;
     Jug     public jug;
@@ -154,7 +162,7 @@ contract DssDeploy is DSAuth {
     Flopper public flop;
     Spotter public spotter;
     Pot     public pot;
-    DSProxy public mom;
+    DSPause public pause;
 
     mapping(bytes32 => Ilk) public ilks;
 
@@ -180,7 +188,8 @@ contract DssDeploy is DSAuth {
         FlipFab flipFab_,
         SpotFab spotFab_,
         ProxyFab proxyFab_,
-        PotFab potFab_
+        PotFab potFab_,
+        PauseFab pauseFab_
     ) public {
         vatFab = vatFab_;
         jugFab = jugFab_;
@@ -195,6 +204,7 @@ contract DssDeploy is DSAuth {
         spotFab = spotFab_;
         proxyFab = proxyFab_;
         potFab = potFab_;
+        pauseFab = pauseFab_;
     }
 
     function rad(uint wad) internal pure returns (uint) {
@@ -281,6 +291,22 @@ contract DssDeploy is DSAuth {
         spotter.rely(address(mom));
         mom.setAuthority(authority);
         mom.setOwner(address(0));
+        this.setAuthority(authority);
+        this.setOwner(address(0));
+        guard.setAuthority(authority);
+        guard.setOwner(msg.sender);
+    }
+
+    function deployPause(uint delay, DSAuthority authority) public auth {
+        pause = pauseFab.newPause(delay, address(0), authority);
+
+        vat.rely(address(pause));
+        cat.rely(address(pause));
+        vow.rely(address(pause));
+        jug.rely(address(pause));
+        pot.rely(address(pause));
+        spotter.rely(address(pause));
+
         this.setAuthority(authority);
         this.setOwner(address(0));
         guard.setAuthority(authority);

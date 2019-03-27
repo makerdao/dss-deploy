@@ -33,7 +33,7 @@ contract Gem3TokenLike {
 }
 
 contract VatLike {
-    function slip(bytes32,bytes32,int) public;
+    function slip(bytes32,address,int) public;
 }
 
 /*
@@ -65,7 +65,7 @@ contract GemJoin2 is DSNote {
         ilk = ilk_;
         gem = Gem2TokenLike(gem_);
     }
-    function join(bytes32 urn, uint wad) public note {
+    function join(address urn, uint wad) public note {
         require(int(wad) >= 0, "");
         vat.slip(ilk, urn, int(wad));
         uint256 prevBalance = gem.balanceOf(msg.sender);
@@ -81,8 +81,8 @@ contract GemJoin2 is DSNote {
 
         require(prevBalance - wad == gem.balanceOf(msg.sender), "");
     }
-    function exit(bytes32 urn, address guy, uint wad) public note {
-        require(bytes20(urn) == bytes20(msg.sender), "");
+    function exit(address urn, address guy, uint wad) public note {
+        require(urn == msg.sender, "");
         require(int(wad) >= 0, "");
         vat.slip(ilk, urn, -int(wad));
         uint256 prevBalance = gem.balanceOf(address(this));
@@ -109,14 +109,14 @@ contract GemJoin3 is DSNote {
         gem = Gem3TokenLike(gem_);
         require(gem.decimals() < 18, "");
     }
-    function join(bytes32 urn, uint wad) public note {
+    function join(address urn, uint wad) public note {
         uint wad18 = wad * 10 ** (18 - gem.decimals());
         require(int(wad18) >= 0, "");
         vat.slip(ilk, urn, int(wad18));
         require(gem.transferFrom(msg.sender, address(this), wad), "");
     }
-    function exit(bytes32 urn, address guy, uint wad) public note {
-        require(bytes20(urn) == bytes20(msg.sender), "");
+    function exit(address urn, address guy, uint wad) public note {
+        require(urn == msg.sender, "");
         require(int(wad) >= 0, "");
         uint wad18 = wad * 10 ** (18 - gem.decimals());
         vat.slip(ilk, urn, -int(wad18));

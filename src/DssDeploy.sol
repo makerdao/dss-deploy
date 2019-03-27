@@ -239,8 +239,8 @@ contract DssDeploy is DSAuth {
         // Internal references set up
         vow.file("vat", address(vat));
         vow.file("flap", address(flap));
-        jug.file("vow", bytes32(bytes20(address(vow))));
-        pot.file("vow", bytes32(bytes20(address(vow))));
+        jug.file("vow", address(vow));
+        pot.file("vow", address(vow));
 
         // Internal auth
         vat.rely(address(vow));

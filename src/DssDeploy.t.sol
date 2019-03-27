@@ -34,43 +34,43 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testJoinETH() public {
         deploy();
-        assertEq(vat.gem("ETH", urn), 0);
+        assertEq(vat.gem("ETH", address(this)), 0);
         weth.deposit.value(1 ether)();
         assertEq(weth.balanceOf(address(this)), 1 ether);
         weth.approve(address(ethJoin), 1 ether);
-        ethJoin.join(urn, 1 ether);
+        ethJoin.join(address(this), 1 ether);
         assertEq(weth.balanceOf(address(this)), 0);
-        assertEq(vat.gem("ETH", urn), 1 ether);
+        assertEq(vat.gem("ETH", address(this)), 1 ether);
     }
 
     function testJoinGem() public {
         deploy();
         col.mint(1 ether);
         assertEq(col.balanceOf(address(this)), 1 ether);
-        assertEq(vat.gem("COL", urn), 0);
+        assertEq(vat.gem("COL", address(this)), 0);
         col.approve(address(colJoin), 1 ether);
-        colJoin.join(urn, 1 ether);
+        colJoin.join(address(this), 1 ether);
         assertEq(col.balanceOf(address(this)), 0);
-        assertEq(vat.gem("COL", urn), 1 ether);
+        assertEq(vat.gem("COL", address(this)), 1 ether);
     }
 
     function testExitETH() public {
         deploy();
         weth.deposit.value(1 ether)();
         weth.approve(address(ethJoin), uint(-1));
-        ethJoin.join(urn, 1 ether);
-        ethJoin.exit(urn, address(this), 1 ether);
-        assertEq(vat.gem("ETH", urn), 0);
+        ethJoin.join(address(this), 1 ether);
+        ethJoin.exit(address(this), address(this), 1 ether);
+        assertEq(vat.gem("ETH", address(this)), 0);
     }
 
     function testExitGem() public {
         deploy();
         col.mint(1 ether);
         col.approve(address(colJoin), 1 ether);
-        colJoin.join(urn, 1 ether);
-        colJoin.exit(urn, address(this), 1 ether);
+        colJoin.join(address(this), 1 ether);
+        colJoin.exit(address(this), address(this), 1 ether);
         assertEq(col.balanceOf(address(this)), 1 ether);
-        assertEq(vat.gem("COL", urn), 0);
+        assertEq(vat.gem("COL", address(this)), 0);
     }
 
     function testFrobDrawDai() public {
@@ -78,16 +78,16 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(dai.balanceOf(address(this)), 0);
         weth.deposit.value(1 ether)();
         weth.approve(address(ethJoin), uint(-1));
-        ethJoin.join(urn, 1 ether);
+        ethJoin.join(address(this), 1 ether);
 
-        vat.frob("ETH", urn, urn, urn, 0.5 ether, 60 ether);
-        assertEq(vat.gem("ETH", urn), 0.5 ether);
-        assertEq(vat.dai(urn), mul(ONE, 60 ether));
+        vat.frob("ETH", address(this), address(this), address(this), 0.5 ether, 60 ether);
+        assertEq(vat.gem("ETH", address(this)), 0.5 ether);
+        assertEq(vat.dai(address(this)), mul(ONE, 60 ether));
 
         vat.hope(address(daiJoin));
-        daiJoin.exit(urn, address(this), 60 ether);
+        daiJoin.exit(address(this), address(this), 60 ether);
         assertEq(dai.balanceOf(address(this)), 60 ether);
-        assertEq(vat.dai(urn), 0);
+        assertEq(vat.dai(address(this)), 0);
     }
 
     function testFrobDrawDaiGem() public {
@@ -95,12 +95,12 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(dai.balanceOf(address(this)), 0);
         col.mint(1 ether);
         col.approve(address(colJoin), 1 ether);
-        colJoin.join(urn, 1 ether);
+        colJoin.join(address(this), 1 ether);
 
-        vat.frob("COL", urn, urn, urn, 0.5 ether, 20 ether);
+        vat.frob("COL", address(this), address(this), address(this), 0.5 ether, 20 ether);
 
         vat.hope(address(daiJoin));
-        daiJoin.exit(urn, address(this), 20 ether);
+        daiJoin.exit(address(this), address(this), 20 ether);
         assertEq(dai.balanceOf(address(this)), 20 ether);
     }
 
@@ -108,104 +108,104 @@ contract DssDeployTest is DssDeployTestBase {
         deploy();
         weth.deposit.value(1 ether)();
         weth.approve(address(ethJoin), uint(-1));
-        ethJoin.join(urn, 1 ether);
-        vat.frob("ETH", urn, urn, urn, 0.5 ether, 100 ether); // 0.5 * 300 / 1.5 = 100 DAI max
+        ethJoin.join(address(this), 1 ether);
+        vat.frob("ETH", address(this), address(this), address(this), 0.5 ether, 100 ether); // 0.5 * 300 / 1.5 = 100 DAI max
     }
 
     function testFrobDrawDaiGemLimit() public {
         deploy();
         col.mint(1 ether);
         col.approve(address(colJoin), 1 ether);
-        colJoin.join(urn, 1 ether);
-        vat.frob("COL", urn, urn, urn, 0.5 ether, 20.454545454545454545 ether); // 0.5 * 45 / 1.1 = 20.454545454545454545 DAI max
+        colJoin.join(address(this), 1 ether);
+        vat.frob("COL", address(this), address(this), address(this), 0.5 ether, 20.454545454545454545 ether); // 0.5 * 45 / 1.1 = 20.454545454545454545 DAI max
     }
 
     function testFailFrobDrawDaiLimit() public {
         deploy();
         weth.deposit.value(1 ether)();
         weth.approve(address(ethJoin), uint(-1));
-        ethJoin.join(urn, 1 ether);
-        vat.frob("ETH", urn, urn, urn, 0.5 ether, 100 ether + 1);
+        ethJoin.join(address(this), 1 ether);
+        vat.frob("ETH", address(this), address(this), address(this), 0.5 ether, 100 ether + 1);
     }
 
     function testFailFrobDrawDaiGemLimit() public {
         deploy();
         col.mint(1 ether);
         col.approve(address(colJoin), 1 ether);
-        colJoin.join(urn, 1 ether);
-        vat.frob("COL", urn, urn, urn, 0.5 ether, 20.454545454545454545 ether + 1);
+        colJoin.join(address(this), 1 ether);
+        vat.frob("COL", address(this), address(this), address(this), 0.5 ether, 20.454545454545454545 ether + 1);
     }
 
     function testFrobPaybackDai() public {
         deploy();
         weth.deposit.value(1 ether)();
         weth.approve(address(ethJoin), uint(-1));
-        ethJoin.join(urn, 1 ether);
-        vat.frob("ETH", urn, urn, urn, 0.5 ether, 60 ether);
+        ethJoin.join(address(this), 1 ether);
+        vat.frob("ETH", address(this), address(this), address(this), 0.5 ether, 60 ether);
         vat.hope(address(daiJoin));
-        daiJoin.exit(urn, address(this), 60 ether);
+        daiJoin.exit(address(this), address(this), 60 ether);
         assertEq(dai.balanceOf(address(this)), 60 ether);
         dai.approve(address(daiJoin), uint(-1));
-        daiJoin.join(urn, 60 ether);
+        daiJoin.join(address(this), 60 ether);
         assertEq(dai.balanceOf(address(this)), 0);
 
-        assertEq(vat.dai(urn), mul(ONE, 60 ether));
-        vat.frob("ETH", urn, urn, urn, 0 ether, -60 ether);
-        assertEq(vat.dai(urn), 0);
+        assertEq(vat.dai(address(this)), mul(ONE, 60 ether));
+        vat.frob("ETH", address(this), address(this), address(this), 0 ether, -60 ether);
+        assertEq(vat.dai(address(this)), 0);
     }
 
     function testFrobFromAnotherUser() public {
         deploy();
         weth.deposit.value(1 ether)();
         weth.approve(address(ethJoin), uint(-1));
-        ethJoin.join(urn, 1 ether);
+        ethJoin.join(address(this), 1 ether);
         vat.hope(address(user1));
-        user1.doFrob(address(vat), "ETH", urn, urn, urn, 0.5 ether, 60 ether);
+        user1.doFrob(address(vat), "ETH", address(this), address(this), address(this), 0.5 ether, 60 ether);
     }
 
     function testFailFrobDust() public {
         deploy();
         weth.deposit.value(100 ether)(); // Big number just to make sure to avoid unsafe situation
         weth.approve(address(ethJoin), uint(-1));
-        ethJoin.join(urn, 100 ether);
+        ethJoin.join(address(this), 100 ether);
 
         this.file(address(vat), "ETH", "dust", mul(ONE, 20 ether));
-        vat.frob("ETH", urn, urn, urn, 100 ether, 19 ether);
+        vat.frob("ETH", address(this), address(this), address(this), 100 ether, 19 ether);
     }
 
     function testFailFrobFromAnotherUser() public {
         deploy();
         weth.deposit.value(1 ether)();
         weth.approve(address(ethJoin), uint(-1));
-        ethJoin.join(urn, 1 ether);
-        user1.doFrob(address(vat), "ETH", urn, urn, urn, 0.5 ether, 60 ether);
+        ethJoin.join(address(this), 1 ether);
+        user1.doFrob(address(vat), "ETH", address(this), address(this), address(this), 0.5 ether, 60 ether);
     }
 
     function testFailBite() public {
         deploy();
         weth.deposit.value(1 ether)();
         weth.approve(address(ethJoin), uint(-1));
-        ethJoin.join(urn, 1 ether);
-        vat.frob("ETH", urn, urn, urn, 0.5 ether, 100 ether); // Maximun DAI
+        ethJoin.join(address(this), 1 ether);
+        vat.frob("ETH", address(this), address(this), address(this), 0.5 ether, 100 ether); // Maximun DAI
 
-        cat.bite("ETH", urn);
+        cat.bite("ETH", address(this));
     }
 
     function testBite() public {
         deploy();
         weth.deposit.value(0.5 ether)();
         weth.approve(address(ethJoin), uint(-1));
-        ethJoin.join(urn, 0.5 ether);
-        vat.frob("ETH", urn, urn, urn, 0.5 ether, 100 ether); // Maximun DAI generated
+        ethJoin.join(address(this), 0.5 ether);
+        vat.frob("ETH", address(this), address(this), address(this), 0.5 ether, 100 ether); // Maximun DAI generated
 
         pipETH.poke(bytes32(uint(300 * 10 ** 18 - 1))); // Decrease price in 1 wei
         spotter.poke("ETH");
 
-        (uint ink, uint art) = vat.urns("ETH", urn);
+        (uint ink, uint art) = vat.urns("ETH", address(this));
         assertEq(ink, 0.5 ether);
         assertEq(art, 100 ether);
-        cat.bite("ETH", urn);
-        (ink, art) = vat.urns("ETH", urn);
+        cat.bite("ETH", address(this));
+        (ink, art) = vat.urns("ETH", address(this));
         assertEq(ink, 0);
         assertEq(art, 0);
     }
@@ -214,23 +214,21 @@ contract DssDeployTest is DssDeployTestBase {
         deploy();
         weth.deposit.value(0.5 ether)();
         weth.approve(address(ethJoin), uint(-1));
-        ethJoin.join(urn, 0.5 ether);
-        vat.frob("ETH", urn, urn, urn, 0.5 ether, 100 ether); // Maximun DAI generated
+        ethJoin.join(address(this), 0.5 ether);
+        vat.frob("ETH", address(this), address(this), address(this), 0.5 ether, 100 ether); // Maximun DAI generated
         pipETH.poke(bytes32(uint(300 * 10 ** 18 - 1))); // Decrease price in 1 wei
         spotter.poke("ETH");
-        uint nflip = cat.bite("ETH", urn);
-        assertEq(vat.gem("ETH", bytes32(bytes20(address(ethFlip)))), 0);
+        uint nflip = cat.bite("ETH", address(this));
+        assertEq(vat.gem("ETH", address(ethFlip)), 0);
         uint batchId = cat.flip(nflip, rad(100 ether));
-        assertEq(vat.gem("ETH", bytes32(bytes20(address(ethFlip)))), 0.5 ether);
+        assertEq(vat.gem("ETH", address(ethFlip)), 0.5 ether);
         address(user1).transfer(10 ether);
-        bytes32 user1Urn = bytes32(bytes20(address(user1)));
-        user1.doEthJoin(address(weth), address(ethJoin), user1Urn, 10 ether);
-        user1.doFrob(address(vat), "ETH", user1Urn, user1Urn, user1Urn, 10 ether, 1000 ether);
+        user1.doEthJoin(address(weth), address(ethJoin), address(user1), 10 ether);
+        user1.doFrob(address(vat), "ETH", address(user1), address(user1), address(user1), 10 ether, 1000 ether);
 
         address(user2).transfer(10 ether);
-        bytes32 user2Urn = bytes32(bytes20(address(user2)));
-        user2.doEthJoin(address(weth), address(ethJoin), user2Urn, 10 ether);
-        user2.doFrob(address(vat), "ETH", user2Urn, user2Urn, user2Urn, 10 ether, 1000 ether);
+        user2.doEthJoin(address(weth), address(ethJoin), address(user2), 10 ether);
+        user2.doFrob(address(vat), "ETH", address(user2), address(user2), address(user2), 10 ether, 1000 ether);
 
         user1.doHope(address(vat), address(ethFlip));
         user2.doHope(address(vat), address(ethFlip));
@@ -252,22 +250,20 @@ contract DssDeployTest is DssDeployTestBase {
         deploy();
         weth.deposit.value(0.5 ether)();
         weth.approve(address(ethJoin), uint(-1));
-        ethJoin.join(urn, 0.5 ether);
-        vat.frob("ETH", urn, urn, urn, 0.5 ether, 100 ether); // Maximun DAI generated
+        ethJoin.join(address(this), 0.5 ether);
+        vat.frob("ETH", address(this), address(this), address(this), 0.5 ether, 100 ether); // Maximun DAI generated
         pipETH.poke(bytes32(uint(300 * 10 ** 18 - 1))); // Decrease price in 1 wei
         spotter.poke("ETH");
         uint48 eraBite = uint48(now);
-        uint nflip = cat.bite("ETH", urn);
+        uint nflip = cat.bite("ETH", address(this));
         uint batchId = cat.flip(nflip, rad(100 ether));
         address(user1).transfer(10 ether);
-        bytes32 user1Urn = bytes32(bytes20(address(user1)));
-        user1.doEthJoin(address(weth), address(ethJoin), user1Urn, 10 ether);
-        user1.doFrob(address(vat), "ETH", user1Urn, user1Urn, user1Urn, 10 ether, 1000 ether);
+        user1.doEthJoin(address(weth), address(ethJoin), address(user1), 10 ether);
+        user1.doFrob(address(vat), "ETH", address(user1), address(user1), address(user1), 10 ether, 1000 ether);
 
         address(user2).transfer(10 ether);
-        bytes32 user2Urn = bytes32(bytes20(address(user2)));
-        user2.doEthJoin(address(weth), address(ethJoin), user2Urn, 10 ether);
-        user2.doFrob(address(vat), "ETH", user2Urn, user2Urn, user2Urn, 10 ether, 1000 ether);
+        user2.doEthJoin(address(weth), address(ethJoin), address(user2), 10 ether);
+        user2.doFrob(address(vat), "ETH", address(user2), address(user2), address(user2), 10 ether, 1000 ether);
 
         user1.doHope(address(vat), address(ethFlip));
         user2.doHope(address(vat), address(ethFlip));
@@ -307,8 +303,8 @@ contract DssDeployTest is DssDeployTestBase {
         this.file(address(jug), bytes32("ETH"), bytes32("duty"), uint(1.05 * 10 ** 27));
         weth.deposit.value(0.5 ether)();
         weth.approve(address(ethJoin), uint(-1));
-        ethJoin.join(urn, 0.5 ether);
-        vat.frob("ETH", urn, urn, urn, 0.1 ether, 10 ether);
+        ethJoin.join(address(this), 0.5 ether);
+        vat.frob("ETH", address(this), address(this), address(this), 0.1 ether, 10 ether);
         hevm.warp(now + 1);
         assertEq(vow.Joy(), 0);
         jug.drip("ETH");
@@ -336,7 +332,7 @@ contract DssDeployTest is DssDeployTestBase {
         user1.doDeal(address(flap), batchId);
         assertEq(gov.balanceOf(address(0)), 0.0016 ether);
         user1.doHope(address(vat), address(daiJoin));
-        user1.doDaiExit(address(daiJoin), bytes32(bytes20(address(user1))), address(user1), 0.05 ether);
+        user1.doDaiExit(address(daiJoin), address(user1), address(user1), 0.05 ether);
         assertEq(dai.balanceOf(address(user1)), 0.05 ether);
     }
 
@@ -346,148 +342,119 @@ contract DssDeployTest is DssDeployTestBase {
         this.file(address(pot), "dsr", uint(1.05 * 10 ** 27));
         weth.deposit.value(0.5 ether)();
         weth.approve(address(ethJoin), uint(-1));
-        ethJoin.join(urn, 0.5 ether);
-        vat.frob("ETH", urn, urn, urn, 0.1 ether, 10 ether);
-        assertEq(vat.dai(urn), mul(10 ether, ONE));
+        ethJoin.join(address(this), 0.5 ether);
+        vat.frob("ETH", address(this), address(this), address(this), 0.1 ether, 10 ether);
+        assertEq(vat.dai(address(this)), mul(10 ether, ONE));
         vat.hope(address(pot));
-        pot.save(urn, 10 ether);
+        pot.save(address(this), 10 ether);
         hevm.warp(now + 1);
         jug.drip("ETH");
         pot.drip();
-        pot.save(urn, -int(10 ether));
-        assertEq(vat.dai(urn), mul(10.5 ether, ONE));
+        pot.save(address(this), -int(10 ether));
+        assertEq(vat.dai(address(this)), mul(10.5 ether, ONE));
     }
 
     function testFork() public {
         deploy();
         weth.deposit.value(1 ether)();
         weth.approve(address(ethJoin), uint(-1));
-        ethJoin.join(urn, 1 ether);
+        ethJoin.join(address(this), 1 ether);
 
-        vat.frob("ETH", urn, urn, urn, 1 ether, 60 ether);
-        (uint ink, uint art) = vat.urns("ETH", urn);
+        vat.frob("ETH", address(this), address(this), address(this), 1 ether, 60 ether);
+        (uint ink, uint art) = vat.urns("ETH", address(this));
         assertEq(ink, 1 ether);
         assertEq(art, 60 ether);
 
-        bytes32 otherOwnedUrn = bytes32(uint(address(this)) * 2 ** (12 * 8) + uint96(1));
-        vat.fork("ETH", urn, otherOwnedUrn, 0.25 ether, 15 ether);
-
-        (ink, art) = vat.urns("ETH", urn);
-        assertEq(ink, 0.75 ether);
-        assertEq(art, 45 ether);
-
-        (ink, art) = vat.urns("ETH", otherOwnedUrn);
-        assertEq(ink, 0.25 ether);
-        assertEq(art, 15 ether);
-    }
-
-    function testForkNotOwnedUrn() public {
-        deploy();
-        weth.deposit.value(1 ether)();
-        weth.approve(address(ethJoin), uint(-1));
-        ethJoin.join(urn, 1 ether);
-
-        vat.frob("ETH", urn, urn, urn, 1 ether, 60 ether);
-        (uint ink, uint art) = vat.urns("ETH", urn);
-        assertEq(ink, 1 ether);
-        assertEq(art, 60 ether);
-
-        bytes32 notOwnedUrn = bytes32(bytes20(address(user1)));
         user1.doHope(address(vat), address(this));
-        vat.fork("ETH", urn, notOwnedUrn, 0.25 ether, 15 ether);
+        vat.fork("ETH", address(this), address(user1), 0.25 ether, 15 ether);
 
-        (ink, art) = vat.urns("ETH", urn);
+        (ink, art) = vat.urns("ETH", address(this));
         assertEq(ink, 0.75 ether);
         assertEq(art, 45 ether);
 
-        (ink, art) = vat.urns("ETH", notOwnedUrn);
+        (ink, art) = vat.urns("ETH", address(user1));
         assertEq(ink, 0.25 ether);
         assertEq(art, 15 ether);
     }
 
-    function testFailForkNotOwnedUrn() public {
+    function testFailFork() public {
         deploy();
         weth.deposit.value(1 ether)();
         weth.approve(address(ethJoin), uint(-1));
-        ethJoin.join(urn, 1 ether);
+        ethJoin.join(address(this), 1 ether);
 
-        vat.frob("ETH", urn, urn, urn, 1 ether, 60 ether);
+        vat.frob("ETH", address(this), address(this), address(this), 1 ether, 60 ether);
 
-        bytes32 notOwnedUrn = bytes32(bytes20(address(user1)));
-        vat.fork("ETH", urn, notOwnedUrn, 0.25 ether, 15 ether);
+        vat.fork("ETH", address(this), address(user1), 0.25 ether, 15 ether);
     }
 
     function testForkFromOtherUsr() public {
         deploy();
         weth.deposit.value(1 ether)();
         weth.approve(address(ethJoin), uint(-1));
-        ethJoin.join(urn, 1 ether);
+        ethJoin.join(address(this), 1 ether);
 
-        vat.frob("ETH", urn, urn, urn, 1 ether, 60 ether);
+        vat.frob("ETH", address(this), address(this), address(this), 1 ether, 60 ether);
 
-        bytes32 notOwnedUrn = bytes32(bytes20(address(user1)));
         vat.hope(address(user1));
-        user1.doFork(address(vat), "ETH", urn, notOwnedUrn, 0.25 ether, 15 ether);
+        user1.doFork(address(vat), "ETH", address(this), address(user1), 0.25 ether, 15 ether);
     }
 
     function testFailForkFromOtherUsr() public {
         deploy();
         weth.deposit.value(1 ether)();
         weth.approve(address(ethJoin), uint(-1));
-        ethJoin.join(urn, 1 ether);
+        ethJoin.join(address(this), 1 ether);
 
-        vat.frob("ETH", urn, urn, urn, 1 ether, 60 ether);
+        vat.frob("ETH", address(this), address(this), address(this), 1 ether, 60 ether);
 
-        bytes32 notOwnedUrn = bytes32(bytes20(address(user1)));
-        user1.doFork(address(vat), "ETH", urn, notOwnedUrn, 0.25 ether, 15 ether);
+        user1.doFork(address(vat), "ETH", address(this), address(user1), 0.25 ether, 15 ether);
     }
 
     function testFailForkUnsafeSrc() public {
         deploy();
         weth.deposit.value(1 ether)();
         weth.approve(address(ethJoin), uint(-1));
-        ethJoin.join(urn, 1 ether);
+        ethJoin.join(address(this), 1 ether);
 
-        vat.frob("ETH", urn, urn, urn, 1 ether, 60 ether);
-        bytes32 notOwnedUrn = bytes32(bytes20(address(user1)));
-        vat.fork("ETH", urn, notOwnedUrn, 0.9 ether, 1 ether);
+        vat.frob("ETH", address(this), address(this), address(this), 1 ether, 60 ether);
+        vat.fork("ETH", address(this), address(user1), 0.9 ether, 1 ether);
     }
 
     function testFailForkUnsafeDst() public {
         deploy();
         weth.deposit.value(1 ether)();
         weth.approve(address(ethJoin), uint(-1));
-        ethJoin.join(urn, 1 ether);
+        ethJoin.join(address(this), 1 ether);
 
-        vat.frob("ETH", urn, urn, urn, 1 ether, 60 ether);
-        bytes32 notOwnedUrn = bytes32(bytes20(address(user1)));
-        vat.fork("ETH", urn, notOwnedUrn, 0.1 ether, 59 ether);
+        vat.frob("ETH", address(this), address(this), address(this), 1 ether, 60 ether);
+        vat.fork("ETH", address(this), address(user1), 0.1 ether, 59 ether);
     }
 
     function testFailForkDustSrc() public {
         deploy();
         weth.deposit.value(100 ether)(); // Big number just to make sure to avoid unsafe situation
         weth.approve(address(ethJoin), uint(-1));
-        ethJoin.join(urn, 100 ether);
+        ethJoin.join(address(this), 100 ether);
 
         this.file(address(vat), "ETH", "dust", mul(ONE, 20 ether));
-        vat.frob("ETH", urn, urn, urn, 100 ether, 60 ether);
+        vat.frob("ETH", address(this), address(this), address(this), 100 ether, 60 ether);
 
-        bytes32 otherOwnedUrn = bytes32(uint(address(this)) * 2 ** (12 * 8) + uint96(1));
-        vat.fork("ETH", urn, otherOwnedUrn, 50 ether, 19 ether);
+        user1.doHope(address(vat), address(this));
+        vat.fork("ETH", address(this), address(user1), 50 ether, 19 ether);
     }
 
     function testFailForkDustDst() public {
         deploy();
         weth.deposit.value(100 ether)(); // Big number just to make sure to avoid unsafe situation
         weth.approve(address(ethJoin), uint(-1));
-        ethJoin.join(urn, 100 ether);
+        ethJoin.join(address(this), 100 ether);
 
         this.file(address(vat), "ETH", "dust", mul(ONE, 20 ether));
-        vat.frob("ETH", urn, urn, urn, 100 ether, 60 ether);
+        vat.frob("ETH", address(this), address(this), address(this), 100 ether, 60 ether);
 
-        bytes32 otherOwnedUrn = bytes32(uint(address(this)) * 2 ** (12 * 8) + uint96(1));
-        vat.fork("ETH", urn, otherOwnedUrn, 50 ether, 41 ether);
+        user1.doHope(address(vat), address(this));
+        vat.fork("ETH", address(this), address(user1), 50 ether, 41 ether);
     }
 
     function testTokens() public {
@@ -512,38 +479,38 @@ contract DssDeployTest is DssDeployTestBase {
 
         token1.approve(address(col1Join), uint(-1));
         assertEq(token1.balanceOf(address(col1Join)), 0);
-        assertEq(vat.gem("COL1", urn), 0);
-        col1Join.join(urn, 10);
+        assertEq(vat.gem("COL1", address(this)), 0);
+        col1Join.join(address(this), 10);
         assertEq(token1.balanceOf(address(col1Join)), 10);
-        assertEq(vat.gem("COL1", urn), 10);
+        assertEq(vat.gem("COL1", address(this)), 10);
 
         token2.approve(address(col2Join), uint(-1));
         assertEq(token2.balanceOf(address(col2Join)), 0);
-        assertEq(vat.gem("COL2", urn), 0);
-        col2Join.join(urn, 10);
+        assertEq(vat.gem("COL2", address(this)), 0);
+        col2Join.join(address(this), 10);
         assertEq(token2.balanceOf(address(col2Join)), 10);
-        assertEq(vat.gem("COL2", urn), 10);
+        assertEq(vat.gem("COL2", address(this)), 10);
 
         token3.approve(address(col3Join), uint(-1));
         assertEq(token3.balanceOf(address(col3Join)), 0);
-        assertEq(vat.gem("COL3", urn), 0);
-        col3Join.join(urn, 10);
+        assertEq(vat.gem("COL3", address(this)), 0);
+        col3Join.join(address(this), 10);
         assertEq(token3.balanceOf(address(col3Join)), 10);
-        assertEq(vat.gem("COL3", urn), 10);
+        assertEq(vat.gem("COL3", address(this)), 10);
 
         token4.approve(address(col4Join), uint(-1));
         assertEq(token1.balanceOf(address(col4Join)), 0);
-        assertEq(vat.gem("COL4", urn), 0);
-        col4Join.join(urn, 10);
+        assertEq(vat.gem("COL4", address(this)), 0);
+        col4Join.join(address(this), 10);
         assertEq(token4.balanceOf(address(col4Join)), 10);
-        assertEq(vat.gem("COL4", urn), 10);
+        assertEq(vat.gem("COL4", address(this)), 10);
 
         token5.approve(address(col5Join), uint(-1));
         assertEq(token1.balanceOf(address(col5Join)), 0);
-        assertEq(vat.gem("COL5", urn), 0);
-        col5Join.join(urn, 10);
+        assertEq(vat.gem("COL5", address(this)), 0);
+        col5Join.join(address(this), 10);
         assertEq(token5.balanceOf(address(col5Join)), 10);
-        assertEq(vat.gem("COL5", urn), 10 * 10 ** 9);
+        assertEq(vat.gem("COL5", address(this)), 10 * 10 ** 9);
     }
 
     function testAuth() public {

@@ -30,25 +30,25 @@ contract FakeUser {
         DSToken(token).approve(guy);
     }
 
-    function doDaiJoin(address obj, bytes32 urn, uint wad) public {
+    function doDaiJoin(address obj, address urn, uint wad) public {
         DaiJoin(obj).join(urn, wad);
     }
 
-    function doDaiExit(address obj, bytes32 urn, address guy, uint wad) public {
+    function doDaiExit(address obj, address urn, address guy, uint wad) public {
         DaiJoin(obj).exit(urn, guy, wad);
     }
 
-    function doEthJoin(address payable obj, address gem, bytes32 addr, uint wad) public {
+    function doEthJoin(address payable obj, address gem, address urn, uint wad) public {
         WETH9_(obj).deposit.value(wad)();
         WETH9_(obj).approve(address(gem), uint(-1));
-        GemJoin(gem).join(addr, wad);
+        GemJoin(gem).join(urn, wad);
     }
 
-    function doFrob(address obj, bytes32 ilk, bytes32 urn, bytes32 gem, bytes32 dai, int dink, int dart) public {
+    function doFrob(address obj, bytes32 ilk, address urn, address gem, address dai, int dink, int dart) public {
         Vat(obj).frob(ilk, urn, gem, dai, dink, dart);
     }
 
-    function doFork(address obj, bytes32 ilk, bytes32 src, bytes32 dst, int dink, int dart) public {
+    function doFork(address obj, bytes32 ilk, address src, address dst, int dink, int dart) public {
         Vat(obj).fork(ilk, src, dst, dink, dart);
     }
 
@@ -125,8 +125,6 @@ contract DssDeployTestBase is DSTest {
 
     MomLib momLib;
 
-    bytes32 urn;
-
     // --- Math ---
     uint256 constant ONE = 10 ** 27;
 
@@ -179,8 +177,6 @@ contract DssDeployTestBase is DSTest {
 
         hevm = Hevm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
         hevm.warp(0);
-
-        urn = bytes32(bytes20(address(this)));
     }
 
     function rad(uint wad) internal pure returns (uint) {

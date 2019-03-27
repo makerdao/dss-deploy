@@ -89,11 +89,10 @@ contract GemJoin2 is DSNote {
 
         require(prevBalance >= wad, "");
 
-        (bool ok, bytes memory data) = address(gem).call(
+        (bool ok,) = address(gem).call(
             abi.encodeWithSignature("transfer(address,uint256)", guy, wad)
         );
-        ok;
-        data;
+        require(ok, "");
 
         require(prevBalance - wad == gem.balanceOf(address(this)), "");
     }

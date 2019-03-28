@@ -59,7 +59,7 @@ contract DssDeployTest is DssDeployTestBase {
         weth.deposit.value(1 ether)();
         weth.approve(address(ethJoin), uint(-1));
         ethJoin.join(address(this), 1 ether);
-        ethJoin.exit(address(this), address(this), 1 ether);
+        ethJoin.exit(address(this), 1 ether);
         assertEq(vat.gem("ETH", address(this)), 0);
     }
 
@@ -68,7 +68,7 @@ contract DssDeployTest is DssDeployTestBase {
         col.mint(1 ether);
         col.approve(address(colJoin), 1 ether);
         colJoin.join(address(this), 1 ether);
-        colJoin.exit(address(this), address(this), 1 ether);
+        colJoin.exit(address(this), 1 ether);
         assertEq(col.balanceOf(address(this)), 1 ether);
         assertEq(vat.gem("COL", address(this)), 0);
     }
@@ -85,7 +85,7 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(vat.dai(address(this)), mul(ONE, 60 ether));
 
         vat.hope(address(daiJoin));
-        daiJoin.exit(address(this), address(this), 60 ether);
+        daiJoin.exit(address(this), 60 ether);
         assertEq(dai.balanceOf(address(this)), 60 ether);
         assertEq(vat.dai(address(this)), 0);
     }
@@ -100,7 +100,7 @@ contract DssDeployTest is DssDeployTestBase {
         vat.frob("COL", address(this), address(this), address(this), 0.5 ether, 20 ether);
 
         vat.hope(address(daiJoin));
-        daiJoin.exit(address(this), address(this), 20 ether);
+        daiJoin.exit(address(this), 20 ether);
         assertEq(dai.balanceOf(address(this)), 20 ether);
     }
 
@@ -143,7 +143,7 @@ contract DssDeployTest is DssDeployTestBase {
         ethJoin.join(address(this), 1 ether);
         vat.frob("ETH", address(this), address(this), address(this), 0.5 ether, 60 ether);
         vat.hope(address(daiJoin));
-        daiJoin.exit(address(this), address(this), 60 ether);
+        daiJoin.exit(address(this), 60 ether);
         assertEq(dai.balanceOf(address(this)), 60 ether);
         dai.approve(address(daiJoin), uint(-1));
         daiJoin.join(address(this), 60 ether);
@@ -332,7 +332,7 @@ contract DssDeployTest is DssDeployTestBase {
         user1.doDeal(address(flap), batchId);
         assertEq(gov.balanceOf(address(0)), 0.0016 ether);
         user1.doHope(address(vat), address(daiJoin));
-        user1.doDaiExit(address(daiJoin), address(user1), address(user1), 0.05 ether);
+        user1.doDaiExit(address(daiJoin), address(user1), 0.05 ether);
         assertEq(dai.balanceOf(address(user1)), 0.05 ether);
     }
 
@@ -346,11 +346,11 @@ contract DssDeployTest is DssDeployTestBase {
         vat.frob("ETH", address(this), address(this), address(this), 0.1 ether, 10 ether);
         assertEq(vat.dai(address(this)), mul(10 ether, ONE));
         vat.hope(address(pot));
-        pot.save(address(this), 10 ether);
+        pot.save(10 ether);
         hevm.warp(now + 1);
         jug.drip("ETH");
         pot.drip();
-        pot.save(address(this), -int(10 ether));
+        pot.save(-int(10 ether));
         assertEq(vat.dai(address(this)), mul(10.5 ether, ONE));
     }
 

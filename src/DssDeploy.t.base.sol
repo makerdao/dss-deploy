@@ -34,8 +34,8 @@ contract FakeUser {
         DaiJoin(obj).join(urn, wad);
     }
 
-    function doDaiExit(address obj, address urn, address guy, uint wad) public {
-        DaiJoin(obj).exit(urn, guy, wad);
+    function doDaiExit(address obj, address guy, uint wad) public {
+        DaiJoin(obj).exit(guy, wad);
     }
 
     function doEthJoin(address payable obj, address gem, address urn, uint wad) public {

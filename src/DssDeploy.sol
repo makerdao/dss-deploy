@@ -276,27 +276,6 @@ contract DssDeploy is DSAuth {
         flop.rely(address(vow));
     }
 
-    function deployMom(DSAuthority authority) public auth {
-        require(address(vow) != address(0), "Missing VOW deployment");
-        require(address(jug) != address(0), "Missing JUG deployment");
-        require(address(cat) != address(0), "Missing CAT deployment");
-
-        // Auth
-        mom = proxyFab.newProxy();
-        vat.rely(address(mom));
-        cat.rely(address(mom));
-        vow.rely(address(mom));
-        jug.rely(address(mom));
-        pot.rely(address(mom));
-        spotter.rely(address(mom));
-        mom.setAuthority(authority);
-        mom.setOwner(address(0));
-        this.setAuthority(authority);
-        this.setOwner(address(0));
-        guard.setAuthority(authority);
-        guard.setOwner(msg.sender);
-    }
-
     function deployPause(uint delay, DSAuthority authority) public auth {
         pause = pauseFab.newPause(delay, address(0), authority);
 

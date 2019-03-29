@@ -35,8 +35,9 @@ seth send "$MCD_DEPLOY" "deployTaxation(address)" "$MCD_GOV"
 # Deploy Liquidation
 seth send "$MCD_DEPLOY" "deployLiquidation(address)" "$MCD_GOV"
 
-# Deploy mom
-seth send "$MCD_DEPLOY" "deployMom(address)" "$MCD_ADM"
+# Deploy pause
+PAUSE_DELAY_SECS=3600
+seth send "$MCD_DEPLOY" "deployPause(uint256,address)" "$(seth --to-uint256 $PAUSE_DELAY_SECS)" "$MCD_ADM"
 
 cat > load-mcd-"$(seth chain)" << EOF
 #!/bin/bash
@@ -56,7 +57,7 @@ export MCD_FLAP=0x$(seth call "$MCD_DEPLOY" "flap()(address)")
 export MCD_FLOP=0x$(seth call "$MCD_DEPLOY" "flop()(address)")
 export MCD_SPOT=0x$(seth call "$MCD_DEPLOY" "spotter()(address)")
 export MCD_POT=0x$(seth call "$MCD_DEPLOY" "pot()(address)")
-export MCD_MOM=0x$(seth call "$MCD_DEPLOY" "mom()(address)")
+export MCD_PAUSE=0x$(seth call "$MCD_DEPLOY" "pause()(address)")
 export MCD_DAI=0x$(seth call "$MCD_DEPLOY" "dai()(address)")
 export MCD_DAI_GUARD=0x$(seth call "$MCD_DEPLOY" "guard()(address)")
 EOF

@@ -8,7 +8,11 @@ export SOLC_FLAGS="--optimize"
 test -z "$SKIP_BUILD" && dapp build
 
 # Check that all fabs are defined
-{ test -z "$VAT_FAB" || test -z "$JUG_FAB" || test -z "$VOW_FAB" || test -z "$CAT_FAB" || test -z "$TOKEN_FAB" || test -z "$GUARD_FAB" || test -z "$MCD_JOIN_FAB" || test -z "$FLAP_FAB" || test -z "$FLOP_FAB" || test -z "$FLIP_FAB" || test -z "$SPOT_FAB" || test -z "$PAUSE_FAB"; } && exit 1
+{ test -z "$VAT_FAB"      || test -z "$JUG_FAB"   || test -z "$VOW_FAB" || \
+  test -z "$CAT_FAB"      || test -z "$TOKEN_FAB" || test -z "$GUARD_FAB" || \
+  test -z "$MCD_JOIN_FAB" || test -z "$FLAP_FAB"  || test -z "$FLOP_FAB" || \
+  test -z "$FLIP_FAB"     || test -z "$SPOT_FAB"  || test -z "$PAUSE_FAB"; } && \
+  exit 1
 
 # If no Governance token is defined, create one
 test -z "$MCD_GOV" && MCD_GOV=$(dapp create DSToken "$(seth --to-bytes32 "$(seth --from-ascii "MKR")")")

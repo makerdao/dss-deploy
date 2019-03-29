@@ -18,7 +18,6 @@ pragma solidity >=0.5.0;
 import {DSToken} from "ds-token/token.sol";
 import {DSAuth, DSAuthority} from "ds-auth/auth.sol";
 import {DSGuard} from "ds-guard/guard.sol";
-import {DSProxy, DSProxyCache} from "ds-proxy/proxy.sol";
 import {DSPause} from "ds-pause/pause.sol";
 
 import {Vat} from "dss/vat.sol";
@@ -122,13 +121,6 @@ contract PotFab {
     }
 }
 
-contract ProxyFab {
-    function newProxy() public returns (DSProxy proxy) {
-        proxy = new DSProxy(address(new DSProxyCache()));
-        proxy.setOwner(msg.sender);
-    }
-}
-
 contract PauseFab {
     function newPause(uint delay, address owner, DSAuthority authority) public returns(DSPause pause) {
         pause = new DSPause(delay, owner, authority);
@@ -148,7 +140,6 @@ contract DssDeploy is DSAuth {
     FlipFab    public flipFab;
     SpotFab    public spotFab;
     PotFab     public potFab;
-    ProxyFab   public proxyFab;
     PauseFab   public pauseFab;
 
     Vat     public vat;
@@ -187,7 +178,6 @@ contract DssDeploy is DSAuth {
         FlopFab flopFab_,
         FlipFab flipFab_,
         SpotFab spotFab_,
-        ProxyFab proxyFab_,
         PotFab potFab_,
         PauseFab pauseFab_
     ) public {
@@ -202,7 +192,6 @@ contract DssDeploy is DSAuth {
         flopFab = flopFab_;
         flipFab = flipFab_;
         spotFab = spotFab_;
-        proxyFab = proxyFab_;
         potFab = potFab_;
         pauseFab = pauseFab_;
     }

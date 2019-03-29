@@ -86,7 +86,6 @@ contract DssDeployTestBase is DSTest {
     FlipFab flipFab;
     SpotFab spotFab;
     PotFab potFab;
-    ProxyFab proxyFab;
     PauseFab pauseFab;
 
     DssDeploy dssDeploy;
@@ -144,7 +143,6 @@ contract DssDeployTestBase is DSTest {
         flopFab = new FlopFab();
         flipFab = new FlipFab();
         spotFab = new SpotFab();
-        proxyFab = new ProxyFab();
         potFab = new PotFab();
         pauseFab = new PauseFab();
         plan = new Plan();
@@ -161,7 +159,6 @@ contract DssDeployTestBase is DSTest {
             flopFab,
             flipFab,
             spotFab,
-            proxyFab,
             potFab,
             pauseFab
         );

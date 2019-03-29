@@ -30,9 +30,9 @@ source "$SCRIPT_DIR/../load-fab-$(seth chain)"
 
 # -----------------------------------------------------------------------------------------
 
-message DEPLOYING MCD
+message DEPLOYING CORE
 
-"${SCRIPT_DIR}/deploy"
+"${SCRIPT_DIR}/deploy-core"
 # shellcheck source=/dev/null
 source "${SCRIPT_DIR}/../load-mcd-$(seth chain)"
 

@@ -40,8 +40,8 @@ seth send "$MCD_DEPLOY" "deployTaxation(address)" "$MCD_GOV"
 seth send "$MCD_DEPLOY" "deployLiquidation(address)" "$MCD_GOV"
 
 # Deploy pause
-PAUSE_DELAY_SECS=3600
-seth send "$MCD_DEPLOY" "deployPause(uint256,address)" "$(seth --to-uint256 $PAUSE_DELAY_SECS)" "$MCD_ADM"
+MCD_PAUSE_DELAY=${MCD_PAUSE_DELAY:-"3600"}
+seth send "$MCD_DEPLOY" "deployPause(uint256,address)" "$(seth --to-uint256 "$MCD_PAUSE_DELAY")" "$MCD_ADM"
 
 cat > load-mcd-"$(seth chain)" << EOF
 #!/bin/bash

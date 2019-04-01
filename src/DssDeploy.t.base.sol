@@ -8,8 +8,7 @@ import {GemJoin} from "dss/join.sol";
 import {WETH9_} from "ds-weth/weth9.sol";
 
 import "./DssDeploy.sol";
-
-import {MomLib} from "./momLib.sol";
+import {Plan} from "./plan.sol";
 
 contract Hevm {
     function warp(uint256) public;
@@ -87,7 +86,7 @@ contract DssDeployTestBase is DSTest {
     FlipFab flipFab;
     SpotFab spotFab;
     PotFab potFab;
-    ProxyFab proxyFab;
+    PauseFab pauseFab;
 
     DssDeploy dssDeploy;
 
@@ -97,6 +96,7 @@ contract DssDeployTestBase is DSTest {
 
     DSRoles authority;
     DSGuard guard;
+    DSPause pause;
 
     WETH9_ weth;
     GemJoin ethJoin;
@@ -113,7 +113,7 @@ contract DssDeployTestBase is DSTest {
     Spotter spotter;
     Pot pot;
 
-    DSProxy mom;
+    Plan plan;
 
     Flipper ethFlip;
 
@@ -123,11 +123,8 @@ contract DssDeployTestBase is DSTest {
     FakeUser user1;
     FakeUser user2;
 
-    MomLib momLib;
-
     // --- Math ---
     uint256 constant ONE = 10 ** 27;
-
     function mul(uint x, uint y) internal pure returns (uint z) {
         require(y == 0 || (z = x * y) / y == x);
     }
@@ -144,8 +141,9 @@ contract DssDeployTestBase is DSTest {
         flopFab = new FlopFab();
         flipFab = new FlipFab();
         spotFab = new SpotFab();
-        proxyFab = new ProxyFab();
         potFab = new PotFab();
+        pauseFab = new PauseFab();
+        plan = new Plan();
 
         dssDeploy = new DssDeploy(
             vatFab,
@@ -159,8 +157,8 @@ contract DssDeployTestBase is DSTest {
             flopFab,
             flipFab,
             spotFab,
-            proxyFab,
-            potFab
+            potFab,
+            pauseFab
         );
 
         gov = new DSToken("GOV");
@@ -183,12 +181,14 @@ contract DssDeployTestBase is DSTest {
         return wad * 10 ** 27;
     }
 
-    function file(address, bytes32, uint) external {
-        mom.execute(address(momLib), msg.data);
+    function file(address who, bytes32 what, uint256 data) external {
+        pause.plan(address(plan), abi.encodeWithSignature("file(address,bytes32,uint256)", who, what, data), now);
+        pause.exec(address(plan), abi.encodeWithSignature("file(address,bytes32,uint256)", who, what, data), now);
     }
 
-    function file(address, bytes32, bytes32, uint) external {
-        mom.execute(address(momLib), msg.data);
+    function file(address who, bytes32 ilk, bytes32 what, uint256 data) external {
+        pause.plan(address(plan), abi.encodeWithSignature("file(address,bytes32,bytes32,uint256)", who, ilk, what, data), now);
+        pause.exec(address(plan), abi.encodeWithSignature("file(address,bytes32,bytes32,uint256)", who, ilk, what, data), now);
     }
 
     function deploy() public {
@@ -196,7 +196,7 @@ contract DssDeployTestBase is DSTest {
         dssDeploy.deployDai();
         dssDeploy.deployTaxation(address(gov));
         dssDeploy.deployLiquidation(address(gov));
-        dssDeploy.deployMom(authority);
+        dssDeploy.deployPause(0, authority);
 
         vat = dssDeploy.vat();
         jug = dssDeploy.jug();
@@ -209,7 +209,8 @@ contract DssDeployTestBase is DSTest {
         spotter = dssDeploy.spotter();
         pot = dssDeploy.pot();
         guard = dssDeploy.guard();
-        mom = dssDeploy.mom();
+        pause = dssDeploy.pause();
+        authority.setRootUser(address(pause), true);
 
         weth = new WETH9_();
         ethJoin = new GemJoin(address(vat), "ETH", address(weth));
@@ -220,7 +221,6 @@ contract DssDeployTestBase is DSTest {
         dssDeploy.deployCollateral("COL", address(colJoin), address(pipCOL));
 
         // Set Params
-        momLib = new MomLib();
         this.file(address(vat), bytes32("Line"), uint(10000 * 10 ** 45));
         this.file(address(vat), bytes32("ETH"), bytes32("line"), uint(10000 * 10 ** 45));
         this.file(address(vat), bytes32("COL"), bytes32("line"), uint(10000 * 10 ** 45));

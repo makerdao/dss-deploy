@@ -15,21 +15,21 @@ contract DssDeployTest is DssDeployTestBase {
         deploy();
     }
 
-    function testFailDeploy() public {
+    function testFailMissingVat() public {
         dssDeploy.deployTaxation(address(gov));
     }
 
-    function testFailDeploy2() public {
+    function testFailMissingTaxation() public {
         dssDeploy.deployVat();
         dssDeploy.deployDai();
         dssDeploy.deployLiquidation(address(gov));
     }
 
-    function testFailDeploy3() public {
+    function testFailMissingLiquidation() public {
         dssDeploy.deployVat();
         dssDeploy.deployDai();
         dssDeploy.deployTaxation(address(gov));
-        dssDeploy.deployMom(authority);
+        dssDeploy.deployPause(0, authority);
     }
 
     function testJoinETH() public {
@@ -541,24 +541,24 @@ contract DssDeployTest is DssDeployTestBase {
 
         // vow
         assertEq(vow.wards(address(dssDeploy)), 1);
-        assertEq(vow.wards(address(mom)), 1);
+        assertEq(vow.wards(address(pause)), 1);
         assertEq(vow.wards(address(cat)), 1);
 
         // cat
         assertEq(cat.wards(address(dssDeploy)), 1);
-        assertEq(cat.wards(address(mom)), 1);
+        assertEq(cat.wards(address(pause)), 1);
 
         // spotter
         assertEq(spotter.wards(address(dssDeploy)), 1);
-        assertEq(spotter.wards(address(mom)), 1);
+        assertEq(spotter.wards(address(pause)), 1);
 
         // jug
         assertEq(jug.wards(address(dssDeploy)), 1);
-        assertEq(jug.wards(address(mom)), 1);
+        assertEq(jug.wards(address(pause)), 1);
 
-        // mom
-        assertEq(address(mom.authority()), address(authority));
-        assertEq(mom.owner(), address(0));
+        // pause
+        assertEq(address(pause.authority()), address(authority));
+        assertEq(pause.owner(), address(0));
 
         // dssDeploy
         assertEq(address(dssDeploy.authority()), address(authority));

@@ -13,7 +13,7 @@ contract Setter {
     function init(bytes32) public;
 }
 
-contract MomLib {
+contract Plan {
     function file(address who, address data) public {
         Setter(who).file(data);
     }

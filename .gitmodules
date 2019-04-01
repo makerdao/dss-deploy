@@ -16,12 +16,12 @@
 [submodule "lib/ds-guard"]
 	path = lib/ds-guard
 	url = https://github.com/dapphub/ds-guard
-[submodule "lib/ds-proxy"]
-	path = lib/ds-proxy
-	url = https://github.com/dapphub/ds-proxy
 [submodule "lib/dsr"]
 	path = lib/dsr
 	url = https://github.com/makerdao/dsr
 [submodule "lib/ds-weth"]
 	path = lib/ds-weth
 	url = https://github.com/dapphub/ds-weth
+[submodule "lib/ds-pause"]
+	path = lib/ds-pause
+	url = https://github.com/dapphub/ds-pause

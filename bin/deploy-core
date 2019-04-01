@@ -7,16 +7,21 @@ export SOLC_FLAGS="--optimize"
 
 test -z "$SKIP_BUILD" && dapp build
 
-# Check all fabs are defined
-{ test -z "$VAT_FAB" || test -z "$JUG_FAB" || test -z "$VOW_FAB" || test -z "$CAT_FAB" || test -z "$TOKEN_FAB" || test -z "$GUARD_FAB" || test -z "$MCD_JOIN_FAB" || test -z "$FLAP_FAB" || test -z "$FLOP_FAB" || test -z "$FLIP_FAB" || test -z "$SPOT_FAB" || test -z "$PROXY_FAB"; } && exit 1
+# Check that all fabs are defined
+{ test -z "$VAT_FAB"      || test -z "$JUG_FAB"   || test -z "$VOW_FAB" || \
+  test -z "$CAT_FAB"      || test -z "$TOKEN_FAB" || test -z "$GUARD_FAB" || \
+  test -z "$MCD_JOIN_FAB" || test -z "$FLAP_FAB"  || test -z "$FLOP_FAB" || \
+  test -z "$FLIP_FAB"     || test -z "$SPOT_FAB"  || test -z "$POT_FAB" || \
+  test -z "$PAUSE_FAB"; } && \
+  exit 1
 
-# If there is not Governance token defined, create one
+# If no Governance token is defined, create one
 test -z "$MCD_GOV" && MCD_GOV=$(dapp create DSToken "$(seth --to-bytes32 "$(seth --from-ascii "MKR")")")
 
 # Create deploy contract
-MCD_DEPLOY=$(dapp create DssDeploy "$VAT_FAB" "$JUG_FAB" "$VOW_FAB" "$CAT_FAB" "$TOKEN_FAB" "$GUARD_FAB" "$MCD_JOIN_FAB" "$FLAP_FAB" "$FLOP_FAB" "$FLIP_FAB" "$SPOT_FAB" "$PROXY_FAB" "$POT_FAB")
+MCD_DEPLOY=$(dapp create DssDeploy "$VAT_FAB" "$JUG_FAB" "$VOW_FAB" "$CAT_FAB" "$TOKEN_FAB" "$GUARD_FAB" "$MCD_JOIN_FAB" "$FLAP_FAB" "$FLOP_FAB" "$FLIP_FAB" "$SPOT_FAB" "$POT_FAB" "$PAUSE_FAB")
 
-# If there is not Authorty defined, create one
+# If no Authority is defined, create one
 if [ -z "$MCD_ADM" ]
 then
     MCD_ADM=$(dapp create DSRoles)
@@ -35,8 +40,9 @@ seth send "$MCD_DEPLOY" "deployTaxation(address)" "$MCD_GOV"
 # Deploy Liquidation
 seth send "$MCD_DEPLOY" "deployLiquidation(address)" "$MCD_GOV"
 
-# Deploy mom
-seth send "$MCD_DEPLOY" "deployMom(address)" "$MCD_ADM"
+# Deploy pause
+MCD_PAUSE_DELAY=${MCD_PAUSE_DELAY:-"3600"}
+seth send "$MCD_DEPLOY" "deployPause(uint256,address)" "$(seth --to-uint256 "$MCD_PAUSE_DELAY")" "$MCD_ADM"
 
 cat > load-mcd-"$(seth chain)" << EOF
 #!/bin/bash
@@ -56,7 +62,7 @@ export MCD_FLAP=0x$(seth call "$MCD_DEPLOY" "flap()(address)")
 export MCD_FLOP=0x$(seth call "$MCD_DEPLOY" "flop()(address)")
 export MCD_SPOT=0x$(seth call "$MCD_DEPLOY" "spotter()(address)")
 export MCD_POT=0x$(seth call "$MCD_DEPLOY" "pot()(address)")
-export MCD_MOM=0x$(seth call "$MCD_DEPLOY" "mom()(address)")
+export MCD_PAUSE=0x$(seth call "$MCD_DEPLOY" "pause()(address)")
 export MCD_DAI=0x$(seth call "$MCD_DEPLOY" "dai()(address)")
 export MCD_DAI_GUARD=0x$(seth call "$MCD_DEPLOY" "guard()(address)")
 EOF

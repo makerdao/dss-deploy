@@ -1,0 +1,14 @@
+os:
+  - linux
+language: nix
+sudo: required
+# workaround for a macOS specific issue with trusted users
+before_install:
+  - sudo mkdir -p /etc/nix
+  - echo "trusted-users = root $USER" | sudo tee -a /etc/nix/nix.conf
+  - nix-env -iA cachix -f https://cachix.org/api/v1/install
+  - cachix use cachix
+  - cachix use dapp
+  - nix-env -f https://github.com/dapphub/dapptools/tarball/master -iA dapp
+script:
+  - dapp test

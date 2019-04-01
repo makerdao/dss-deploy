@@ -123,8 +123,6 @@ contract DssDeployTestBase is DSTest {
     FakeUser user1;
     FakeUser user2;
 
-    bytes32 urn;
-
     // --- Math ---
     uint256 constant ONE = 10 ** 27;
     function mul(uint x, uint y) internal pure returns (uint z) {

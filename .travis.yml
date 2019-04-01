@@ -2,7 +2,6 @@ os:
   - linux
 language: nix
 sudo: required
-# workaround for a macOS specific issue with trusted users
 before_install:
   - sudo mkdir -p /etc/nix
   - echo "trusted-users = root $USER" | sudo tee -a /etc/nix/nix.conf

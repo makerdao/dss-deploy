@@ -292,15 +292,4 @@ contract DssDeploy is DSAuth {
         // Internal auth
         vat.rely(adapter);
     }
-
-    // developer backdoor
-    function rely(address dev) public auth {
-        vat.rely(dev);
-        cat.rely(dev);
-        vow.rely(dev);
-        flop.rely(dev);
-        jug.rely(dev);
-        pot.rely(dev);
-        spotter.rely(dev);
-    }
 }

@@ -21,13 +21,13 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testFailMissingTaxation() public {
         dssDeploy.deployVat();
-        dssDeploy.deployDai("", "", "", 999);
+        dssDeploy.deployDai("", "", "", 99);
         dssDeploy.deployLiquidation(address(gov));
     }
 
     function testFailMissingLiquidation() public {
         dssDeploy.deployVat();
-        dssDeploy.deployDai("", "", "", 999);
+        dssDeploy.deployDai("", "", "", 99);
         dssDeploy.deployTaxation(address(gov));
         dssDeploy.deployPause(0, authority);
     }

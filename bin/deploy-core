@@ -30,31 +30,8 @@ fi
 # Deploy VAT
 seth send "$MCD_DEPLOY" "deployVat()"
 
-chain=$(seth chain)
-
-case $chain in
-    ethlive)
-        chainId=1;;
-    morden)
-        chainId=2;;
-    ropsten)
-        chainId=3;;
-    kovan)
-        chainId=42;;
-    rinkeby)
-        chainId=1;;
-    goerli)
-        chainId=5;;
-    kotti)
-        chainId=6;;
-    unknown)
-        chainId=999;;
-esac
-
-test -z "$chainId" && exit 1
-
 # Deploy MCD
-seth send "$MCD_DEPLOY" "deployDai(string memory,string memory,string memory,uint256)" "DAI" "Dai Stablecoin" "1" "$chainId"
+seth send "$MCD_DEPLOY" "deployDai(string memory,string memory,string memory,uint256)" "DAI" "Dai Stablecoin" "1" "$(seth rpc net_version)"
 
 # Deploy Taxation
 seth send "$MCD_DEPLOY" "deployTaxation(address)" "$MCD_GOV"
@@ -66,10 +43,10 @@ seth send "$MCD_DEPLOY" "deployLiquidation(address)" "$MCD_GOV"
 MCD_PAUSE_DELAY=${MCD_PAUSE_DELAY:-"3600"}
 seth send "$MCD_DEPLOY" "deployPause(uint256,address)" "$(seth --to-uint256 "$MCD_PAUSE_DELAY")" "$MCD_ADM"
 
-cat > load-mcd-"$chain" << EOF
+cat > load-mcd-"$(seth chain)" << EOF
 #!/bin/bash
 
-# mcd deployment on $chain from $(git rev-parse HEAD)
+# mcd deployment on $(seth chain) from $(git rev-parse HEAD)
 # $(date)
 
 export MCD_DEPLOY=$MCD_DEPLOY

@@ -192,7 +192,7 @@ contract DssDeployTestBase is DSTest {
 
     function deployKeepAuth() public {
         dssDeploy.deployVat();
-        dssDeploy.deployDai("DAI", "Dai Stablecoin", "1", 999);
+        dssDeploy.deployDai("DAI", "Dai Stablecoin", "1", 99);
         dssDeploy.deployTaxation(address(gov));
         dssDeploy.deployLiquidation(address(gov));
         dssDeploy.deployPause(0, authority);

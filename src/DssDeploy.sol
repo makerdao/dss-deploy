@@ -264,6 +264,7 @@ contract DssDeploy is DSAuth {
         pot.rely(address(pause));
         dai.rely(address(pause));
         spotter.rely(address(pause));
+        flop.rely(address(pause));
 
         this.setAuthority(authority);
         this.setOwner(address(0));
@@ -275,6 +276,7 @@ contract DssDeploy is DSAuth {
         require(pip != address(0), "Missing PIP address");
         require(address(vat) != address(0), "Missing VAT deployment");
         require(address(cat) != address(0), "Missing CAT deployment");
+        require(address(pause) != address(0), "Missing PAUSE deployment");
 
         // Deploy
         ilks[ilk].flip = flipFab.newFlip(address(vat), ilk);
@@ -291,5 +293,16 @@ contract DssDeploy is DSAuth {
 
         // Internal auth
         vat.rely(adapter);
+    }
+
+    function releaseAuth() public auth {
+        vat.deny(address(this));
+        cat.deny(address(this));
+        vow.deny(address(this));
+        jug.deny(address(this));
+        pot.deny(address(this));
+        dai.deny(address(this));
+        spotter.deny(address(this));
+        flop.deny(address(this));
     }
 }

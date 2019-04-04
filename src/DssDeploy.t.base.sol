@@ -190,7 +190,7 @@ contract DssDeployTestBase is DSTest {
         pause.exec(address(plan), abi.encodeWithSignature("file(address,bytes32,bytes32,uint256)", who, ilk, what, data), now);
     }
 
-    function deploy() public {
+    function deployKeepAuth() public {
         dssDeploy.deployVat();
         dssDeploy.deployDai("DAI", "Dai Stablecoin", "1", 999);
         dssDeploy.deployTaxation(address(gov));
@@ -240,6 +240,11 @@ contract DssDeployTestBase is DSTest {
         DSGuard(address(gov.authority())).permit(address(flop), address(gov), bytes4(keccak256("mint(address,uint256)")));
 
         gov.mint(100 ether);
+    }
+
+    function deploy() public {
+        deployKeepAuth();
+        dssDeploy.releaseAuth();
     }
 
     function() external payable {

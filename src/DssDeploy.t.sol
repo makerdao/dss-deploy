@@ -458,7 +458,7 @@ contract DssDeployTest is DssDeployTestBase {
     }
 
     function testTokens() public {
-        deploy();
+        deployKeepAuth();
         DSValue pip = new DSValue();
         Token1 token1 = new Token1(100 ether);
         GemJoin col1Join = new GemJoin(address(vat), "COL1", address(token1));
@@ -514,46 +514,48 @@ contract DssDeployTest is DssDeployTestBase {
     }
 
     function testAuth() public {
-        deploy();
+        deployKeepAuth();
 
         // vat
         assertEq(vat.wards(address(dssDeploy)), 1);
-
+        assertEq(vat.wards(address(pause)), 1);
         assertEq(vat.wards(address(ethJoin)), 1);
-
         assertEq(vat.wards(address(colJoin)), 1);
-
         assertEq(vat.wards(address(daiJoin)), 1);
-
         assertEq(vat.wards(address(vow)), 1);
         assertEq(vat.wards(address(cat)), 1);
         assertEq(vat.wards(address(jug)), 1);
         assertEq(vat.wards(address(spotter)), 1);
 
-        // dai
-        assertEq(dai.wards(address(dssDeploy)), 1);
-        assertEq(dai.wards(address(pause)), 1);
-
-        // flop
-        assertEq(flop.wards(address(dssDeploy)), 1);
-        assertEq(flop.wards(address(vow)), 1);
+        // cat
+        assertEq(cat.wards(address(dssDeploy)), 1);
+        assertEq(cat.wards(address(pause)), 1);
 
         // vow
         assertEq(vow.wards(address(dssDeploy)), 1);
         assertEq(vow.wards(address(pause)), 1);
         assertEq(vow.wards(address(cat)), 1);
 
-        // cat
-        assertEq(cat.wards(address(dssDeploy)), 1);
-        assertEq(cat.wards(address(pause)), 1);
+        // jug
+        assertEq(jug.wards(address(dssDeploy)), 1);
+        assertEq(jug.wards(address(pause)), 1);
+
+        // pot
+        assertEq(pot.wards(address(dssDeploy)), 1);
+        assertEq(pot.wards(address(pause)), 1);
+
+        // dai
+        assertEq(dai.wards(address(dssDeploy)), 1);
+        assertEq(dai.wards(address(pause)), 1);
 
         // spotter
         assertEq(spotter.wards(address(dssDeploy)), 1);
         assertEq(spotter.wards(address(pause)), 1);
 
-        // jug
-        assertEq(jug.wards(address(dssDeploy)), 1);
-        assertEq(jug.wards(address(pause)), 1);
+        // flop
+        assertEq(flop.wards(address(dssDeploy)), 1);
+        assertEq(flop.wards(address(pause)), 1);
+        assertEq(flop.wards(address(vow)), 1);
 
         // pause
         assertEq(address(pause.authority()), address(authority));
@@ -565,5 +567,15 @@ contract DssDeployTest is DssDeployTestBase {
 
         // root
         assertTrue(authority.isUserRoot(address(this)));
+
+        dssDeploy.releaseAuth();
+        assertEq(vat.wards(address(dssDeploy)), 0);
+        assertEq(cat.wards(address(dssDeploy)), 0);
+        assertEq(vow.wards(address(dssDeploy)), 0);
+        assertEq(jug.wards(address(dssDeploy)), 0);
+        assertEq(pot.wards(address(dssDeploy)), 0);
+        assertEq(dai.wards(address(dssDeploy)), 0);
+        assertEq(spotter.wards(address(dssDeploy)), 0);
+        assertEq(flop.wards(address(dssDeploy)), 0);
     }
 }

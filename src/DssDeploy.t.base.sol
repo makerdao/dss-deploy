@@ -1,8 +1,10 @@
 pragma solidity >=0.5.0;
 
 import {DSTest} from "ds-test/test.sol";
+import {DSToken} from "ds-token/token.sol";
 import {DSValue} from "ds-value/value.sol";
 import {DSRoles} from "ds-roles/roles.sol";
+import {DSGuard} from "ds-guard/guard.sol";
 
 import {GemJoin} from "dss/join.sol";
 import {WETH9_} from "ds-weth/weth9.sol";
@@ -78,8 +80,7 @@ contract DssDeployTestBase is DSTest {
     JugFab jugFab;
     VowFab vowFab;
     CatFab catFab;
-    TokenFab tokenFab;
-    GuardFab guardFab;
+    DaiFab daiFab;
     DaiJoinFab daiJoinFab;
     FlapFab flapFab;
     FlopFab flopFab;
@@ -108,7 +109,7 @@ contract DssDeployTestBase is DSTest {
     Cat cat;
     Flapper flap;
     Flopper flop;
-    DSToken dai;
+    Dai dai;
     DaiJoin daiJoin;
     Spotter spotter;
     Pot pot;
@@ -134,8 +135,7 @@ contract DssDeployTestBase is DSTest {
         jugFab = new JugFab();
         vowFab = new VowFab();
         catFab = new CatFab();
-        tokenFab = new TokenFab();
-        guardFab = new GuardFab();
+        daiFab = new DaiFab();
         daiJoinFab = new DaiJoinFab();
         flapFab = new FlapFab();
         flopFab = new FlopFab();
@@ -150,8 +150,7 @@ contract DssDeployTestBase is DSTest {
             jugFab,
             vowFab,
             catFab,
-            tokenFab,
-            guardFab,
+            daiFab,
             daiJoinFab,
             flapFab,
             flopFab,
@@ -193,7 +192,7 @@ contract DssDeployTestBase is DSTest {
 
     function deploy() public {
         dssDeploy.deployVat();
-        dssDeploy.deployDai();
+        dssDeploy.deployDai("DAI", "Dai Stablecoin", "1", 999);
         dssDeploy.deployTaxation(address(gov));
         dssDeploy.deployLiquidation(address(gov));
         dssDeploy.deployPause(0, authority);
@@ -208,7 +207,7 @@ contract DssDeployTestBase is DSTest {
         daiJoin = dssDeploy.daiJoin();
         spotter = dssDeploy.spotter();
         pot = dssDeploy.pot();
-        guard = dssDeploy.guard();
+        guard = new DSGuard();
         pause = dssDeploy.pause();
         authority.setRootUser(address(pause), true);
 

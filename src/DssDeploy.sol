@@ -15,9 +15,7 @@
 
 pragma solidity >=0.5.0;
 
-import {DSToken} from "ds-token/token.sol";
 import {DSAuth, DSAuthority} from "ds-auth/auth.sol";
-import {DSGuard} from "ds-guard/guard.sol";
 import {DSPause} from "ds-pause/pause.sol";
 
 import {Vat} from "dss/vat.sol";
@@ -28,6 +26,7 @@ import {DaiJoin} from "dss/join.sol";
 import {Flapper} from "dss/flap.sol";
 import {Flopper} from "dss/flop.sol";
 import {Flipper} from "dss/flip.sol";
+import {Dai} from "dss/dai.sol";
 
 import {Pot} from "dsr/dsr.sol";
 
@@ -65,17 +64,11 @@ contract CatFab {
     }
 }
 
-contract TokenFab {
-    function newToken(bytes32 symbol) public returns (DSToken token) {
-        token = new DSToken(symbol);
-        token.setOwner(msg.sender);
-    }
-}
-
-contract GuardFab {
-    function newGuard() public returns (DSGuard guard) {
-        guard = new DSGuard();
-        guard.setOwner(msg.sender);
+contract DaiFab {
+    function newDai(string memory symbol, string memory name, string memory version, uint chainId) public returns (Dai dai) {
+        dai = new Dai(symbol, name, version, chainId);
+        dai.rely(msg.sender);
+        dai.deny(address(this));
     }
 }
 
@@ -132,8 +125,7 @@ contract DssDeploy is DSAuth {
     JugFab     public jugFab;
     VowFab     public vowFab;
     CatFab     public catFab;
-    TokenFab   public tokenFab;
-    GuardFab   public guardFab;
+    DaiFab     public daiFab;
     DaiJoinFab public daiJoinFab;
     FlapFab    public flapFab;
     FlopFab    public flopFab;
@@ -146,8 +138,7 @@ contract DssDeploy is DSAuth {
     Jug     public jug;
     Vow     public vow;
     Cat     public cat;
-    DSToken public dai;
-    DSGuard public guard;
+    Dai     public dai;
     DaiJoin public daiJoin;
     Flapper public flap;
     Flopper public flop;
@@ -171,8 +162,7 @@ contract DssDeploy is DSAuth {
         JugFab jugFab_,
         VowFab vowFab_,
         CatFab catFab_,
-        TokenFab tokenFab_,
-        GuardFab guardFab_,
+        DaiFab daiFab_,
         DaiJoinFab daiJoinFab_,
         FlapFab flapFab_,
         FlopFab flopFab_,
@@ -185,8 +175,7 @@ contract DssDeploy is DSAuth {
         jugFab = jugFab_;
         vowFab = vowFab_;
         catFab = catFab_;
-        tokenFab = tokenFab_;
-        guardFab = guardFab_;
+        daiFab = daiFab_;
         daiJoinFab = daiJoinFab_;
         flapFab = flapFab_;
         flopFab = flopFab_;
@@ -209,17 +198,13 @@ contract DssDeploy is DSAuth {
         vat.rely(address(spotter));
     }
 
-    function deployDai() public auth {
+    function deployDai(string memory symbol, string memory name, string memory version, uint256 chainId) public auth {
         require(address(vat) != address(0), "Missing VAT deployment");
 
         // Deploy
-        dai     = tokenFab.newToken("DAI");
+        dai     = daiFab.newDai(symbol, name, version, chainId);
         daiJoin = daiJoinFab.newDaiJoin(address(vat), address(dai));
-        guard = guardFab.newGuard();
-        guard.permit(address(daiJoin), address(dai), bytes4(keccak256("mint(address,uint256)")));
-        guard.permit(address(daiJoin), address(dai), bytes4(keccak256("burn(address,uint256)")));
-        dai.setAuthority(guard);
-        dai.setOwner(address(0));
+        dai.rely(address(daiJoin));
 
         // Internal auth
         vat.rely(address(daiJoin));
@@ -266,6 +251,10 @@ contract DssDeploy is DSAuth {
     }
 
     function deployPause(uint delay, DSAuthority authority) public auth {
+        require(address(vow) != address(0), "Missing VOW deployment");
+        require(address(jug) != address(0), "Missing JUG deployment");
+        require(address(cat) != address(0), "Missing CAT deployment");
+
         pause = pauseFab.newPause(delay, address(0), authority);
 
         vat.rely(address(pause));
@@ -273,12 +262,11 @@ contract DssDeploy is DSAuth {
         vow.rely(address(pause));
         jug.rely(address(pause));
         pot.rely(address(pause));
+        dai.rely(address(pause));
         spotter.rely(address(pause));
 
         this.setAuthority(authority);
         this.setOwner(address(0));
-        guard.setAuthority(authority);
-        guard.setOwner(msg.sender);
     }
 
     function deployCollateral(bytes32 ilk, address adapter, address pip) public auth {

@@ -14,15 +14,14 @@ VAT_FABtx=$(ETH_NONCE=$ETH_NONCE dapp create VatFab)
 JUG_FABtx=$(ETH_NONCE=$((ETH_NONCE + 1)) dapp create JugFab)
 VOW_FABtx=$(ETH_NONCE=$((ETH_NONCE + 2)) dapp create VowFab)
 CAT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 3)) dapp create CatFab)
-TOKEN_FABtx=$(ETH_NONCE=$((ETH_NONCE + 4)) dapp create TokenFab)
-GUARD_FABtx=$(ETH_NONCE=$((ETH_NONCE + 5)) dapp create GuardFab)
-MCD_JOIN_FABtx=$(ETH_NONCE=$((ETH_NONCE + 6)) dapp create DaiJoinFab)
-FLAP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 7)) dapp create FlapFab)
-FLOP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 8)) dapp create FlopFab)
-FLIP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 9)) dapp create FlipFab)
-SPOT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 10)) dapp create SpotFab)
-POT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 11)) dapp create PotFab)
-PAUSE_FABtx=$(ETH_NONCE=$((ETH_NONCE + 12)) dapp create PauseFab)
+DAI_FABtx=$(ETH_NONCE=$((ETH_NONCE + 4)) dapp create DaiFab)
+MCD_JOIN_FABtx=$(ETH_NONCE=$((ETH_NONCE + 5)) dapp create DaiJoinFab)
+FLAP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 6)) dapp create FlapFab)
+FLOP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 7)) dapp create FlopFab)
+FLIP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 8)) dapp create FlipFab)
+SPOT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 9)) dapp create SpotFab)
+POT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 10)) dapp create PotFab)
+PAUSE_FABtx=$(ETH_NONCE=$((ETH_NONCE + 11)) dapp create PauseFab)
 
 export SETH_ASYNC=no
 
@@ -30,8 +29,7 @@ test "$(seth receipt "$VAT_FABtx" status)" -eq 0 && exit 1
 test "$(seth receipt "$JUG_FABtx" status)" -eq 0 && exit 1
 test "$(seth receipt "$VOW_FABtx" status)" -eq 0 && exit 1
 test "$(seth receipt "$CAT_FABtx" status)" -eq 0 && exit 1
-test "$(seth receipt "$TOKEN_FABtx" status)" -eq 0 && exit 1
-test "$(seth receipt "$GUARD_FABtx" status)" -eq 0 && exit 1
+test "$(seth receipt "$DAI_FABtx" status)" -eq 0 && exit 1
 test "$(seth receipt "$MCD_JOIN_FABtx" status)" -eq 0 && exit 1
 test "$(seth receipt "$FLAP_FABtx" status)" -eq 0 && exit 1
 test "$(seth receipt "$FLOP_FABtx" status)" -eq 0 && exit 1
@@ -44,8 +42,7 @@ VAT_FAB=$(seth receipt "$VAT_FABtx" contractAddress)
 JUG_FAB=$(seth receipt "$JUG_FABtx" contractAddress)
 VOW_FAB=$(seth receipt "$VOW_FABtx" contractAddress)
 CAT_FAB=$(seth receipt "$CAT_FABtx" contractAddress)
-TOKEN_FAB=$(seth receipt "$TOKEN_FABtx" contractAddress)
-GUARD_FAB=$(seth receipt "$GUARD_FABtx" contractAddress)
+DAI_FAB=$(seth receipt "$DAI_FABtx" contractAddress)
 MCD_JOIN_FAB=$(seth receipt "$MCD_JOIN_FABtx" contractAddress)
 FLAP_FAB=$(seth receipt "$FLAP_FABtx" contractAddress)
 FLOP_FAB=$(seth receipt "$FLOP_FABtx" contractAddress)
@@ -64,8 +61,7 @@ export VAT_FAB=$VAT_FAB
 export JUG_FAB=$JUG_FAB
 export VOW_FAB=$VOW_FAB
 export CAT_FAB=$CAT_FAB
-export TOKEN_FAB=$TOKEN_FAB
-export GUARD_FAB=$GUARD_FAB
+export DAI_FAB=$DAI_FAB
 export MCD_JOIN_FAB=$MCD_JOIN_FAB
 export FLAP_FAB=$FLAP_FAB
 export FLOP_FAB=$FLOP_FAB

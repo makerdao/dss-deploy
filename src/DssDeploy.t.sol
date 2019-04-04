@@ -21,13 +21,13 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testFailMissingTaxation() public {
         dssDeploy.deployVat();
-        dssDeploy.deployDai();
+        dssDeploy.deployDai("", "", "", 999);
         dssDeploy.deployLiquidation(address(gov));
     }
 
     function testFailMissingLiquidation() public {
         dssDeploy.deployVat();
-        dssDeploy.deployDai();
+        dssDeploy.deployDai("", "", "", 999);
         dssDeploy.deployTaxation(address(gov));
         dssDeploy.deployPause(0, authority);
     }
@@ -531,9 +531,8 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(vat.wards(address(spotter)), 1);
 
         // dai
-        assertEq(address(dai.authority()), address(guard));
-        assertTrue(guard.canCall(address(daiJoin), address(dai), bytes4(keccak256("mint(address,uint256)"))));
-        assertTrue(guard.canCall(address(daiJoin), address(dai), bytes4(keccak256("burn(address,uint256)"))));
+        assertEq(dai.wards(address(dssDeploy)), 1);
+        assertEq(dai.wards(address(pause)), 1);
 
         // flop
         assertEq(flop.wards(address(dssDeploy)), 1);
@@ -566,9 +565,5 @@ contract DssDeployTest is DssDeployTestBase {
 
         // root
         assertTrue(authority.isUserRoot(address(this)));
-
-        // guard
-        assertEq(address(guard.authority()), address(authority));
-        assertEq(guard.owner(), address(this));
     }
 }

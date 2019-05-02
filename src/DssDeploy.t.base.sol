@@ -96,7 +96,6 @@ contract DssDeployTestBase is DSTest {
     DSValue pipCOL;
 
     DSRoles authority;
-    DSGuard guard;
     DSPause pause;
 
     WETH9_ weth;
@@ -207,7 +206,6 @@ contract DssDeployTestBase is DSTest {
         daiJoin = dssDeploy.daiJoin();
         spotter = dssDeploy.spotter();
         pot = dssDeploy.pot();
-        guard = new DSGuard();
         pause = dssDeploy.pause();
         authority.setRootUser(address(pause), true);
 

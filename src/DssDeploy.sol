@@ -49,8 +49,8 @@ contract JugFab {
 }
 
 contract VowFab {
-    function newVow() public returns (Vow vow) {
-        vow = new Vow();
+    function newVow(address vat, address flap, address flop) public returns (Vow vow) {
+        vow = new Vow(vat, flap, flop);
         vow.rely(msg.sender);
         vow.deny(address(this));
     }
@@ -210,19 +210,18 @@ contract DssDeploy is DSAuth {
         vat.rely(address(daiJoin));
     }
 
-    function deployTaxation(address gov) public auth {
+    function deployTaxationAndAuctions(address gov) public auth {
         require(gov != address(0), "Missing GOV address");
         require(address(vat) != address(0), "Missing VAT deployment");
 
         // Deploy
-        vow = vowFab.newVow();
         jug = jugFab.newJug(address(vat));
         pot = potFab.newPot(address(vat));
         flap = flapFab.newFlap(address(vat), gov);
+        flop = flopFab.newFlop(address(vat), gov);
+        vow = vowFab.newVow(address(vat), address(flap), address(flop));
 
         // Internal references set up
-        vow.file("vat", address(vat));
-        vow.file("flap", address(flap));
         jug.file("vow", address(vow));
         pot.file("vow", address(vow));
 
@@ -230,24 +229,21 @@ contract DssDeploy is DSAuth {
         vat.rely(address(vow));
         vat.rely(address(jug));
         vat.rely(address(pot));
+        flop.rely(address(vow));
     }
 
-    function deployLiquidation(address gov) public auth {
-        require(address(vat) != address(0), "Missing VAT deployment");
+    function deployLiquidator() public auth {
         require(address(vow) != address(0), "Missing VOW deployment");
 
         // Deploy
         cat = catFab.newCat(address(vat));
-        cat.file("vow", address(vow));
-        flop = flopFab.newFlop(address(vat), gov);
 
         // Internal references set up
-        vow.file("flop", address(flop));
+        cat.file("vow", address(vow));
 
         // Internal auth
         vat.rely(address(cat));
         vow.rely(address(cat));
-        flop.rely(address(vow));
     }
 
     function deployPause(uint delay, DSAuthority authority) public auth {

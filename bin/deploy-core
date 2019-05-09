@@ -34,10 +34,10 @@ seth send "$MCD_DEPLOY" "deployVat()"
 seth send "$MCD_DEPLOY" "deployDai(string memory,string memory,string memory,uint256)" "DAI" "Dai Stablecoin" "1" "$(seth rpc net_version)"
 
 # Deploy Taxation
-seth send "$MCD_DEPLOY" "deployTaxation(address)" "$MCD_GOV"
+seth send "$MCD_DEPLOY" "deployTaxationAndAuctions(address)" "$MCD_GOV"
 
 # Deploy Liquidation
-seth send "$MCD_DEPLOY" "deployLiquidation(address)" "$MCD_GOV"
+seth send "$MCD_DEPLOY" "deployLiquidator()"
 
 # Deploy pause
 MCD_PAUSE_DELAY=${MCD_PAUSE_DELAY:-"3600"}

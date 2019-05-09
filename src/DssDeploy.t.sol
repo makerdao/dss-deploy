@@ -16,19 +16,19 @@ contract DssDeployTest is DssDeployTestBase {
     }
 
     function testFailMissingVat() public {
-        dssDeploy.deployTaxation(address(gov));
+        dssDeploy.deployTaxationAndAuctions(address(gov));
     }
 
-    function testFailMissingTaxation() public {
+    function testFailMissingTaxationAndAuctions() public {
         dssDeploy.deployVat();
         dssDeploy.deployDai("", "", "", 99);
-        dssDeploy.deployLiquidation(address(gov));
+        dssDeploy.deployLiquidator();
     }
 
-    function testFailMissingLiquidation() public {
+    function testFailMissingLiquidator() public {
         dssDeploy.deployVat();
         dssDeploy.deployDai("", "", "", 99);
-        dssDeploy.deployTaxation(address(gov));
+        dssDeploy.deployTaxationAndAuctions(address(gov));
         dssDeploy.deployPause(0, authority);
     }
 
@@ -346,11 +346,11 @@ contract DssDeployTest is DssDeployTestBase {
         vat.frob("ETH", address(this), address(this), address(this), 0.1 ether, 10 ether);
         assertEq(vat.dai(address(this)), mul(10 ether, ONE));
         vat.hope(address(pot));
-        pot.save(10 ether);
+        pot.join(10 ether);
         hevm.warp(now + 1);
         jug.drip("ETH");
         pot.drip();
-        pot.save(-int(10 ether));
+        pot.exit(10 ether);
         assertEq(vat.dai(address(this)), mul(10.5 ether, ONE));
     }
 

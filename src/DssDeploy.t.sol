@@ -552,10 +552,20 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(spotter.wards(address(dssDeploy)), 1);
         assertEq(spotter.wards(address(pause)), 1);
 
+        // flap
+        assertEq(flap.wards(address(dssDeploy)), 1);
+        assertEq(flap.wards(address(pause)), 1);
+
         // flop
         assertEq(flop.wards(address(dssDeploy)), 1);
         assertEq(flop.wards(address(pause)), 1);
         assertEq(flop.wards(address(vow)), 1);
+
+        // flips
+        assertEq(ethFlip.wards(address(dssDeploy)), 1);
+        assertEq(ethFlip.wards(address(pause)), 1);
+        assertEq(colFlip.wards(address(dssDeploy)), 1);
+        assertEq(colFlip.wards(address(pause)), 1);
 
         // pause
         assertEq(address(pause.authority()), address(authority));
@@ -569,6 +579,8 @@ contract DssDeployTest is DssDeployTestBase {
         assertTrue(authority.isUserRoot(address(this)));
 
         dssDeploy.releaseAuth();
+        dssDeploy.releaseAuthFlip("ETH");
+        dssDeploy.releaseAuthFlip("COL");
         assertEq(vat.wards(address(dssDeploy)), 0);
         assertEq(cat.wards(address(dssDeploy)), 0);
         assertEq(vow.wards(address(dssDeploy)), 0);
@@ -576,6 +588,9 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(pot.wards(address(dssDeploy)), 0);
         assertEq(dai.wards(address(dssDeploy)), 0);
         assertEq(spotter.wards(address(dssDeploy)), 0);
+        assertEq(flap.wards(address(dssDeploy)), 0);
         assertEq(flop.wards(address(dssDeploy)), 0);
+        assertEq(ethFlip.wards(address(dssDeploy)), 0);
+        assertEq(colFlip.wards(address(dssDeploy)), 0);
     }
 }

@@ -305,6 +305,11 @@ contract DssDeploy is DSAuth {
         pot.deny(address(this));
         dai.deny(address(this));
         spotter.deny(address(this));
+        flap.deny(address(this));
         flop.deny(address(this));
+    }
+
+    function releaseAuthFlip(bytes32 ilk) public auth {
+        ilks[ilk].flip.deny(address(this));
     }
 }

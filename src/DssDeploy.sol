@@ -81,6 +81,8 @@ contract DaiJoinFab {
 contract FlapFab {
     function newFlap(address vat, address gov) public returns (Flapper flap) {
         flap = new Flapper(vat, gov);
+        flap.rely(msg.sender);
+        flap.deny(address(this));
     }
 }
 
@@ -95,6 +97,8 @@ contract FlopFab {
 contract FlipFab {
     function newFlip(address vat, bytes32 ilk) public returns (Flipper flip) {
         flip = new Flipper(vat, ilk);
+        flip.rely(msg.sender);
+        flip.deny(address(this));
     }
 }
 
@@ -260,6 +264,7 @@ contract DssDeploy is DSAuth {
         pot.rely(address(pause));
         dai.rely(address(pause));
         spotter.rely(address(pause));
+        flap.rely(address(pause));
         flop.rely(address(pause));
 
         this.setAuthority(authority);
@@ -289,6 +294,7 @@ contract DssDeploy is DSAuth {
 
         // Internal auth
         vat.rely(adapter);
+        ilks[ilk].flip.rely(address(pause));
     }
 
     function releaseAuth() public auth {

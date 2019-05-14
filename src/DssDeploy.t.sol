@@ -218,9 +218,8 @@ contract DssDeployTest is DssDeployTestBase {
         vat.frob("ETH", address(this), address(this), address(this), 0.5 ether, 100 ether); // Maximun DAI generated
         pipETH.poke(bytes32(uint(300 * 10 ** 18 - 1))); // Decrease price in 1 wei
         spotter.poke("ETH");
-        uint nflip = cat.bite("ETH", address(this));
         assertEq(vat.gem("ETH", address(ethFlip)), 0);
-        uint batchId = cat.flip(nflip, rad(100 ether));
+        uint batchId = cat.bite("ETH", address(this));
         assertEq(vat.gem("ETH", address(ethFlip)), 0.5 ether);
         address(user1).transfer(10 ether);
         user1.doEthJoin(address(weth), address(ethJoin), address(user1), 10 ether);
@@ -255,8 +254,7 @@ contract DssDeployTest is DssDeployTestBase {
         pipETH.poke(bytes32(uint(300 * 10 ** 18 - 1))); // Decrease price in 1 wei
         spotter.poke("ETH");
         uint48 eraBite = uint48(now);
-        uint nflip = cat.bite("ETH", address(this));
-        uint batchId = cat.flip(nflip, rad(100 ether));
+        uint batchId = cat.bite("ETH", address(this));
         address(user1).transfer(10 ether);
         user1.doEthJoin(address(weth), address(ethJoin), address(user1), 10 ether);
         user1.doFrob(address(vat), "ETH", address(user1), address(user1), address(user1), 10 ether, 1000 ether);

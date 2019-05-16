@@ -193,6 +193,8 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testBite() public {
         deploy();
+        this.file(address(cat), "ETH", "lump", rad(10000 ether)); // 10000 units of collateral per batch
+        this.file(address(cat), "ETH", "chop", ONE);
         weth.deposit.value(0.5 ether)();
         weth.approve(address(ethJoin), uint(-1));
         ethJoin.join(address(this), 0.5 ether);
@@ -212,6 +214,8 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testFlip() public {
         deploy();
+        this.file(address(cat), "ETH", "lump", rad(10000 ether)); // 10000 units of collateral per batch
+        this.file(address(cat), "ETH", "chop", ONE);
         weth.deposit.value(0.5 ether)();
         weth.approve(address(ethJoin), uint(-1));
         ethJoin.join(address(this), 0.5 ether);
@@ -247,6 +251,8 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testFlop() public {
         deploy();
+        this.file(address(cat), "ETH", "lump", rad(10000 ether)); // 10000 units of collateral per batch
+        this.file(address(cat), "ETH", "chop", ONE);
         weth.deposit.value(0.5 ether)();
         weth.approve(address(ethJoin), uint(-1));
         ethJoin.join(address(this), 0.5 ether);

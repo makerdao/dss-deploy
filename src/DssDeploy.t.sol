@@ -193,38 +193,59 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testBite() public {
         deploy();
-        this.file(address(cat), "ETH", "lump", rad(10000 ether)); // 10000 units of collateral per batch
+        this.file(address(cat), "ETH", "lump", 1 ether); // 1 unit of collateral per batch
         this.file(address(cat), "ETH", "chop", ONE);
-        weth.deposit.value(0.5 ether)();
+        weth.deposit.value(1 ether)();
         weth.approve(address(ethJoin), uint(-1));
-        ethJoin.join(address(this), 0.5 ether);
-        vat.frob("ETH", address(this), address(this), address(this), 0.5 ether, 100 ether); // Maximun DAI generated
+        ethJoin.join(address(this), 1 ether);
+        vat.frob("ETH", address(this), address(this), address(this), 1 ether, 200 ether); // Maximun DAI generated
 
         pipETH.poke(bytes32(uint(300 * 10 ** 18 - 1))); // Decrease price in 1 wei
         spotter.poke("ETH");
 
         (uint ink, uint art) = vat.urns("ETH", address(this));
-        assertEq(ink, 0.5 ether);
-        assertEq(art, 100 ether);
+        assertEq(ink, 1 ether);
+        assertEq(art, 200 ether);
         cat.bite("ETH", address(this));
         (ink, art) = vat.urns("ETH", address(this));
         assertEq(ink, 0);
         assertEq(art, 0);
     }
 
+    function testBitePartial() public {
+        deploy();
+        this.file(address(cat), "ETH", "lump", 1 ether); // 1 unit of collateral per batch
+        this.file(address(cat), "ETH", "chop", ONE);
+        weth.deposit.value(10 ether)();
+        weth.approve(address(ethJoin), uint(-1));
+        ethJoin.join(address(this), 10 ether);
+        vat.frob("ETH", address(this), address(this), address(this), 10 ether, 2000 ether); // Maximun DAI generated
+
+        pipETH.poke(bytes32(uint(300 * 10 ** 18 - 1))); // Decrease price in 1 wei
+        spotter.poke("ETH");
+
+        (uint ink, uint art) = vat.urns("ETH", address(this));
+        assertEq(ink, 10 ether);
+        assertEq(art, 2000 ether);
+        cat.bite("ETH", address(this));
+        (ink, art) = vat.urns("ETH", address(this));
+        assertEq(ink, 9 ether);
+        assertEq(art, 1800 ether);
+    }
+
     function testFlip() public {
         deploy();
-        this.file(address(cat), "ETH", "lump", rad(10000 ether)); // 10000 units of collateral per batch
+        this.file(address(cat), "ETH", "lump", 1 ether); // 1 unit of collateral per batch
         this.file(address(cat), "ETH", "chop", ONE);
-        weth.deposit.value(0.5 ether)();
+        weth.deposit.value(1 ether)();
         weth.approve(address(ethJoin), uint(-1));
-        ethJoin.join(address(this), 0.5 ether);
-        vat.frob("ETH", address(this), address(this), address(this), 0.5 ether, 100 ether); // Maximun DAI generated
+        ethJoin.join(address(this), 1 ether);
+        vat.frob("ETH", address(this), address(this), address(this), 1 ether, 200 ether); // Maximun DAI generated
         pipETH.poke(bytes32(uint(300 * 10 ** 18 - 1))); // Decrease price in 1 wei
         spotter.poke("ETH");
         assertEq(vat.gem("ETH", address(ethFlip)), 0);
         uint batchId = cat.bite("ETH", address(this));
-        assertEq(vat.gem("ETH", address(ethFlip)), 0.5 ether);
+        assertEq(vat.gem("ETH", address(ethFlip)), 1 ether);
         address(user1).transfer(10 ether);
         user1.doEthJoin(address(weth), address(ethJoin), address(user1), 10 ether);
         user1.doFrob(address(vat), "ETH", address(user1), address(user1), address(user1), 10 ether, 1000 ether);
@@ -236,27 +257,27 @@ contract DssDeployTest is DssDeployTestBase {
         user1.doHope(address(vat), address(ethFlip));
         user2.doHope(address(vat), address(ethFlip));
 
-        user1.doTend(address(ethFlip), batchId, 0.5 ether, rad(50 ether));
-        user2.doTend(address(ethFlip), batchId, 0.5 ether, rad(70 ether));
-        user1.doTend(address(ethFlip), batchId, 0.5 ether, rad(90 ether));
-        user2.doTend(address(ethFlip), batchId, 0.5 ether, rad(100 ether));
+        user1.doTend(address(ethFlip), batchId, 1 ether, rad(100 ether));
+        user2.doTend(address(ethFlip), batchId, 1 ether, rad(140 ether));
+        user1.doTend(address(ethFlip), batchId, 1 ether, rad(180 ether));
+        user2.doTend(address(ethFlip), batchId, 1 ether, rad(200 ether));
 
-        user1.doDent(address(ethFlip), batchId, 0.4 ether, rad(100 ether));
-        user2.doDent(address(ethFlip), batchId, 0.35 ether, rad(100 ether));
+        user1.doDent(address(ethFlip), batchId, 0.8 ether, rad(200 ether));
+        user2.doDent(address(ethFlip), batchId, 0.7 ether, rad(200 ether));
         hevm.warp(ethFlip.ttl() - 1);
-        user1.doDent(address(ethFlip), batchId, 0.3 ether, rad(100 ether));
+        user1.doDent(address(ethFlip), batchId, 0.6 ether, rad(200 ether));
         hevm.warp(now + ethFlip.ttl() + 1);
         user1.doDeal(address(ethFlip), batchId);
     }
 
     function testFlop() public {
         deploy();
-        this.file(address(cat), "ETH", "lump", rad(10000 ether)); // 10000 units of collateral per batch
+        this.file(address(cat), "ETH", "lump", 1 ether); // 1 unit of collateral per batch
         this.file(address(cat), "ETH", "chop", ONE);
-        weth.deposit.value(0.5 ether)();
+        weth.deposit.value(1 ether)();
         weth.approve(address(ethJoin), uint(-1));
-        ethJoin.join(address(this), 0.5 ether);
-        vat.frob("ETH", address(this), address(this), address(this), 0.5 ether, 100 ether); // Maximun DAI generated
+        ethJoin.join(address(this), 1 ether);
+        vat.frob("ETH", address(this), address(this), address(this), 1 ether, 200 ether); // Maximun DAI generated
         pipETH.poke(bytes32(uint(300 * 10 ** 18 - 1))); // Decrease price in 1 wei
         spotter.poke("ETH");
         uint48 eraBite = uint48(now);
@@ -272,31 +293,31 @@ contract DssDeployTest is DssDeployTestBase {
         user1.doHope(address(vat), address(ethFlip));
         user2.doHope(address(vat), address(ethFlip));
 
-        user1.doTend(address(ethFlip), batchId, 0.5 ether, rad(50 ether));
-        user2.doTend(address(ethFlip), batchId, 0.5 ether, rad(70 ether));
-        user1.doTend(address(ethFlip), batchId, 0.5 ether, rad(90 ether));
+        user1.doTend(address(ethFlip), batchId, 1 ether, rad(100 ether));
+        user2.doTend(address(ethFlip), batchId, 1 ether, rad(140 ether));
+        user1.doTend(address(ethFlip), batchId, 1 ether, rad(180 ether));
 
         hevm.warp(now + ethFlip.ttl() + 1);
         user1.doDeal(address(ethFlip), batchId);
 
         vow.flog(eraBite);
-        vow.heal(rad(90 ether));
-        this.file(address(vow), bytes32("sump"), rad(10 ether));
+        vow.heal(rad(180 ether));
+        this.file(address(vow), bytes32("sump"), rad(20 ether));
         batchId = vow.flop();
 
         (uint bid,,,,,) = flop.bids(batchId);
-        assertEq(bid, rad(10 ether));
+        assertEq(bid, rad(20 ether));
         user1.doHope(address(vat), address(flop));
         user2.doHope(address(vat), address(flop));
-        user1.doDent(address(flop), batchId, 0.3 ether, rad(10 ether));
+        user1.doDent(address(flop), batchId, 0.6 ether, rad(20 ether));
         hevm.warp(now + flop.ttl() - 1);
-        user2.doDent(address(flop), batchId, 0.1 ether, rad(10 ether));
-        user1.doDent(address(flop), batchId, 0.08 ether, rad(10 ether));
+        user2.doDent(address(flop), batchId, 0.2 ether, rad(20 ether));
+        user1.doDent(address(flop), batchId, 0.16 ether, rad(20 ether));
         hevm.warp(now + flop.ttl() + 1);
         uint prevGovSupply = gov.totalSupply();
         user1.doDeal(address(flop), batchId);
-        assertEq(gov.totalSupply(), prevGovSupply + 0.08 ether);
-        vow.kiss(rad(10 ether));
+        assertEq(gov.totalSupply(), prevGovSupply + 0.16 ether);
+        vow.kiss(rad(20 ether));
         assertEq(vow.Joy(), 0);
         assertEq(vow.Woe(), 0);
         assertEq(vow.Awe(), 0);

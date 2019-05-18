@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -ex
 
+ADDRESS_DIR=${ADDRESS_DIR:-$PWD}
+
 export ETH_GAS=${ETH_GAS:-"7000000"}
 export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
 export SOLC_FLAGS="--optimize"
@@ -43,7 +45,7 @@ seth send "$MCD_DEPLOY" "deployLiquidator()"
 MCD_PAUSE_DELAY=${MCD_PAUSE_DELAY:-"3600"}
 seth send "$MCD_DEPLOY" "deployPause(uint256,address)" "$(seth --to-uint256 "$MCD_PAUSE_DELAY")" "$MCD_ADM"
 
-cat > load-mcd-"$(seth chain)" << EOF
+cat > "$ADDRESS_DIR/load-mcd-$(seth chain)" << EOF
 #!/bin/bash
 
 # mcd deployment on $(seth chain) from $(git rev-parse HEAD)

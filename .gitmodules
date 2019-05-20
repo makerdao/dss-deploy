@@ -22,3 +22,6 @@
 [submodule "lib/ds-pause"]
 	path = lib/ds-pause
 	url = https://github.com/dapphub/ds-pause
+[submodule "lib/ds-note"]
+	path = lib/ds-note
+	url = https://github.com/dapphub/ds-note

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -ex
 
+ADDRESS_DIR=${ADDRESS_DIR:-$PWD}
+
 export ETH_GAS=${ETH_GAS:-"3500000"}
 export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
 unset SOLC_FLAGS
@@ -51,7 +53,7 @@ SPOT_FAB=$(seth receipt "$SPOT_FABtx" contractAddress)
 POT_FAB=$(seth receipt "$POT_FABtx" contractAddress)
 PAUSE_FAB=$(seth receipt "$PAUSE_FABtx" contractAddress)
 
-cat > load-fab-"$(seth chain)" << EOF
+cat > "$ADDRESS_DIR/load-fab-$(seth chain)" << EOF
 #!/bin/bash
 
 # fab deployment on $(seth chain) from $(git rev-parse HEAD)

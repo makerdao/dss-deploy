@@ -2,7 +2,8 @@
 
 set -e
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+BIN_DIR=${BIN_DIR:-$(cd "${0%/*}"&&pwd)}
+ADDRESS_DIR=${ADDRESS_DIR:-$PWD}
 
 # -----------------------------------------------------------------------------------------
 
@@ -24,64 +25,64 @@ dapp update
 
 message DEPLOYING FABS
 
-"$SCRIPT_DIR/deploy-fab"
+"$BIN_DIR/deploy-fab"
 # shellcheck source=/dev/null
-source "$SCRIPT_DIR/../load-fab-$(seth chain)"
+source "$ADDRESS_DIR/load-fab-$(seth chain)"
 
 # -----------------------------------------------------------------------------------------
 
 message DEPLOYING CORE
 
-"${SCRIPT_DIR}/deploy-core"
+"$BIN_DIR/deploy-core"
 # shellcheck source=/dev/null
-source "${SCRIPT_DIR}/../load-mcd-$(seth chain)"
+source "$ADDRESS_DIR/load-mcd-$(seth chain)"
 
 # -----------------------------------------------------------------------------------------
 
 message DEPLOYING ETH
 
-"${SCRIPT_DIR}/deploy-ilk-eth"
+"$BIN_DIR/deploy-ilk-eth"
 # shellcheck source=/dev/null
-source "${SCRIPT_DIR}/../load-ilk-eth-a-$(seth chain)"
+source "$ADDRESS_DIR/load-ilk-eth-a-$(seth chain)"
 
 # -----------------------------------------------------------------------------------------
 
 message DEPLOYING COL1
 
-"${SCRIPT_DIR}/deploy-ilk-col1"
+"$BIN_DIR/deploy-ilk-col1"
 # shellcheck source=/dev/null
-source "${SCRIPT_DIR}/../load-ilk-col1-a-$(seth chain)"
+source "$ADDRESS_DIR/load-ilk-col1-a-$(seth chain)"
 
 # -----------------------------------------------------------------------------------------
 
 message DEPLOYING COL2
 
-"${SCRIPT_DIR}/deploy-ilk-col2"
+"$BIN_DIR/deploy-ilk-col2"
 # shellcheck source=/dev/null
-source "${SCRIPT_DIR}/../load-ilk-col2-a-$(seth chain)"
+source "$ADDRESS_DIR/load-ilk-col2-a-$(seth chain)"
 
 # -----------------------------------------------------------------------------------------
 
 message DEPLOYING COL3
 
-"${SCRIPT_DIR}/deploy-ilk-col3"
+"$BIN_DIR/deploy-ilk-col3"
 # shellcheck source=/dev/null
-source "${SCRIPT_DIR}/../load-ilk-col3-a-$(seth chain)"
+source "$ADDRESS_DIR/load-ilk-col3-a-$(seth chain)"
 
 # -----------------------------------------------------------------------------------------
 
 message DEPLOYING COL4
 
-"${SCRIPT_DIR}/deploy-ilk-col4"
+"$BIN_DIR/deploy-ilk-col4"
 # shellcheck source=/dev/null
-source "${SCRIPT_DIR}/../load-ilk-col4-a-$(seth chain)"
+source "$ADDRESS_DIR/load-ilk-col4-a-$(seth chain)"
 
 # -----------------------------------------------------------------------------------------
 
 message DEPLOYING COL5
 
-"${SCRIPT_DIR}/deploy-ilk-col5"
+"$BIN_DIR/deploy-ilk-col5"
 # shellcheck source=/dev/null
-source "${SCRIPT_DIR}/../load-ilk-col5-a-$(seth chain)"
+source "$ADDRESS_DIR/load-ilk-col5-a-$(seth chain)"
 
 # -----------------------------------------------------------------------------------------

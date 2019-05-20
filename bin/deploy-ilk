@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -ex
 
+ADDRESS_DIR=${ADDRESS_DIR:-$PWD}
+
 export ETH_GAS=${ETH_GAS:-"7000000"}
 export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
 unset SOLC_FLAGS
@@ -23,7 +25,7 @@ seth send "$MCD_DEPLOY" "deployCollateral(bytes32,address,address)" "$(seth --to
 while IFS=$'\n' read -r line; do data+=("$line"); done < <(seth call "$MCD_DEPLOY" "ilks(bytes32)(address,address)" "$(seth --to-bytes32 "$(seth --from-ascii "$ilk")")")
 eval export "\MCD_FLIP_${ilkVar}=0x${data[0]}"
 
-cat > load-ilk-"$(echo "$ilk" | tr '[:upper:]' '[:lower:]')"-"$(seth chain)" << EOF
+cat > "$ADDRESS_DIR/load-ilk-$(echo "$ilk" | tr '[:upper:]' '[:lower:]')-$(seth chain)" << EOF
 #!/bin/bash
 
 # ilk deployment on $(seth chain) from $(git rev-parse HEAD)

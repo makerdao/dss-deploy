@@ -209,9 +209,6 @@ contract DssDeploy is DSAuth {
         dai     = daiFab.newDai(symbol, name, version, chainId);
         daiJoin = daiJoinFab.newDaiJoin(address(vat), address(dai));
         dai.rely(address(daiJoin));
-
-        // Internal auth
-        vat.rely(address(daiJoin));
     }
 
     function deployTaxationAndAuctions(address gov) public auth {

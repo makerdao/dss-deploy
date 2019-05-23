@@ -259,7 +259,6 @@ contract DssDeploy is DSAuth {
         vow.rely(address(pause));
         jug.rely(address(pause));
         pot.rely(address(pause));
-        dai.rely(address(pause));
         spotter.rely(address(pause));
         flap.rely(address(pause));
         flop.rely(address(pause));

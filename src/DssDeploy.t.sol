@@ -570,7 +570,6 @@ contract DssDeployTest is DssDeployTestBase {
 
         // dai
         assertEq(dai.wards(address(dssDeploy)), 1);
-        assertEq(dai.wards(address(pause)), 1);
 
         // spotter
         assertEq(spotter.wards(address(dssDeploy)), 1);

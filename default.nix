@@ -1,9 +1,9 @@
-{ pkgsSrc ? (import ./pkgs.nix {}).pkgsSrc
-, pkgs ? (import ./pkgs.nix { inherit pkgsSrc; }).pkgs
+{ pkgsSrc ? (import ./nix/pkgs.nix {}).pkgsSrc
+, pkgs ? (import ./nix/pkgs.nix { inherit pkgsSrc; }).pkgs
 }: with pkgs;
 
 let
-  inherit (callPackage ./dapp.nix {}) this;
+  inherit (callPackage ./nix/dapp.nix {}) this;
 in
 
 makerScriptPackage {

@@ -27,6 +27,7 @@ import {Flapper} from "dss/flap.sol";
 import {Flopper} from "dss/flop.sol";
 import {Flipper} from "dss/flip.sol";
 import {Dai} from "dss/dai.sol";
+import {End} from "dss/end.sol";
 
 import {Pot} from "dsr/dsr.sol";
 
@@ -118,6 +119,14 @@ contract PotFab {
     }
 }
 
+contract EndFab {
+    function newEnd() public returns (End end) {
+        end = new End();
+        end.rely(msg.sender);
+        end.deny(address(this));
+    }
+}
+
 contract PauseFab {
     function newPause(uint delay, address owner, DSAuthority authority) public returns(DSPause pause) {
         pause = new DSPause(delay, owner, authority);
@@ -136,6 +145,7 @@ contract DssDeploy is DSAuth {
     FlipFab    public flipFab;
     SpotFab    public spotFab;
     PotFab     public potFab;
+    EndFab     public endFab;
     PauseFab   public pauseFab;
 
     Vat     public vat;
@@ -148,6 +158,7 @@ contract DssDeploy is DSAuth {
     Flopper public flop;
     Spotter public spotter;
     Pot     public pot;
+    End     public end;
     DSPause public pause;
 
     mapping(bytes32 => Ilk) public ilks;
@@ -173,6 +184,7 @@ contract DssDeploy is DSAuth {
         FlipFab flipFab_,
         SpotFab spotFab_,
         PotFab potFab_,
+        EndFab endFab_,
         PauseFab pauseFab_
     ) public {
         vatFab = vatFab_;
@@ -186,6 +198,7 @@ contract DssDeploy is DSAuth {
         flipFab = flipFab_;
         spotFab = spotFab_;
         potFab = potFab_;
+        endFab = endFab_;
         pauseFab = pauseFab_;
     }
 
@@ -203,7 +216,7 @@ contract DssDeploy is DSAuth {
     }
 
     function deployDai(string memory symbol, string memory name, string memory version, uint256 chainId) public auth {
-        require(address(vat) != address(0), "Missing VAT deployment");
+        require(address(vat) != address(0), "Missing previous step");
 
         // Deploy
         dai     = daiFab.newDai(symbol, name, version, chainId);
@@ -213,7 +226,7 @@ contract DssDeploy is DSAuth {
 
     function deployTaxationAndAuctions(address gov) public auth {
         require(gov != address(0), "Missing GOV address");
-        require(address(vat) != address(0), "Missing VAT deployment");
+        require(address(vat) != address(0), "Missing previous step");
 
         // Deploy
         jug = jugFab.newJug(address(vat));
@@ -230,11 +243,12 @@ contract DssDeploy is DSAuth {
         vat.rely(address(vow));
         vat.rely(address(jug));
         vat.rely(address(pot));
+        flap.rely(address(vow));
         flop.rely(address(vow));
     }
 
     function deployLiquidator() public auth {
-        require(address(vow) != address(0), "Missing VOW deployment");
+        require(address(vow) != address(0), "Missing previous step");
 
         // Deploy
         cat = catFab.newCat(address(vat));
@@ -247,10 +261,27 @@ contract DssDeploy is DSAuth {
         vow.rely(address(cat));
     }
 
+    function deployEnd() public auth {
+        require(address(cat) != address(0), "Missing previous step");
+
+        // Deploy
+        end = endFab.newEnd();
+
+        // Internal references set up
+        end.file("vat", address(vat));
+        end.file("cat", address(cat));
+        end.file("vow", address(vow));
+        end.file("spot", address(spotter));
+
+        // Internal auth
+        vat.rely(address(end));
+        cat.rely(address(end));
+        vow.rely(address(end));
+    }
+
     function deployPause(uint delay, DSAuthority authority) public auth {
-        require(address(vow) != address(0), "Missing VOW deployment");
-        require(address(jug) != address(0), "Missing JUG deployment");
-        require(address(cat) != address(0), "Missing CAT deployment");
+        require(address(dai) != address(0), "Missing previous step");
+        require(address(end) != address(0), "Missing previous step");
 
         pause = pauseFab.newPause(delay, address(0), authority);
 
@@ -262,6 +293,7 @@ contract DssDeploy is DSAuth {
         spotter.rely(address(pause));
         flap.rely(address(pause));
         flop.rely(address(pause));
+        end.rely(address(pause));
 
         this.setAuthority(authority);
         this.setOwner(address(0));
@@ -271,9 +303,7 @@ contract DssDeploy is DSAuth {
         require(ilk != bytes32(""), "Missing ilk name");
         require(adapter != address(0), "Missing adapter address");
         require(pip != address(0), "Missing PIP address");
-        require(address(vat) != address(0), "Missing VAT deployment");
-        require(address(cat) != address(0), "Missing CAT deployment");
-        require(address(pause) != address(0), "Missing PAUSE deployment");
+        require(address(pause) != address(0), "Missing previous step");
 
         // Deploy
         ilks[ilk].flip = flipFab.newFlip(address(vat), ilk);
@@ -287,6 +317,7 @@ contract DssDeploy is DSAuth {
 
         // Internal auth
         vat.rely(adapter);
+        ilks[ilk].flip.rely(address(end));
         ilks[ilk].flip.rely(address(pause));
     }
 
@@ -300,6 +331,7 @@ contract DssDeploy is DSAuth {
         spotter.deny(address(this));
         flap.deny(address(this));
         flop.deny(address(this));
+        end.deny(address(this));
     }
 
     function releaseAuthFlip(bytes32 ilk) public auth {

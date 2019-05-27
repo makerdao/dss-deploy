@@ -10,7 +10,7 @@ makerScriptPackage {
   name = "dss-deploy";
   src = ./bin;
 
-  solidityPackage = [ this ];
+  solidityPackages = [ this ];
 
   extraBins = [ git ];
   scriptEnv = {

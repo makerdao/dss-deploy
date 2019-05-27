@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
-set -ex
 
-export ETH_GAS=${ETH_GAS:-"7000000"}
+. "${LIB_DIR:-$(cd "${0%/*}/lib"&&pwd)}/common.sh"
+
 export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
-unset SOLC_FLAGS
 
 test -z "$SKIP_BUILD" && dapp build
 
@@ -13,4 +12,4 @@ export COL1
 export PIP_COL1
 
 # shellcheck source=/dev/null
-source "$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )/deploy-ilk" "COL1" "${1:-"A"}" "GemJoin"
+source "$BIN_DIR/deploy-ilk" "COL1" "${1:-"A"}" "GemJoin"

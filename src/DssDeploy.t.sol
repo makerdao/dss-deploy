@@ -633,54 +633,54 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(vat.wards(address(jug)), 1);
         assertEq(vat.wards(address(spotter)), 1);
         assertEq(vat.wards(address(end)), 1);
-        assertEq(vat.wards(address(pause)), 1);
+        assertEq(vat.wards(address(pause.proxy())), 1);
 
         // cat
         assertEq(cat.wards(address(dssDeploy)), 1);
         assertEq(cat.wards(address(end)), 1);
-        assertEq(cat.wards(address(pause)), 1);
+        assertEq(cat.wards(address(pause.proxy())), 1);
 
         // vow
         assertEq(vow.wards(address(dssDeploy)), 1);
         assertEq(vow.wards(address(cat)), 1);
         assertEq(vow.wards(address(end)), 1);
-        assertEq(vow.wards(address(pause)), 1);
+        assertEq(vow.wards(address(pause.proxy())), 1);
 
         // jug
         assertEq(jug.wards(address(dssDeploy)), 1);
-        assertEq(jug.wards(address(pause)), 1);
+        assertEq(jug.wards(address(pause.proxy())), 1);
 
         // pot
         assertEq(pot.wards(address(dssDeploy)), 1);
-        assertEq(pot.wards(address(pause)), 1);
+        assertEq(pot.wards(address(pause.proxy())), 1);
 
         // dai
         assertEq(dai.wards(address(dssDeploy)), 1);
 
         // spotter
         assertEq(spotter.wards(address(dssDeploy)), 1);
-        assertEq(spotter.wards(address(pause)), 1);
+        assertEq(spotter.wards(address(pause.proxy())), 1);
 
         // flap
         assertEq(flap.wards(address(dssDeploy)), 1);
         assertEq(flap.wards(address(vow)), 1);
-        assertEq(flap.wards(address(pause)), 1);
+        assertEq(flap.wards(address(pause.proxy())), 1);
 
         // flop
         assertEq(flop.wards(address(dssDeploy)), 1);
         assertEq(flop.wards(address(vow)), 1);
-        assertEq(flop.wards(address(pause)), 1);
+        assertEq(flop.wards(address(pause.proxy())), 1);
 
         // end
         assertEq(end.wards(address(dssDeploy)), 1);
-        assertEq(end.wards(address(pause)), 1);
+        assertEq(end.wards(address(pause.proxy())), 1);
 
         // flips
         assertEq(ethFlip.wards(address(dssDeploy)), 1);
-        assertEq(ethFlip.wards(address(pause)), 1);
+        assertEq(ethFlip.wards(address(pause.proxy())), 1);
         assertEq(colFlip.wards(address(dssDeploy)), 1);
         assertEq(colFlip.wards(address(end)), 1);
-        assertEq(colFlip.wards(address(pause)), 1);
+        assertEq(colFlip.wards(address(pause.proxy())), 1);
 
         // pause
         assertEq(address(pause.authority()), address(authority));

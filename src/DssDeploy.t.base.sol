@@ -82,22 +82,22 @@ contract ProxyActions {
     Plan plan;
 
     function file(address who, bytes32 what, uint256 data) external {
-        pause.plan(address(plan), abi.encodeWithSignature("file(address,bytes32,uint256)", who, what, data), now);
+        pause.plot(address(plan), abi.encodeWithSignature("file(address,bytes32,uint256)", who, what, data), now);
         pause.exec(address(plan), abi.encodeWithSignature("file(address,bytes32,uint256)", who, what, data), now);
     }
 
     function file(address who, bytes32 ilk, bytes32 what, uint256 data) external {
-        pause.plan(address(plan), abi.encodeWithSignature("file(address,bytes32,bytes32,uint256)", who, ilk, what, data), now);
+        pause.plot(address(plan), abi.encodeWithSignature("file(address,bytes32,bytes32,uint256)", who, ilk, what, data), now);
         pause.exec(address(plan), abi.encodeWithSignature("file(address,bytes32,bytes32,uint256)", who, ilk, what, data), now);
     }
 
     function cage(address end) external {
-        pause.plan(address(plan), abi.encodeWithSignature("cage(address)", end), now);
+        pause.plot(address(plan), abi.encodeWithSignature("cage(address)", end), now);
         pause.exec(address(plan), abi.encodeWithSignature("cage(address)", end), now);
     }
 
     function cage(address end, bytes32 ilk) external {
-        pause.plan(address(plan), abi.encodeWithSignature("cage(address,bytes32)", end, ilk), now);
+        pause.plot(address(plan), abi.encodeWithSignature("cage(address,bytes32)", end, ilk), now);
         pause.exec(address(plan), abi.encodeWithSignature("cage(address,bytes32)", end, ilk), now);
     }
 }
@@ -229,7 +229,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
         pot = dssDeploy.pot();
         end = dssDeploy.end();
         pause = dssDeploy.pause();
-        authority.setRootUser(address(pause), true);
+        authority.setRootUser(address(pause.proxy()), true);
 
         weth = new WETH9_();
         ethJoin = new GemJoin(address(vat), "ETH", address(weth));

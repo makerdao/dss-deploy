@@ -285,15 +285,15 @@ contract DssDeploy is DSAuth {
 
         pause = pauseFab.newPause(delay, address(0), authority);
 
-        vat.rely(address(pause));
-        cat.rely(address(pause));
-        vow.rely(address(pause));
-        jug.rely(address(pause));
-        pot.rely(address(pause));
-        spotter.rely(address(pause));
-        flap.rely(address(pause));
-        flop.rely(address(pause));
-        end.rely(address(pause));
+        vat.rely(address(pause.proxy()));
+        cat.rely(address(pause.proxy()));
+        vow.rely(address(pause.proxy()));
+        jug.rely(address(pause.proxy()));
+        pot.rely(address(pause.proxy()));
+        spotter.rely(address(pause.proxy()));
+        flap.rely(address(pause.proxy()));
+        flop.rely(address(pause.proxy()));
+        end.rely(address(pause.proxy()));
 
         this.setAuthority(authority);
         this.setOwner(address(0));
@@ -318,7 +318,7 @@ contract DssDeploy is DSAuth {
         // Internal auth
         vat.rely(adapter);
         ilks[ilk].flip.rely(address(end));
-        ilks[ilk].flip.rely(address(pause));
+        ilks[ilk].flip.rely(address(pause.proxy()));
     }
 
     function releaseAuth() public auth {

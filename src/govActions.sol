@@ -18,7 +18,7 @@ contract EndLike {
     function cage(bytes32) public;
 }
 
-contract Plan {
+contract GovActions {
     function file(address who, address data) public {
         Setter(who).file(data);
     }

@@ -13,6 +13,11 @@ contract Setter {
     function init(bytes32) public;
 }
 
+contract EndLike {
+    function cage() public;
+    function cage(bytes32) public;
+}
+
 contract Plan {
     function file(address who, address data) public {
         Setter(who).file(data);
@@ -52,5 +57,13 @@ contract Plan {
 
     function init(address who, bytes32 ilk) public {
         Setter(who).init(ilk);
+    }
+
+    function cage(address end) public {
+        EndLike(end).cage();
+    }
+
+    function cage(address end, bytes32 ilk) public {
+        EndLike(end).cage(ilk);
     }
 }

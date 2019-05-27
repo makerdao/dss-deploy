@@ -69,11 +69,40 @@ contract FakeUser {
         AuctionLike(obj).deal(id);
     }
 
+    function doEndFree(address end, bytes32 ilk) public {
+        End(end).free(ilk);
+    }
+
     function() external payable {
     }
 }
 
-contract DssDeployTestBase is DSTest {
+contract ProxyActions {
+    DSPause pause;
+    Plan plan;
+
+    function file(address who, bytes32 what, uint256 data) external {
+        pause.plan(address(plan), abi.encodeWithSignature("file(address,bytes32,uint256)", who, what, data), now);
+        pause.exec(address(plan), abi.encodeWithSignature("file(address,bytes32,uint256)", who, what, data), now);
+    }
+
+    function file(address who, bytes32 ilk, bytes32 what, uint256 data) external {
+        pause.plan(address(plan), abi.encodeWithSignature("file(address,bytes32,bytes32,uint256)", who, ilk, what, data), now);
+        pause.exec(address(plan), abi.encodeWithSignature("file(address,bytes32,bytes32,uint256)", who, ilk, what, data), now);
+    }
+
+    function cage(address end) external {
+        pause.plan(address(plan), abi.encodeWithSignature("cage(address)", end), now);
+        pause.exec(address(plan), abi.encodeWithSignature("cage(address)", end), now);
+    }
+
+    function cage(address end, bytes32 ilk) external {
+        pause.plan(address(plan), abi.encodeWithSignature("cage(address,bytes32)", end, ilk), now);
+        pause.exec(address(plan), abi.encodeWithSignature("cage(address,bytes32)", end, ilk), now);
+    }
+}
+
+contract DssDeployTestBase is DSTest, ProxyActions {
     Hevm hevm;
 
     VatFab vatFab;
@@ -87,6 +116,7 @@ contract DssDeployTestBase is DSTest {
     FlipFab flipFab;
     SpotFab spotFab;
     PotFab potFab;
+    EndFab endFab;
     PauseFab pauseFab;
 
     DssDeploy dssDeploy;
@@ -96,7 +126,6 @@ contract DssDeployTestBase is DSTest {
     DSValue pipCOL;
 
     DSRoles authority;
-    DSPause pause;
 
     WETH9_ weth;
     GemJoin ethJoin;
@@ -112,8 +141,7 @@ contract DssDeployTestBase is DSTest {
     DaiJoin daiJoin;
     Spotter spotter;
     Pot pot;
-
-    Plan plan;
+    End end;
 
     Flipper ethFlip;
 
@@ -141,6 +169,7 @@ contract DssDeployTestBase is DSTest {
         flipFab = new FlipFab();
         spotFab = new SpotFab();
         potFab = new PotFab();
+        endFab = new EndFab();
         pauseFab = new PauseFab();
         plan = new Plan();
 
@@ -156,6 +185,7 @@ contract DssDeployTestBase is DSTest {
             flipFab,
             spotFab,
             potFab,
+            endFab,
             pauseFab
         );
 
@@ -179,21 +209,12 @@ contract DssDeployTestBase is DSTest {
         return wad * 10 ** 27;
     }
 
-    function file(address who, bytes32 what, uint256 data) external {
-        pause.plan(address(plan), abi.encodeWithSignature("file(address,bytes32,uint256)", who, what, data), now);
-        pause.exec(address(plan), abi.encodeWithSignature("file(address,bytes32,uint256)", who, what, data), now);
-    }
-
-    function file(address who, bytes32 ilk, bytes32 what, uint256 data) external {
-        pause.plan(address(plan), abi.encodeWithSignature("file(address,bytes32,bytes32,uint256)", who, ilk, what, data), now);
-        pause.exec(address(plan), abi.encodeWithSignature("file(address,bytes32,bytes32,uint256)", who, ilk, what, data), now);
-    }
-
     function deployKeepAuth() public {
         dssDeploy.deployVat();
         dssDeploy.deployDai("DAI", "Dai Stablecoin", "1", 99);
         dssDeploy.deployTaxationAndAuctions(address(gov));
         dssDeploy.deployLiquidator();
+        dssDeploy.deployEnd();
         dssDeploy.deployPause(0, authority);
 
         vat = dssDeploy.vat();
@@ -206,6 +227,7 @@ contract DssDeployTestBase is DSTest {
         daiJoin = dssDeploy.daiJoin();
         spotter = dssDeploy.spotter();
         pot = dssDeploy.pot();
+        end = dssDeploy.end();
         pause = dssDeploy.pause();
         authority.setRootUser(address(pause), true);
 

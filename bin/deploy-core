@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
-set -ex
 
-ADDRESS_DIR=${ADDRESS_DIR:-$PWD}
+. "${LIB_DIR:-$(cd "${0%/*}/lib"&&pwd)}/common.sh"
 
-export ETH_GAS=${ETH_GAS:-"7000000"}
 export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
 export SOLC_FLAGS="--optimize"
 

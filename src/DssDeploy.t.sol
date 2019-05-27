@@ -565,6 +565,13 @@ contract DssDeployTest is DssDeployTestBase {
         vat.fork("ETH", address(this), address(user1), 50 ether, 41 ether);
     }
 
+    function testSetPauseDelay() public {
+        deploy();
+        assertEq(pause.delay(), 0);
+        this.setDelay(5);
+        assertEq(pause.delay(), 5);
+    }
+
     function testTokens() public {
         deployKeepAuth();
         DSValue pip = new DSValue();

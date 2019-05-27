@@ -18,6 +18,10 @@ contract EndLike {
     function cage(bytes32) public;
 }
 
+contract PauseLike {
+    function setDelay(uint) public;
+}
+
 contract GovActions {
     function file(address who, address data) public {
         Setter(who).file(data);
@@ -65,5 +69,9 @@ contract GovActions {
 
     function cage(address end, bytes32 ilk) public {
         EndLike(end).cage(ilk);
+    }
+
+    function setDelay(address pause, uint newDelay) public {
+        PauseLike(pause).setDelay(newDelay);
     }
 }

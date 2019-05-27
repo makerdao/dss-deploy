@@ -116,6 +116,15 @@ contract ProxyActions {
         pause.plot(usr, fax, eta);
         pause.exec(usr, fax, eta);
     }
+
+    function setDelay(uint newDelay) external {
+        address      usr = address(govActions);
+        bytes memory fax = abi.encodeWithSignature("setDelay(address,uint256)", pause, newDelay);
+        uint         eta = now;
+
+        pause.plot(usr, fax, eta);
+        pause.exec(usr, fax, eta);
+    }
 }
 
 contract DssDeployTestBase is DSTest, ProxyActions {

@@ -18,18 +18,18 @@ let
     };
   };
 
-  deploy-core = mkScripts {
-    name = "dss-deploy-core";
+  optimized = mkScripts {
+    name = "dss-deploy-optimized";
     regex = [ "deploy-core" ];
     solidityPackages = [ this-optimize ];
   };
 
-  deploy-fabs = mkScripts {
-    name = "dss-deploy-fabs";
+  nonOptimized = mkScripts {
+    name = "dss-deploy-non-optimized";
     regex = [ "deploy-fab" "deploy-ilk.*" ];
     solidityPackages = [ this ];
   };
 in symlinkJoin {
   name = "dss-deploy";
-  paths = [ deploy-fabs deploy-core ];
+  paths = [ optimized nonOptimized ];
 }

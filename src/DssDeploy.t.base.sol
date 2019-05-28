@@ -117,9 +117,9 @@ contract ProxyActions {
         pause.exec(usr, fax, eta);
     }
 
-    function setAuthority(address authority) external {
+    function setAuthority(address newAuthority) external {
         address      usr = address(govActions);
-        bytes memory fax = abi.encodeWithSignature("setAuthority(address,address)", pause, authority);
+        bytes memory fax = abi.encodeWithSignature("setAuthority(address,address)", pause, newAuthority);
         uint         eta = now;
 
         pause.plot(usr, fax, eta);
@@ -129,6 +129,15 @@ contract ProxyActions {
     function setDelay(uint newDelay) external {
         address      usr = address(govActions);
         bytes memory fax = abi.encodeWithSignature("setDelay(address,uint256)", pause, newDelay);
+        uint         eta = now;
+
+        pause.plot(usr, fax, eta);
+        pause.exec(usr, fax, eta);
+    }
+
+    function setAuthorityAndDelay(address newAuthority, uint newDelay) external {
+        address      usr = address(govActions);
+        bytes memory fax = abi.encodeWithSignature("setAuthorityAndDelay(address,address,uint256)", pause, newAuthority, newDelay);
         uint         eta = now;
 
         pause.plot(usr, fax, eta);

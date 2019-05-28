@@ -72,11 +72,16 @@ contract GovActions {
         EndLike(end).cage(ilk);
     }
 
-    function setAuthority(address pause, address authority) public {
-        PauseLike(pause).setAuthority(authority);
+    function setAuthority(address pause, address newAuthority) public {
+        PauseLike(pause).setAuthority(newAuthority);
     }
 
     function setDelay(address pause, uint newDelay) public {
+        PauseLike(pause).setDelay(newDelay);
+    }
+
+    function setAuthorityAndDelay(address pause, address newAuthority, uint newDelay) public {
+        PauseLike(pause).setAuthority(newAuthority);
         PauseLike(pause).setDelay(newDelay);
     }
 }

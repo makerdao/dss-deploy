@@ -579,6 +579,15 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(pause.delay(), 5);
     }
 
+    function testSetPauseAuthorityAndDelay() public {
+        deploy();
+        assertEq(address(pause.authority()), address(authority));
+        assertEq(pause.delay(), 0);
+        this.setAuthorityAndDelay(address(123), 5);
+        assertEq(address(pause.authority()), address(123));
+        assertEq(pause.delay(), 5);
+    }
+
     function testTokens() public {
         deployKeepAuth();
         DSValue pip = new DSValue();

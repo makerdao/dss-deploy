@@ -5,7 +5,7 @@
 
 export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
 
-test -z "$SKIP_BUILD" && dapp build
+dappBuild
 
 test -z "$COL3" && COL3=$(dapp create Token3 "$(seth --to-uint256 "$(seth --to-wei 1000000 ETH)")")
 test -z "$PIP_COL3" && PIP_COL3=$(dapp create DSValue)

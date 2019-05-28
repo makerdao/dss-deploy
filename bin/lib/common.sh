@@ -16,11 +16,19 @@ message() {
     echo
 }
 
+dappBuild() {
+  [[ -n $SKIP_BUILD || -n $DAPP_SKIP_BUILD ]] && return
+
+  (cd "$BIN_DIR/.." || exit 1
+    dapp "$@" build
+  )
+}
+
 # Start verbose output
 set -x
 
 # Set exported variables
+export DAPP_OUT=${DAPP_OUT:-$BIN_DIR/../out}
 export ADDRESS_DIR=${ADDRESS_DIR:-$PWD}
 export ETH_GAS=${ETH_GAS:-"7000000"}
 unset SOLC_FLAGS
-

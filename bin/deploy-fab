@@ -5,7 +5,7 @@
 
 export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
 
-test -z "$SKIP_BUILD" && dapp build
+dappBuild
 
 export SETH_ASYNC=yes
 

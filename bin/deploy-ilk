@@ -4,7 +4,7 @@
 
 export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
 
-test -z "$SKIP_BUILD" && dapp build
+dappBuild
 
 { test -z "$1" || test -z "$2" || test -z "$3"; } && exit 1
 

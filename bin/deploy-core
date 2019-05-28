@@ -6,7 +6,7 @@
 export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
 export SOLC_FLAGS="--optimize"
 
-test -z "$SKIP_BUILD" && dapp build
+dappBuild
 
 # Check that all fabs are defined
 { test -z "$VAT_FAB"    || test -z "$JUG_FAB"     || test -z "$VOW_FAB" || \

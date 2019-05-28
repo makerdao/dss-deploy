@@ -19,6 +19,7 @@ contract EndLike {
 }
 
 contract PauseLike {
+    function setAuthority(address) public;
     function setDelay(uint) public;
 }
 
@@ -69,6 +70,10 @@ contract GovActions {
 
     function cage(address end, bytes32 ilk) public {
         EndLike(end).cage(ilk);
+    }
+
+    function setAuthority(address pause, address authority) public {
+        PauseLike(pause).setAuthority(authority);
     }
 
     function setDelay(address pause, uint newDelay) public {

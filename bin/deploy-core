@@ -68,6 +68,6 @@ export MCD_SPOT=0x$(seth call "$MCD_DEPLOY" "spotter()(address)")
 export MCD_POT=0x$(seth call "$MCD_DEPLOY" "pot()(address)")
 export MCD_END=0x$(seth call "$MCD_DEPLOY" "end()(address)")
 export MCD_PAUSE=0x$(seth call "$MCD_DEPLOY" "pause()(address)")
-export MCD_PAUSE=0x$(seth call "0x$(seth call "$MCD_DEPLOY" "pause()(address)")" "proxy()(address)")
+export MCD_PAUSE_PROXY=0x$(seth call "0x$(seth call "$MCD_DEPLOY" "pause()(address)")" "proxy()(address)")
 export MCD_DAI=0x$(seth call "$MCD_DEPLOY" "dai()(address)")
 EOF

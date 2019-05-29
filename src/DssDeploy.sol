@@ -28,10 +28,8 @@ import {Flopper} from "dss/flop.sol";
 import {Flipper} from "dss/flip.sol";
 import {Dai} from "dss/dai.sol";
 import {End} from "dss/end.sol";
-
-import {Pot} from "dsr/dsr.sol";
-
-import {Spotter} from "./poke.sol";
+import {Pot} from "dss/pot.sol";
+import {Spotter} from "dss/spot.sol";
 
 contract VatFab {
     function newVat() public returns (Vat vat) {

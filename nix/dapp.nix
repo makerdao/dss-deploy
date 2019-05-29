@@ -272,7 +272,7 @@ let
       src' = fetchGit repo';
       src = "${src'}/src";
     };
-    dss_0f8880e = rec {
+    dss_3dd110c = rec {
       name = "dss";
       deps = {
         ds-test = ds-test_a4e4005;
@@ -280,9 +280,9 @@ let
         ds-value = ds-value_f307171;
       };
       repo' = {
-        name = "dss-0f8880e-source";
+        name = "dss-3dd110c-source";
         url = "https://github.com/makerdao/dss";
-        rev = "0f8880e56a5cbb3b13f0b7104d053654c772ef6a";
+        rev = "3dd110ce3c120c6dd8e547b65f04fb0edcaaf56b";
         ref = "HEAD";
       };
       src' = fetchGit repo';
@@ -301,7 +301,7 @@ let
       src' = fetchGit repo';
       src = "${src'}/src";
     };
-    dss-deploy_cc978d5 = rec {
+    dss-deploy_3af4435 = rec {
       name = "dss-deploy";
       deps = {
         ds-auth = ds-auth_f783169;
@@ -312,18 +312,18 @@ let
         ds-test = ds-test_a4e4005;
         ds-token = ds-token_cee36a1;
         ds-weth = ds-weth_dfada5b;
-        dss = dss_0f8880e;
+        dss = dss_3dd110c;
       };
       repo' = {
-        name = "dss-deploy-cc978d5-source";
+        name = "dss-deploy-3af4435-source";
         url = "git@github.com:makerdao/dss-deploy";
-        rev = "cc978d573b10d91915f3cc41650510c7e3db12fc";
-        ref = "HEAD";
+        rev = "3af4435fd2f5cc4e20b099bd760643264045926d";
+        ref = "master";
       };
       src' = fetchGit repo';
       src = "${src'}/src";
     };
-    this = dss-deploy_cc978d5 // { src' = ../.; src = ../src; };
+    this = dss-deploy_3af4435 // { src' = ../.; src = ../src; };
   };
 in {
   inherit package packageSpecs specs;

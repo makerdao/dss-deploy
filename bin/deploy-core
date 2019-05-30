@@ -16,37 +16,49 @@ dappBuild
   test -z "$PAUSE_FAB"; } && \
   exit 1
 
+export ETH_NONCE=$(seth nonce $ETH_FROM)
+
 # If no Governance token is defined, create one
-test -z "$MCD_GOV" && MCD_GOV=$(dapp create DSToken "$(seth --to-bytes32 "$(seth --from-ascii "MKR")")")
+test -z "$MCD_GOV" && MCD_GOV=$(dapp create DSToken "$(seth --to-bytes32 "$(seth --from-ascii "MKR")")") && ETH_NONCE="$(($ETH_NONCE + 1))"
+export ETH_NONCE
 
 # Create deploy contract
 MCD_DEPLOY=$(dapp create DssDeploy "$VAT_FAB" "$JUG_FAB" "$VOW_FAB" "$CAT_FAB" "$DAI_FAB" "$MCD_JOIN_FAB" "$FLAP_FAB" "$FLOP_FAB" "$FLIP_FAB" "$SPOT_FAB" "$POT_FAB" "$END_FAB" "$PAUSE_FAB")
+export ETH_NONCE="$(($ETH_NONCE + 1))"
 
 # If no Authority is defined, create one
 if [ -z "$MCD_ADM" ]
 then
     MCD_ADM=$(dapp create DSRoles)
+    export ETH_NONCE="$(($ETH_NONCE + 1))"
     seth send "$MCD_ADM" 'setRootUser(address,bool)' "$ETH_FROM" true
+    export ETH_NONCE="$(($ETH_NONCE + 1))"
 fi
 
 # Deploy VAT
 seth send "$MCD_DEPLOY" "deployVat()"
+export ETH_NONCE="$(($ETH_NONCE + 1))"
 
 # Deploy MCD
 seth send "$MCD_DEPLOY" "deployDai(string memory,string memory,string memory,uint256)" "DAI" "Dai Stablecoin" "1" "$(seth rpc net_version)"
+export ETH_NONCE="$(($ETH_NONCE + 1))"
 
 # Deploy Taxation
 seth send "$MCD_DEPLOY" "deployTaxationAndAuctions(address)" "$MCD_GOV"
+export ETH_NONCE="$(($ETH_NONCE + 1))"
 
 # Deploy Liquidation
 seth send "$MCD_DEPLOY" "deployLiquidator()"
+export ETH_NONCE="$(($ETH_NONCE + 1))"
 
 # Deploy End
 seth send "$MCD_DEPLOY" "deployEnd()"
+export ETH_NONCE="$(($ETH_NONCE + 1))"
 
 # Deploy pause
 MCD_PAUSE_DELAY=${MCD_PAUSE_DELAY:-"3600"}
 seth send "$MCD_DEPLOY" "deployPause(uint256,address)" "$(seth --to-uint256 "$MCD_PAUSE_DELAY")" "$MCD_ADM"
+export ETH_NONCE="$(($ETH_NONCE + 1))"
 
 cat > "$ADDRESS_DIR/load-mcd-$(seth chain)" << EOF
 #!/bin/bash

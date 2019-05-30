@@ -8,6 +8,8 @@ dappBuild
 
 { test -z "$1" || test -z "$2" || test -z "$3"; } && exit 1
 
+# export ETH_NONCE=$(seth nonce $ETH_FROM)
+
 tok=$1
 ilk="${1}-${2}"
 ilkVar="${1}_${2}"
@@ -18,7 +20,9 @@ test -z "$MCD_DEPLOY" && exit 1
 
 MCD_VAT=0x$(seth call "$MCD_DEPLOY" "vat()(address)")
 eval export "\MCD_JOIN_${ilkVar}=$(dapp create "$ilkJoin" "$MCD_VAT" "$(seth --to-bytes32 "$(seth --from-ascii "$ilk")")" "$(eval echo "\$${tok}")")"
+export ETH_NONCE="$(($ETH_NONCE + 1))"
 seth send "$MCD_DEPLOY" "deployCollateral(bytes32,address,address)" "$(seth --to-bytes32 "$(seth --from-ascii "$ilk")")" "$(eval echo "\$MCD_JOIN_${ilkVar}")" "$(eval echo "\$PIP_${tok}")"
+export ETH_NONCE="$(($ETH_NONCE + 1))"
 while IFS=$'\n' read -r line; do data+=("$line"); done < <(seth call "$MCD_DEPLOY" "ilks(bytes32)(address,address)" "$(seth --to-bytes32 "$(seth --from-ascii "$ilk")")")
 eval export "\MCD_FLIP_${ilkVar}=0x${data[0]}"
 

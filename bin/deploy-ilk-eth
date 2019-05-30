@@ -7,8 +7,12 @@ export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
 
 dappBuild
 
-test -z "$ETH" && ETH=$(dapp create WETH9_)
-test -z "$PIP_ETH" && PIP_ETH=$(dapp create DSValue)
+export ETH_NONCE=$(seth nonce $ETH_FROM)
+
+test -z "$ETH" && ETH=$(dapp create WETH9_) && ETH_NONCE="$(($ETH_NONCE + 1))"
+export ETH_NONCE
+test -z "$PIP_ETH" && PIP_ETH=$(dapp create DSValue) && ETH_NONCE="$(($ETH_NONCE + 1))"
+export ETH_NONCE
 export ETH
 export PIP_ETH
 

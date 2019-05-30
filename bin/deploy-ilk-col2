@@ -7,8 +7,12 @@ export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
 
 dappBuild
 
-test -z "$COL2" && COL2=$(dapp create Token2 "$(seth --to-uint256 "$(seth --to-wei 1000000 ETH)")")
-test -z "$PIP_COL2" && PIP_COL2=$(dapp create DSValue)
+export ETH_NONCE=$(seth nonce $ETH_FROM)
+
+test -z "$COL2" && COL2=$(dapp create Token2 "$(seth --to-uint256 "$(seth --to-wei 1000000 ETH)")") && ETH_NONCE="$(($ETH_NONCE + 1))"
+export ETH_NONCE
+test -z "$PIP_COL2" && PIP_COL2=$(dapp create DSValue) && ETH_NONCE="$(($ETH_NONCE + 1))"
+export ETH_NONCE
 export COL2
 export PIP_COL2
 

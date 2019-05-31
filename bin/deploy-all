@@ -12,9 +12,15 @@ test -z "$SKIP_BUILD" && {
 
 # -----------------------------------------------------------------------------------------
 
+ETH_NONCE=${ETH_NONCE:-$(seth nonce "$ETH_FROM")}
+export ETH_NONCE
+
+# -----------------------------------------------------------------------------------------
+
 message DEPLOYING FABS
 
-"$BIN_DIR/deploy-fab"
+# shellcheck source=bin/deploy-fab
+source "$BIN_DIR/deploy-fab"
 # shellcheck source=/dev/null
 source "$ADDRESS_DIR/load-fab-$(seth chain)"
 
@@ -22,7 +28,8 @@ source "$ADDRESS_DIR/load-fab-$(seth chain)"
 
 message DEPLOYING CORE
 
-"$BIN_DIR/deploy-core"
+# shellcheck source=bin/deploy-core
+source "$BIN_DIR/deploy-core"
 # shellcheck source=/dev/null
 source "$ADDRESS_DIR/load-mcd-$(seth chain)"
 
@@ -30,7 +37,8 @@ source "$ADDRESS_DIR/load-mcd-$(seth chain)"
 
 message DEPLOYING ETH
 
-"$BIN_DIR/deploy-ilk-eth"
+# shellcheck source=bin/deploy-ilk-eth
+source "$BIN_DIR/deploy-ilk-eth"
 # shellcheck source=/dev/null
 source "$ADDRESS_DIR/load-ilk-eth-a-$(seth chain)"
 
@@ -38,7 +46,8 @@ source "$ADDRESS_DIR/load-ilk-eth-a-$(seth chain)"
 
 message DEPLOYING COL1
 
-"$BIN_DIR/deploy-ilk-col1"
+# shellcheck source=bin/deploy-ilk-col1
+source "$BIN_DIR/deploy-ilk-col1"
 # shellcheck source=/dev/null
 source "$ADDRESS_DIR/load-ilk-col1-a-$(seth chain)"
 
@@ -46,7 +55,8 @@ source "$ADDRESS_DIR/load-ilk-col1-a-$(seth chain)"
 
 message DEPLOYING COL2
 
-"$BIN_DIR/deploy-ilk-col2"
+# shellcheck source=bin/deploy-ilk-col2
+source "$BIN_DIR/deploy-ilk-col2"
 # shellcheck source=/dev/null
 source "$ADDRESS_DIR/load-ilk-col2-a-$(seth chain)"
 
@@ -54,7 +64,8 @@ source "$ADDRESS_DIR/load-ilk-col2-a-$(seth chain)"
 
 message DEPLOYING COL3
 
-"$BIN_DIR/deploy-ilk-col3"
+# shellcheck source=bin/deploy-ilk-col3
+source "$BIN_DIR/deploy-ilk-col3"
 # shellcheck source=/dev/null
 source "$ADDRESS_DIR/load-ilk-col3-a-$(seth chain)"
 
@@ -62,7 +73,8 @@ source "$ADDRESS_DIR/load-ilk-col3-a-$(seth chain)"
 
 message DEPLOYING COL4
 
-"$BIN_DIR/deploy-ilk-col4"
+# shellcheck source=bin/deploy-ilk-col4
+source "$BIN_DIR/deploy-ilk-col4"
 # shellcheck source=/dev/null
 source "$ADDRESS_DIR/load-ilk-col4-a-$(seth chain)"
 
@@ -70,8 +82,13 @@ source "$ADDRESS_DIR/load-ilk-col4-a-$(seth chain)"
 
 message DEPLOYING COL5
 
-"$BIN_DIR/deploy-ilk-col5"
+# shellcheck source=bin/deploy-ilk-col5
+source "$BIN_DIR/deploy-ilk-col5"
 # shellcheck source=/dev/null
 source "$ADDRESS_DIR/load-ilk-col5-a-$(seth chain)"
+
+# -----------------------------------------------------------------------------------------
+
+export ETH_NONCE
 
 # -----------------------------------------------------------------------------------------

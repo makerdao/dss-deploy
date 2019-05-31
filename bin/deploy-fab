@@ -9,7 +9,8 @@ dappBuild
 
 export SETH_ASYNC=yes
 
-ETH_NONCE=$(seth nonce "$ETH_FROM")
+ETH_NONCE=${ETH_NONCE:-$(seth nonce "$ETH_FROM")}
+
 VAT_FABtx=$(ETH_NONCE=$ETH_NONCE dapp create VatFab)
 JUG_FABtx=$(ETH_NONCE=$((ETH_NONCE + 1)) dapp create JugFab)
 VOW_FABtx=$(ETH_NONCE=$((ETH_NONCE + 2)) dapp create VowFab)
@@ -23,6 +24,9 @@ SPOT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 9)) dapp create SpotFab)
 POT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 10)) dapp create PotFab)
 END_FABtx=$(ETH_NONCE=$((ETH_NONCE + 11)) dapp create EndFab)
 PAUSE_FABtx=$(ETH_NONCE=$((ETH_NONCE + 12)) dapp create PauseFab)
+
+ETH_NONCE=$((ETH_NONCE + 13))
+export ETH_NONCE
 
 export SETH_ASYNC=no
 

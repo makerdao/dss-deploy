@@ -10,23 +10,21 @@ dappBuild
 export SETH_ASYNC=yes
 
 ETH_NONCE=${ETH_NONCE:-$(seth nonce "$ETH_FROM")}
-
-VAT_FABtx=$(ETH_NONCE=$ETH_NONCE dapp create VatFab)
-JUG_FABtx=$(ETH_NONCE=$((ETH_NONCE + 1)) dapp create JugFab)
-VOW_FABtx=$(ETH_NONCE=$((ETH_NONCE + 2)) dapp create VowFab)
-CAT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 3)) dapp create CatFab)
-DAI_FABtx=$(ETH_NONCE=$((ETH_NONCE + 4)) dapp create DaiFab)
-MCD_JOIN_FABtx=$(ETH_NONCE=$((ETH_NONCE + 5)) dapp create DaiJoinFab)
-FLAP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 6)) dapp create FlapFab)
-FLOP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 7)) dapp create FlopFab)
-FLIP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 8)) dapp create FlipFab)
-SPOT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 9)) dapp create SpotFab)
-POT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 10)) dapp create PotFab)
-END_FABtx=$(ETH_NONCE=$((ETH_NONCE + 11)) dapp create EndFab)
-PAUSE_FABtx=$(ETH_NONCE=$((ETH_NONCE + 12)) dapp create PauseFab)
-
-ETH_NONCE=$((ETH_NONCE + 13))
 export ETH_NONCE
+
+VAT_FABtx=$(dapp create VatFab) && ETH_NONCE=$((ETH_NONCE + 1))
+JUG_FABtx=$(dapp create JugFab) && ETH_NONCE=$((ETH_NONCE + 1))
+VOW_FABtx=$(dapp create VowFab) && ETH_NONCE=$((ETH_NONCE + 1))
+CAT_FABtx=$(dapp create CatFab) && ETH_NONCE=$((ETH_NONCE + 1))
+DAI_FABtx=$(dapp create DaiFab) && ETH_NONCE=$((ETH_NONCE + 1))
+MCD_JOIN_FABtx=$(dapp create DaiJoinFab) && ETH_NONCE=$((ETH_NONCE + 1))
+FLAP_FABtx=$(dapp create FlapFab) && ETH_NONCE=$((ETH_NONCE + 1))
+FLOP_FABtx=$(dapp create FlopFab) && ETH_NONCE=$((ETH_NONCE + 1))
+FLIP_FABtx=$(dapp create FlipFab) && ETH_NONCE=$((ETH_NONCE + 1))
+SPOT_FABtx=$(dapp create SpotFab) && ETH_NONCE=$((ETH_NONCE + 1))
+POT_FABtx=$(dapp create PotFab) && ETH_NONCE=$((ETH_NONCE + 1))
+END_FABtx=$(dapp create EndFab) && ETH_NONCE=$((ETH_NONCE + 1))
+PAUSE_FABtx=$(dapp create PauseFab) && ETH_NONCE=$((ETH_NONCE + 1))
 
 export SETH_ASYNC=no
 

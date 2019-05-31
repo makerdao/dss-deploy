@@ -17,49 +17,48 @@ dappBuild
   exit 1
 
 ETH_NONCE=${ETH_NONCE:-$(seth nonce "$ETH_FROM")}
+export ETH_NONCE
 
 # If no Governance token is defined, create one
-test -z "$MCD_GOV" && MCD_GOV=$(ETH_NONCE=$ETH_NONCE dapp create DSToken "$(seth --to-bytes32 "$(seth --from-ascii "MKR")")") && ETH_NONCE=$((ETH_NONCE + 1))
+test -z "$MCD_GOV" && MCD_GOV=$(dapp create DSToken "$(seth --to-bytes32 "$(seth --from-ascii "MKR")")") && ETH_NONCE=$((ETH_NONCE + 1))
 
 # Create deploy contract
-MCD_DEPLOY=$(ETH_NONCE=$ETH_NONCE dapp create DssDeploy "$VAT_FAB" "$JUG_FAB" "$VOW_FAB" "$CAT_FAB" "$DAI_FAB" "$MCD_JOIN_FAB" "$FLAP_FAB" "$FLOP_FAB" "$FLIP_FAB" "$SPOT_FAB" "$POT_FAB" "$END_FAB" "$PAUSE_FAB")
+MCD_DEPLOY=$(dapp create DssDeploy "$VAT_FAB" "$JUG_FAB" "$VOW_FAB" "$CAT_FAB" "$DAI_FAB" "$MCD_JOIN_FAB" "$FLAP_FAB" "$FLOP_FAB" "$FLIP_FAB" "$SPOT_FAB" "$POT_FAB" "$END_FAB" "$PAUSE_FAB")
 ETH_NONCE=$((ETH_NONCE + 1))
 
 # If no Authority is defined, create one
 if [ -z "$MCD_ADM" ]
 then
-    MCD_ADM=$(ETH_NONCE=$ETH_NONCE dapp create DSRoles)
+    MCD_ADM=$(dapp create DSRoles)
     ETH_NONCE=$((ETH_NONCE + 1))
-    ETH_NONCE=$ETH_NONCE seth send "$MCD_ADM" 'setRootUser(address,bool)' "$ETH_FROM" true
+    seth send "$MCD_ADM" 'setRootUser(address,bool)' "$ETH_FROM" true
     ETH_NONCE=$((ETH_NONCE + 1))
 fi
 
 # Deploy VAT
-ETH_NONCE=$ETH_NONCE seth send "$MCD_DEPLOY" "deployVat()"
+seth send "$MCD_DEPLOY" "deployVat()"
 ETH_NONCE=$((ETH_NONCE + 1))
 
 # Deploy MCD
-ETH_NONCE=$ETH_NONCE seth send "$MCD_DEPLOY" "deployDai(string memory,string memory,string memory,uint256)" "DAI" "Dai Stablecoin" "1" "$(seth rpc net_version)"
+seth send "$MCD_DEPLOY" "deployDai(string memory,string memory,string memory,uint256)" "DAI" "Dai Stablecoin" "1" "$(seth rpc net_version)"
 ETH_NONCE=$((ETH_NONCE + 1))
 
 # Deploy Taxation
-ETH_NONCE=$ETH_NONCE seth send "$MCD_DEPLOY" "deployTaxationAndAuctions(address)" "$MCD_GOV"
+seth send "$MCD_DEPLOY" "deployTaxationAndAuctions(address)" "$MCD_GOV"
 ETH_NONCE=$((ETH_NONCE + 1))
 
 # Deploy Liquidation
-ETH_NONCE=$ETH_NONCE seth send "$MCD_DEPLOY" "deployLiquidator()"
+seth send "$MCD_DEPLOY" "deployLiquidator()"
 ETH_NONCE=$((ETH_NONCE + 1))
 
 # Deploy End
-ETH_NONCE=$ETH_NONCE seth send "$MCD_DEPLOY" "deployEnd()"
+seth send "$MCD_DEPLOY" "deployEnd()"
 ETH_NONCE=$((ETH_NONCE + 1))
 
 # Deploy pause
 MCD_PAUSE_DELAY=${MCD_PAUSE_DELAY:-"3600"}
-ETH_NONCE=$ETH_NONCE seth send "$MCD_DEPLOY" "deployPause(uint256,address)" "$(seth --to-uint256 "$MCD_PAUSE_DELAY")" "$MCD_ADM"
+seth send "$MCD_DEPLOY" "deployPause(uint256,address)" "$(seth --to-uint256 "$MCD_PAUSE_DELAY")" "$MCD_ADM"
 ETH_NONCE=$((ETH_NONCE + 1))
-
-export ETH_NONCE
 
 cat > "$ADDRESS_DIR/load-mcd-$(seth chain)" << EOF
 #!/bin/bash

@@ -33,7 +33,7 @@ fi
 seth send "$MCD_DEPLOY" "deployVat()"
 
 # Deploy MCD
-seth send "$MCD_DEPLOY" "deployDai(string memory,string memory,string memory,uint256)" "DAI" "Dai Stablecoin" "1" "$(seth rpc net_version)"
+seth send "$MCD_DEPLOY" "deployDai(uint256)" "$(seth rpc net_version)"
 
 # Deploy Taxation
 seth send "$MCD_DEPLOY" "deployTaxationAndAuctions(address)" "$MCD_GOV"

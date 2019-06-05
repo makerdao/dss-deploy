@@ -21,20 +21,20 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testFailMissingTaxationAndAuctions() public {
         dssDeploy.deployVat();
-        dssDeploy.deployDai("", "", "", 99);
+        dssDeploy.deployDai(99);
         dssDeploy.deployLiquidator();
     }
 
     function testFailMissingLiquidator() public {
         dssDeploy.deployVat();
-        dssDeploy.deployDai("", "", "", 99);
+        dssDeploy.deployDai(99);
         dssDeploy.deployTaxationAndAuctions(address(gov));
         dssDeploy.deployEnd();
     }
 
     function testFailMissingEnd() public {
         dssDeploy.deployVat();
-        dssDeploy.deployDai("", "", "", 99);
+        dssDeploy.deployDai(99);
         dssDeploy.deployTaxationAndAuctions(address(gov));
         dssDeploy.deployPause(0, authority);
     }

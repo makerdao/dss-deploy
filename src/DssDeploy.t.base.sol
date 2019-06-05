@@ -261,7 +261,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
 
     function deployKeepAuth() public {
         dssDeploy.deployVat();
-        dssDeploy.deployDai("DAI", "Dai Stablecoin", "1", 99);
+        dssDeploy.deployDai(99);
         dssDeploy.deployTaxationAndAuctions(address(gov));
         dssDeploy.deployLiquidator();
         dssDeploy.deployEnd();

@@ -64,8 +64,8 @@ contract CatFab {
 }
 
 contract DaiFab {
-    function newDai(string memory symbol, string memory name, string memory version, uint chainId) public returns (Dai dai) {
-        dai = new Dai(symbol, name, version, chainId);
+    function newDai(uint chainId) public returns (Dai dai) {
+        dai = new Dai(chainId);
         dai.rely(msg.sender);
         dai.deny(address(this));
     }
@@ -213,11 +213,11 @@ contract DssDeploy is DSAuth {
         vat.rely(address(spotter));
     }
 
-    function deployDai(string memory symbol, string memory name, string memory version, uint256 chainId) public auth {
+    function deployDai(uint256 chainId) public auth {
         require(address(vat) != address(0), "Missing previous step");
 
         // Deploy
-        dai     = daiFab.newDai(symbol, name, version, chainId);
+        dai     = daiFab.newDai(chainId);
         daiJoin = daiJoinFab.newDaiJoin(address(vat), address(dai));
         dai.rely(address(daiJoin));
     }

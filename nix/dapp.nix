@@ -114,7 +114,7 @@ let
       src' = fetchGit repo';
       src = "${src'}/src";
     };
-    ds-pause_e2ac2b0 = rec {
+    ds-pause_36ec7d7 = rec {
       name = "ds-pause";
       deps = {
         ds-chief = ds-chief_58a02ff;
@@ -124,9 +124,9 @@ let
         ds-token = ds-token_cee36a1;
       };
       repo' = {
-        name = "ds-pause-e2ac2b0-source";
+        name = "ds-pause-36ec7d7-source";
         url = "https://github.com/dapphub/ds-pause";
-        rev = "e2ac2b057b5b9d54e4b9ebae2feef34b37223bc6";
+        rev = "36ec7d7c49e6a25298f2ce8eec7a7c8e6a23a8e9";
         ref = "HEAD";
       };
       src' = fetchGit repo';
@@ -272,7 +272,7 @@ let
       src' = fetchGit repo';
       src = "${src'}/src";
     };
-    dss_3dd110c = rec {
+    dss_9746105 = rec {
       name = "dss";
       deps = {
         ds-test = ds-test_a4e4005;
@@ -280,9 +280,9 @@ let
         ds-value = ds-value_f307171;
       };
       repo' = {
-        name = "dss-3dd110c-source";
+        name = "dss-9746105-source";
         url = "https://github.com/makerdao/dss";
-        rev = "3dd110ce3c120c6dd8e547b65f04fb0edcaaf56b";
+        rev = "97461050d4cb185522459cad474e82cd7ecf9757";
         ref = "HEAD";
       };
       src' = fetchGit repo';
@@ -301,29 +301,29 @@ let
       src' = fetchGit repo';
       src = "${src'}/src";
     };
-    dss-deploy_3af4435 = rec {
+    dss-deploy_5ccec75 = rec {
       name = "dss-deploy";
       deps = {
         ds-auth = ds-auth_f783169;
         ds-guard = ds-guard_4678e1c;
         ds-note = ds-note_beef816;
-        ds-pause = ds-pause_e2ac2b0;
+        ds-pause = ds-pause_36ec7d7;
         ds-roles = ds-roles_0138372;
         ds-test = ds-test_a4e4005;
         ds-token = ds-token_cee36a1;
         ds-weth = ds-weth_dfada5b;
-        dss = dss_3dd110c;
+        dss = dss_9746105;
       };
       repo' = {
-        name = "dss-deploy-3af4435-source";
+        name = "dss-deploy-5ccec75-source";
         url = "git@github.com:makerdao/dss-deploy";
-        rev = "3af4435fd2f5cc4e20b099bd760643264045926d";
-        ref = "master";
+        rev = "5ccec75be25f5a690be0edd1398daa44752141c5";
+        ref = "HEAD";
       };
       src' = fetchGit repo';
       src = "${src'}/src";
     };
-    this = dss-deploy_3af4435 // { src' = ../.; src = ../src; };
+    this = dss-deploy_5ccec75 // { src' = ../.; src = ../src; };
   };
 in {
   inherit package packageSpecs specs;

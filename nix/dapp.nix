@@ -163,6 +163,22 @@ let
       src' = fetchGit repo';
       src = "${src'}/src";
     };
+    dss_9746105 = rec {
+      name = "dss";
+      deps = {
+        ds-test = ds-test_a4e4005;
+        ds-token = ds-token_cee36a1;
+        ds-value = ds-value_f307171;
+      };
+      repo' = {
+        name = "dss-9746105-source";
+        url = "https://github.com/makerdao/dss";
+        rev = "97461050d4cb185522459cad474e82cd7ecf9757";
+        ref = "HEAD";
+      };
+      src' = fetchGit repo';
+      src = "${src'}/src";
+    };
     ds-spell_c908b78 = rec {
       name = "ds-spell";
       deps = {
@@ -272,22 +288,6 @@ let
       src' = fetchGit repo';
       src = "${src'}/src";
     };
-    dss_9746105 = rec {
-      name = "dss";
-      deps = {
-        ds-test = ds-test_a4e4005;
-        ds-token = ds-token_cee36a1;
-        ds-value = ds-value_f307171;
-      };
-      repo' = {
-        name = "dss-9746105-source";
-        url = "https://github.com/makerdao/dss";
-        rev = "97461050d4cb185522459cad474e82cd7ecf9757";
-        ref = "HEAD";
-      };
-      src' = fetchGit repo';
-      src = "${src'}/src";
-    };
     erc20_f322aac = rec {
       name = "erc20";
       deps = {
@@ -301,7 +301,23 @@ let
       src' = fetchGit repo';
       src = "${src'}/src";
     };
-    dss-deploy_5ccec75 = rec {
+    esm_96d7428 = rec {
+      name = "esm";
+      deps = {
+        ds-note = ds-note_beef816;
+        ds-test = ds-test_a4e4005;
+        ds-token = ds-token_cee36a1;
+      };
+      repo' = {
+        name = "esm-96d7428-source";
+        url = "https://github.com/makerdao/esm";
+        rev = "96d7428a59d20a1e5c1d1ff17bd6552e95042c76";
+        ref = "HEAD";
+      };
+      src' = fetchGit repo';
+      src = "${src'}/src";
+    };
+    dss-deploy_cf1d458 = rec {
       name = "dss-deploy";
       deps = {
         ds-auth = ds-auth_f783169;
@@ -313,17 +329,18 @@ let
         ds-token = ds-token_cee36a1;
         ds-weth = ds-weth_dfada5b;
         dss = dss_9746105;
+        esm = esm_96d7428;
       };
       repo' = {
-        name = "dss-deploy-5ccec75-source";
+        name = "dss-deploy-cf1d458-source";
         url = "git@github.com:makerdao/dss-deploy";
-        rev = "5ccec75be25f5a690be0edd1398daa44752141c5";
-        ref = "HEAD";
+        rev = "cf1d4587f2299a13645f80889af0e6d909be1099";
+        ref = "esm";
       };
       src' = fetchGit repo';
       src = "${src'}/src";
     };
-    this = dss-deploy_5ccec75 // { src' = ../.; src = ../src; };
+    this = dss-deploy_cf1d458 // { src' = ./.; src = ./src; };
   };
 in {
   inherit package packageSpecs specs;

@@ -1,11 +1,17 @@
 { pkgsSrc ? (import ./nix/pkgs.nix {}).pkgsSrc
 , pkgs ? (import ./nix/pkgs.nix { inherit pkgsSrc; }).pkgs
+, doCheck ? false
 }: with pkgs;
 
 let
-  inherit (callPackage ./nix/dapp.nix {}) this specs package;
+  inherit (callPackage ./nix/dapp.nix {}) specs package;
+
+  this = package (specs.this // {
+    inherit doCheck;
+  });
 
   this-optimize = package (specs.this // {
+    inherit doCheck;
     solcFlags = "--optimize";
   });
 

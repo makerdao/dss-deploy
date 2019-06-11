@@ -28,6 +28,7 @@ import {Flopper} from "dss/flop.sol";
 import {Flipper} from "dss/flip.sol";
 import {Dai} from "dss/dai.sol";
 import {End} from "dss/end.sol";
+import {ESM} from "esm/ESM.sol";
 import {Pot} from "dss/pot.sol";
 import {Spotter} from "dss/spot.sol";
 
@@ -157,6 +158,7 @@ contract DssDeploy is DSAuth {
     Spotter public spotter;
     Pot     public pot;
     End     public end;
+    ESM     public esm;
     DSPause public pause;
 
     mapping(bytes32 => Ilk) public ilks;
@@ -259,7 +261,7 @@ contract DssDeploy is DSAuth {
         vow.rely(address(cat));
     }
 
-    function deployEnd() public auth {
+    function deployEnd(address gov, address sun, uint256 min) public auth {
         require(address(cat) != address(0), "Missing previous step");
 
         // Deploy
@@ -275,6 +277,10 @@ contract DssDeploy is DSAuth {
         vat.rely(address(end));
         cat.rely(address(end));
         vow.rely(address(end));
+
+        // Deploy ESM
+        esm = new ESM(gov, address(end), address(sun), min);
+        end.rely(address(esm));
     }
 
     function deployPause(uint delay, DSAuthority authority) public auth {

@@ -73,6 +73,11 @@ contract FakeUser {
         End(end).free(ilk);
     }
 
+    function doESMJoin(address gem, address esm, uint256 wad) public {
+        DSToken(gem).approve(esm, uint256(-1));
+        ESM(esm).join(wad);
+    }
+
     function() external payable {
     }
 }
@@ -192,6 +197,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
     Spotter spotter;
     Pot pot;
     End end;
+    ESM esm;
 
     Flipper ethFlip;
 
@@ -264,7 +270,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
         dssDeploy.deployDai(99);
         dssDeploy.deployTaxationAndAuctions(address(gov));
         dssDeploy.deployLiquidator();
-        dssDeploy.deployEnd();
+        dssDeploy.deployEnd(address(gov), address(0x0), 10);
         dssDeploy.deployPause(0, authority);
 
         vat = dssDeploy.vat();
@@ -278,6 +284,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
         spotter = dssDeploy.spotter();
         pot = dssDeploy.pot();
         end = dssDeploy.end();
+        esm = dssDeploy.esm();
         pause = dssDeploy.pause();
         authority.setRootUser(address(pause.proxy()), true);
 

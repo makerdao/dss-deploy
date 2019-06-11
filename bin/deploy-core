@@ -42,7 +42,9 @@ seth send "$MCD_DEPLOY" "deployTaxationAndAuctions(address)" "$MCD_GOV"
 seth send "$MCD_DEPLOY" "deployLiquidator()"
 
 # Deploy End
-seth send "$MCD_DEPLOY" "deployEnd()"
+MCD_ESM_SUN=${MCD_ESM_SUN:-"0x0"}
+MCD_ESM_MIN=${MCD_ESM_MIN:-"1000"}
+seth send "$MCD_DEPLOY" "deployEnd(address,address,uint256)" "$MCD_GOV" "$MCD_ESM_SUN" "$MCD_ESM_MIN"
 
 # Deploy pause
 MCD_PAUSE_DELAY=${MCD_PAUSE_DELAY:-"3600"}
@@ -67,6 +69,7 @@ export MCD_FLOP=0x$(seth call "$MCD_DEPLOY" "flop()(address)")
 export MCD_SPOT=0x$(seth call "$MCD_DEPLOY" "spotter()(address)")
 export MCD_POT=0x$(seth call "$MCD_DEPLOY" "pot()(address)")
 export MCD_END=0x$(seth call "$MCD_DEPLOY" "end()(address)")
+export MCD_ESM=0x$(seth call "$MCD_DEPLOY" "esm()(address)")
 export MCD_PAUSE=0x$(seth call "$MCD_DEPLOY" "pause()(address)")
 export MCD_PAUSE_PROXY=0x$(seth call "0x$(seth call "$MCD_DEPLOY" "pause()(address)")" "proxy()(address)")
 export MCD_DAI=0x$(seth call "$MCD_DEPLOY" "dai()(address)")

@@ -29,7 +29,7 @@ contract DssDeployTest is DssDeployTestBase {
         dssDeploy.deployVat();
         dssDeploy.deployDai(99);
         dssDeploy.deployTaxationAndAuctions(address(gov));
-        dssDeploy.deployEnd();
+        dssDeploy.deployShutdown(address(gov), address(0x0), 10);
     }
 
     function testFailMissingEnd() public {
@@ -444,6 +444,14 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(vat.gem("COL", address(this)), 400 * end.fix("COL") / 10 ** 9);
     }
 
+    function testFireESM() public {
+        deploy();
+        gov.mint(address(user1), 10);
+
+        user1.doESMJoin(address(gov), address(esm), 10);
+        esm.fire();
+    }
+
     function testDsr() public {
         deploy();
         this.file(address(jug), bytes32("ETH"), bytes32("duty"), uint(1.1 * 10 ** 27));
@@ -697,6 +705,7 @@ contract DssDeployTest is DssDeployTestBase {
         // end
         assertEq(end.wards(address(dssDeploy)), 1);
         assertEq(end.wards(address(pause.proxy())), 1);
+        assertEq(end.wards(address(dssDeploy.esm())), 1);
 
         // flips
         assertEq(ethFlip.wards(address(dssDeploy)), 1);

@@ -25,3 +25,6 @@
 [submodule "lib/dss"]
 	path = lib/dss
 	url = https://github.com/makerdao/dss
+[submodule "lib/esm"]
+	path = lib/esm
+	url = https://github.com/makerdao/esm

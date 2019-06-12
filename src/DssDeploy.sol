@@ -261,7 +261,7 @@ contract DssDeploy is DSAuth {
         vow.rely(address(cat));
     }
 
-    function deployEnd(address gov, address sun, uint256 min) public auth {
+    function deployShutdown(address gov, address sun, uint256 min) public auth {
         require(address(cat) != address(0), "Missing previous step");
 
         // Deploy

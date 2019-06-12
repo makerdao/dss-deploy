@@ -29,7 +29,7 @@ contract DssDeployTest is DssDeployTestBase {
         dssDeploy.deployVat();
         dssDeploy.deployDai(99);
         dssDeploy.deployTaxationAndAuctions(address(gov));
-        dssDeploy.deployEnd(address(gov), address(0x0), 10);
+        dssDeploy.deployShutdown(address(gov), address(0x0), 10);
     }
 
     function testFailMissingEnd() public {

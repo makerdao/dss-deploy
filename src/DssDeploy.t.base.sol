@@ -270,7 +270,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
         dssDeploy.deployDai(99);
         dssDeploy.deployTaxationAndAuctions(address(gov));
         dssDeploy.deployLiquidator();
-        dssDeploy.deployEnd(address(gov), address(0x0), 10);
+        dssDeploy.deployShutdown(address(gov), address(0x0), 10);
         dssDeploy.deployPause(0, authority);
 
         vat = dssDeploy.vat();

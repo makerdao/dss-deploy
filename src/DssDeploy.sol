@@ -261,7 +261,7 @@ contract DssDeploy is DSAuth {
         vow.rely(address(cat));
     }
 
-    function deployShutdown(address gov, address sun, uint256 min) public auth {
+    function deployShutdown(address gov, address pit, uint256 min) public auth {
         require(address(cat) != address(0), "Missing previous step");
 
         // Deploy
@@ -279,7 +279,7 @@ contract DssDeploy is DSAuth {
         vow.rely(address(end));
 
         // Deploy ESM
-        esm = new ESM(gov, address(end), address(sun), min);
+        esm = new ESM(gov, address(end), address(pit), min);
         end.rely(address(esm));
     }
 

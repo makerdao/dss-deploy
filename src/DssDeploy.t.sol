@@ -704,11 +704,12 @@ contract DssDeployTest is DssDeployTestBase {
 
         // end
         assertEq(end.wards(address(dssDeploy)), 1);
+        assertEq(end.wards(address(esm)), 1);
         assertEq(end.wards(address(pause.proxy())), 1);
-        assertEq(end.wards(address(dssDeploy.esm())), 1);
 
         // flips
         assertEq(ethFlip.wards(address(dssDeploy)), 1);
+        assertEq(ethFlip.wards(address(end)), 1);
         assertEq(ethFlip.wards(address(pause.proxy())), 1);
         assertEq(colFlip.wards(address(dssDeploy)), 1);
         assertEq(colFlip.wards(address(end)), 1);

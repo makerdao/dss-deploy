@@ -317,7 +317,7 @@ let
       src' = fetchGit repo';
       src = "${src'}/src";
     };
-    dss-deploy_cf1d458 = rec {
+    dss-deploy_13c1904 = rec {
       name = "dss-deploy";
       deps = {
         ds-auth = ds-auth_f783169;
@@ -332,15 +332,15 @@ let
         esm = esm_96d7428;
       };
       repo' = {
-        name = "dss-deploy-cf1d458-source";
+        name = "dss-deploy-13c1904-source";
         url = "git@github.com:makerdao/dss-deploy";
-        rev = "cf1d4587f2299a13645f80889af0e6d909be1099";
-        ref = "esm";
+        rev = "13c19046dd986fb819e414710aaaf43e48a9fc90";
+        ref = "master";
       };
       src' = fetchGit repo';
       src = "${src'}/src";
     };
-    this = dss-deploy_cf1d458 // { src' = ./.; src = ./src; };
+    this = dss-deploy_13c1904 // { src' = ./.; src = ./src; };
   };
 in {
   inherit package packageSpecs specs;

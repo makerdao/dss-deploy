@@ -42,7 +42,7 @@ seth send "$MCD_DEPLOY" "deployTaxationAndAuctions(address)" "$MCD_GOV"
 seth send "$MCD_DEPLOY" "deployLiquidator()"
 
 # Deploy End
-MCD_ESM_SUN=${MCD_ESM_SUN:-"0x0"}
+MCD_ESM_SUN=${MCD_ESM_SUN:-"0x0000000000000000000000000000000000000000"}
 MCD_ESM_MIN=${MCD_ESM_MIN:-"1000"}
 seth send "$MCD_DEPLOY" "deployEnd(address,address,uint256)" "$MCD_GOV" "$MCD_ESM_SUN" "$MCD_ESM_MIN"
 

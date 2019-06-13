@@ -622,6 +622,9 @@ contract DssDeployTest is DssDeployTestBase {
         col1Join.join(address(this), 10);
         assertEq(token1.balanceOf(address(col1Join)), 10);
         assertEq(vat.gem("COL1", address(this)), 10);
+        col1Join.exit(address(this), 4);
+        assertEq(token1.balanceOf(address(col1Join)), 6);
+        assertEq(vat.gem("COL1", address(this)), 6);
 
         token2.approve(address(col2Join), uint(-1));
         assertEq(token2.balanceOf(address(col2Join)), 0);
@@ -629,6 +632,9 @@ contract DssDeployTest is DssDeployTestBase {
         col2Join.join(address(this), 10);
         assertEq(token2.balanceOf(address(col2Join)), 10);
         assertEq(vat.gem("COL2", address(this)), 10);
+        col2Join.exit(address(this), 4);
+        assertEq(token2.balanceOf(address(col2Join)), 6);
+        assertEq(vat.gem("COL2", address(this)), 6);
 
         token3.approve(address(col3Join), uint(-1));
         assertEq(token3.balanceOf(address(col3Join)), 0);
@@ -636,6 +642,9 @@ contract DssDeployTest is DssDeployTestBase {
         col3Join.join(address(this), 10);
         assertEq(token3.balanceOf(address(col3Join)), 10);
         assertEq(vat.gem("COL3", address(this)), 10);
+        col3Join.exit(address(this), 4);
+        assertEq(token3.balanceOf(address(col3Join)), 6);
+        assertEq(vat.gem("COL3", address(this)), 6);
 
         token4.approve(address(col4Join), uint(-1));
         assertEq(token1.balanceOf(address(col4Join)), 0);
@@ -643,6 +652,9 @@ contract DssDeployTest is DssDeployTestBase {
         col4Join.join(address(this), 10);
         assertEq(token4.balanceOf(address(col4Join)), 10);
         assertEq(vat.gem("COL4", address(this)), 10);
+        col4Join.exit(address(this), 4);
+        assertEq(token4.balanceOf(address(col4Join)), 6);
+        assertEq(vat.gem("COL4", address(this)), 6);
 
         token5.approve(address(col5Join), uint(-1));
         assertEq(token1.balanceOf(address(col5Join)), 0);
@@ -650,6 +662,9 @@ contract DssDeployTest is DssDeployTestBase {
         col5Join.join(address(this), 10);
         assertEq(token5.balanceOf(address(col5Join)), 10);
         assertEq(vat.gem("COL5", address(this)), 10 * 10 ** 9);
+        col5Join.exit(address(this), 4);
+        assertEq(token5.balanceOf(address(col5Join)), 6);
+        assertEq(vat.gem("COL5", address(this)), 6 * 10 ** 9);
     }
 
     function testAuth() public {

@@ -65,14 +65,17 @@ contract GemJoin2 is DSNote {
         ilk = ilk_;
         gem = Gem2TokenLike(gem_);
     }
+    function mul(uint x, uint y) internal pure returns (uint z) {
+        require(y == 0 || (z = x * y) / y == x);
+    }
     function join(address urn, uint wad) public note {
-        require(int(wad) >= 0, "");
+        require(-int(wad) <= 0, "");
         vat.slip(ilk, urn, int(wad));
         uint256 prevBalance = gem.balanceOf(msg.sender);
 
         require(prevBalance >= wad, "");
         require(gem.allowance(msg.sender, address(this)) >= wad, "");
-        
+
         (bool ok, bytes memory data) = address(gem).call(
             abi.encodeWithSignature("transferFrom(address,address,uint256)", msg.sender, address(this), wad)
         );
@@ -81,10 +84,9 @@ contract GemJoin2 is DSNote {
 
         require(prevBalance - wad == gem.balanceOf(msg.sender), "");
     }
-    function exit(address urn, address guy, uint wad) public note {
-        require(urn == msg.sender, "");
-        require(int(wad) >= 0, "");
-        vat.slip(ilk, urn, -int(wad));
+    function exit(address guy, uint wad) public note {
+        require(-int(wad) <= 0, "");
+        vat.slip(ilk, msg.sender, -int(wad));
         uint256 prevBalance = gem.balanceOf(address(this));
 
         require(prevBalance >= wad, "");
@@ -108,17 +110,19 @@ contract GemJoin3 is DSNote {
         gem = Gem3TokenLike(gem_);
         require(gem.decimals() < 18, "");
     }
+    function mul(uint x, uint y) internal pure returns (uint z) {
+        require(y == 0 || (z = x * y) / y == x);
+    }
     function join(address urn, uint wad) public note {
-        uint wad18 = wad * 10 ** (18 - gem.decimals());
-        require(int(wad18) >= 0, "");
+        uint wad18 = mul(wad, 10 ** (18 - gem.decimals()));
+        require(-int(wad18) <= 0, "");
         vat.slip(ilk, urn, int(wad18));
         require(gem.transferFrom(msg.sender, address(this), wad), "");
     }
-    function exit(address urn, address guy, uint wad) public note {
-        require(urn == msg.sender, "");
-        require(int(wad) >= 0, "");
-        uint wad18 = wad * 10 ** (18 - gem.decimals());
-        vat.slip(ilk, urn, -int(wad18));
+    function exit(address guy, uint wad) public note {
+        uint wad18 = mul(wad, 10 ** (18 - gem.decimals()));
+        require(-int(wad18) <= 0, "");
+        vat.slip(ilk, msg.sender, -int(wad18));
         require(gem.transfer(guy, wad), "");
     }
 }

@@ -69,7 +69,7 @@ contract GemJoin2 is DSNote {
         require(y == 0 || (z = x * y) / y == x);
     }
     function join(address urn, uint wad) public note {
-        require(-int(wad) <= 0, "");
+        require(wad <= 2 ** 255, "");
         vat.slip(ilk, urn, int(wad));
         uint256 prevBalance = gem.balanceOf(msg.sender);
 
@@ -85,7 +85,7 @@ contract GemJoin2 is DSNote {
         require(prevBalance - wad == gem.balanceOf(msg.sender), "");
     }
     function exit(address guy, uint wad) public note {
-        require(-int(wad) <= 0, "");
+        require(wad <= 2 ** 255, "");
         vat.slip(ilk, msg.sender, -int(wad));
         uint256 prevBalance = gem.balanceOf(address(this));
 
@@ -115,13 +115,13 @@ contract GemJoin3 is DSNote {
     }
     function join(address urn, uint wad) public note {
         uint wad18 = mul(wad, 10 ** (18 - gem.decimals()));
-        require(-int(wad18) <= 0, "");
+        require(wad18 <= 2 ** 255, "");
         vat.slip(ilk, urn, int(wad18));
         require(gem.transferFrom(msg.sender, address(this), wad), "");
     }
     function exit(address guy, uint wad) public note {
         uint wad18 = mul(wad, 10 ** (18 - gem.decimals()));
-        require(-int(wad18) <= 0, "");
+        require(wad18 <= 2 ** 255, "");
         vat.slip(ilk, msg.sender, -int(wad18));
         require(gem.transfer(guy, wad), "");
     }

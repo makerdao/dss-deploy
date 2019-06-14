@@ -312,7 +312,7 @@ contract DssDeployTest is DssDeployTestBase {
         this.file(address(vow), bytes32("sump"), rad(20 ether));
         batchId = vow.flop();
 
-        (uint bid,,,,,) = flop.bids(batchId);
+        (uint bid,,,,) = flop.bids(batchId);
         assertEq(bid, rad(20 ether));
         user1.doHope(address(vat), address(flop));
         user2.doHope(address(vat), address(flop));
@@ -325,9 +325,9 @@ contract DssDeployTest is DssDeployTestBase {
         user1.doDeal(address(flop), batchId);
         assertEq(gov.totalSupply(), prevGovSupply + 0.16 ether);
         vow.kiss(rad(20 ether));
-        assertEq(vow.Joy(), 0);
-        assertEq(vow.Woe(), 0);
-        assertEq(vow.Awe(), 0);
+        assertEq(vat.dai(address(vow)), 0);
+        assertEq(vat.sin(address(vow)) - vow.Sin() - vow.Ash(), 0);
+        assertEq(vat.sin(address(vow)), 0);
     }
 
     function testFlap() public {
@@ -338,9 +338,9 @@ contract DssDeployTest is DssDeployTestBase {
         ethJoin.join(address(this), 0.5 ether);
         vat.frob("ETH", address(this), address(this), address(this), 0.1 ether, 10 ether);
         hevm.warp(now + 1);
-        assertEq(vow.Joy(), 0);
+        assertEq(vat.dai(address(vow)), 0);
         jug.drip("ETH");
-        assertEq(vow.Joy(), rad(10 * 0.05 ether));
+        assertEq(vat.dai(address(vow)), rad(10 * 0.05 ether));
         this.file(address(vow), bytes32("bump"), rad(0.05 ether));
         uint batchId = vow.flap();
 

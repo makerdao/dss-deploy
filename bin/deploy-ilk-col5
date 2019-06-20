@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+[[ -z $TMP_FILE ]] && {
+  nonce=$(seth nonce "$ETH_FROM")
+  TMP_FILE=$(mktemp /tmp/nonce.XXXXXX)
+  echo "$nonce" > "$TMP_FILE"
+  export TMP_FILE
+}
+
 # shellcheck source=bin/lib/common.sh
 . "${LIB_DIR:-$(cd "${0%/*}/lib"&&pwd)}/common.sh"
 
@@ -7,8 +14,8 @@ export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
 
 dappBuild
 
-test -z "$COL5" && COL5=$(dapp create Token5 "$(seth --to-uint256 "$(seth --to-wei 1000000 ETH)")")
-test -z "$PIP_COL5" && PIP_COL5=$(dapp create DSValue)
+test -z "$COL5" && COL5=$(dappCreate Token5 "$(seth --to-uint256 "$(seth --to-wei 1000000 ETH)")")
+test -z "$PIP_COL5" && PIP_COL5=$(dappCreate DSValue)
 export COL5
 export PIP_COL5
 

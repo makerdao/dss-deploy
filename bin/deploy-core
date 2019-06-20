@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+[[ -z $TMP_FILE ]] && {
+  nonce=$(seth nonce "$ETH_FROM")
+  TMP_FILE=$(mktemp /tmp/nonce.XXXXXX)
+  echo "$nonce" > "$TMP_FILE"
+  export TMP_FILE
+}
+
 # shellcheck source=bin/lib/common.sh
 . "${LIB_DIR:-$(cd "${0%/*}/lib"&&pwd)}/common.sh"
 
@@ -17,38 +24,38 @@ dappBuild
   exit 1
 
 # If no Governance token is defined, create one
-test -z "$MCD_GOV" && MCD_GOV=$(dapp create DSToken "$(seth --to-bytes32 "$(seth --from-ascii "MKR")")")
+test -z "$MCD_GOV" && MCD_GOV=$(dappCreate DSToken "$(seth --to-bytes32 "$(seth --from-ascii "MKR")")")
 
 # Create deploy contract
-MCD_DEPLOY=$(dapp create DssDeploy "$VAT_FAB" "$JUG_FAB" "$VOW_FAB" "$CAT_FAB" "$DAI_FAB" "$MCD_JOIN_FAB" "$FLAP_FAB" "$FLOP_FAB" "$FLIP_FAB" "$SPOT_FAB" "$POT_FAB" "$END_FAB" "$PAUSE_FAB")
+MCD_DEPLOY=$(dappCreate DssDeploy "$VAT_FAB" "$JUG_FAB" "$VOW_FAB" "$CAT_FAB" "$DAI_FAB" "$MCD_JOIN_FAB" "$FLAP_FAB" "$FLOP_FAB" "$FLIP_FAB" "$SPOT_FAB" "$POT_FAB" "$END_FAB" "$PAUSE_FAB")
 
 # If no Authority is defined, create one
 if [ -z "$MCD_ADM" ]
 then
-    MCD_ADM=$(dapp create DSRoles)
-    seth send "$MCD_ADM" 'setRootUser(address,bool)' "$ETH_FROM" true
+    MCD_ADM=$(dappCreate DSRoles)
+    sethSend "$MCD_ADM" 'setRootUser(address,bool)' "$ETH_FROM" true
 fi
 
 # Deploy VAT
-seth send "$MCD_DEPLOY" "deployVat()"
+sethSend "$MCD_DEPLOY" "deployVat()"
 
 # Deploy MCD
-seth send "$MCD_DEPLOY" "deployDai(uint256)" "$(seth rpc net_version)"
+sethSend "$MCD_DEPLOY" "deployDai(uint256)" "$(seth rpc net_version)"
 
 # Deploy Taxation
-seth send "$MCD_DEPLOY" "deployTaxationAndAuctions(address)" "$MCD_GOV"
+sethSend "$MCD_DEPLOY" "deployTaxationAndAuctions(address)" "$MCD_GOV"
 
 # Deploy Liquidation
-seth send "$MCD_DEPLOY" "deployLiquidator()"
+sethSend "$MCD_DEPLOY" "deployLiquidator()"
 
 # Deploy End
 MCD_ESM_PIT=${MCD_ESM_PIT:-"0x0000000000000000000000000000000000000000"}
 MCD_ESM_MIN=${MCD_ESM_MIN:-"1000"}
-seth send "$MCD_DEPLOY" "deployShutdown(address,address,uint256)" "$MCD_GOV" "$MCD_ESM_PIT" "$MCD_ESM_MIN"
+sethSend "$MCD_DEPLOY" "deployShutdown(address,address,uint256)" "$MCD_GOV" "$MCD_ESM_PIT" "$MCD_ESM_MIN"
 
 # Deploy pause
 MCD_PAUSE_DELAY=${MCD_PAUSE_DELAY:-"3600"}
-seth send "$MCD_DEPLOY" "deployPause(uint256,address)" "$(seth --to-uint256 "$MCD_PAUSE_DELAY")" "$MCD_ADM"
+sethSend "$MCD_DEPLOY" "deployPause(uint256,address)" "$(seth --to-uint256 "$MCD_PAUSE_DELAY")" "$MCD_ADM"
 
 cat > "$ADDRESS_DIR/load-mcd-$(seth chain)" << EOF
 #!/bin/bash

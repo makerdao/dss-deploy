@@ -1,5 +1,12 @@
 #! /usr/bin/env bash
 
+[[ -z $TMP_FILE ]] && {
+  nonce=$(seth nonce "$ETH_FROM")
+  TMP_FILE=$(mktemp /tmp/nonce.XXXXXX)
+  echo "$nonce" > "$TMP_FILE"
+  export TMP_FILE
+}
+
 # shellcheck source=bin/lib/common.sh
 . "${LIB_DIR:-$(cd "${0%/*}/lib"&&pwd)}/common.sh"
 

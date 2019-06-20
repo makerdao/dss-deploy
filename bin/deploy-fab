@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+[[ -z $TMP_FILE ]] && {
+  nonce=$(seth nonce "$ETH_FROM")
+  TMP_FILE=$(mktemp /tmp/nonce.XXXXXX)
+  echo "$nonce" > "$TMP_FILE"
+  export TMP_FILE
+}
+
 # shellcheck source=bin/lib/common.sh
 . "${LIB_DIR:-$(cd "${0%/*}/lib"&&pwd)}/common.sh"
 
@@ -9,20 +16,19 @@ dappBuild
 
 export SETH_ASYNC=yes
 
-ETH_NONCE=$(seth nonce "$ETH_FROM")
-VAT_FABtx=$(ETH_NONCE=$ETH_NONCE dapp create VatFab)
-JUG_FABtx=$(ETH_NONCE=$((ETH_NONCE + 1)) dapp create JugFab)
-VOW_FABtx=$(ETH_NONCE=$((ETH_NONCE + 2)) dapp create VowFab)
-CAT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 3)) dapp create CatFab)
-DAI_FABtx=$(ETH_NONCE=$((ETH_NONCE + 4)) dapp create DaiFab)
-MCD_JOIN_FABtx=$(ETH_NONCE=$((ETH_NONCE + 5)) dapp create DaiJoinFab)
-FLAP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 6)) dapp create FlapFab)
-FLOP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 7)) dapp create FlopFab)
-FLIP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 8)) dapp create FlipFab)
-SPOT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 9)) dapp create SpotFab)
-POT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 10)) dapp create PotFab)
-END_FABtx=$(ETH_NONCE=$((ETH_NONCE + 11)) dapp create EndFab)
-PAUSE_FABtx=$(ETH_NONCE=$((ETH_NONCE + 12)) dapp create PauseFab)
+VAT_FABtx=$(dappCreate VatFab)
+JUG_FABtx=$(dappCreate JugFab)
+VOW_FABtx=$(dappCreate VowFab)
+CAT_FABtx=$(dappCreate CatFab)
+DAI_FABtx=$(dappCreate DaiFab)
+MCD_JOIN_FABtx=$(dappCreate DaiJoinFab)
+FLAP_FABtx=$(dappCreate FlapFab)
+FLOP_FABtx=$(dappCreate FlopFab)
+FLIP_FABtx=$(dappCreate FlipFab)
+SPOT_FABtx=$(dappCreate SpotFab)
+POT_FABtx=$(dappCreate PotFab)
+END_FABtx=$(dappCreate EndFab)
+PAUSE_FABtx=$(dappCreate PauseFab)
 
 export SETH_ASYNC=no
 

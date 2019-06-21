@@ -273,7 +273,7 @@ let
       src' = fetchGit repo';
       src = "${src'}/src";
     };
-    dss_6d2b5a3 = rec {
+    dss_f1482ff = rec {
       name = "dss";
       deps = {
         ds-test = ds-test_a4e4005;
@@ -281,9 +281,9 @@ let
         ds-value = ds-value_f307171;
       };
       repo' = {
-        name = "dss-6d2b5a3-source";
+        name = "dss-f1482ff-source";
         url = "https://github.com/makerdao/dss";
-        rev = "6d2b5a3ecfa10d8cdf61b33ac16d31092feb2092";
+        rev = "f1482ff069fb833cf56b1f4d443dc6b23f4de091";
         ref = "HEAD";
       };
       src' = fetchGit repo';
@@ -329,7 +329,7 @@ let
         ds-test = ds-test_a4e4005;
         ds-token = ds-token_cee36a1;
         ds-weth = ds-weth_dfada5b;
-        dss = dss_6d2b5a3;
+        dss = dss_f1482ff;
         esm = esm_e0a85d6;
       };
       src' = ../.;

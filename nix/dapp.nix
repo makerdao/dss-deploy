@@ -41,7 +41,7 @@ let
       src' = fetchGit repo';
       src = "${src'}/src";
     };
-    ds-chief_58a02ff = rec {
+    ds-chief_ea05ee0 = rec {
       name = "ds-chief";
       deps = {
         ds-roles = ds-roles_0138372;
@@ -50,9 +50,9 @@ let
         ds-token = ds-token_cee36a1;
       };
       repo' = {
-        name = "ds-chief-58a02ff-source";
+        name = "ds-chief-ea05ee0-source";
         url = "https://github.com/dapphub/ds-chief";
-        rev = "58a02ff50bdbf5729252aab91bc468a3e77be6bb";
+        rev = "ea05ee0413a8b3852142664a6c04d6e4923be426";
         ref = "HEAD";
       };
       src' = fetchGit repo';
@@ -115,19 +115,19 @@ let
       src' = fetchGit repo';
       src = "${src'}/src";
     };
-    ds-pause_36ec7d7 = rec {
+    ds-pause_81fd9d4 = rec {
       name = "ds-pause";
       deps = {
-        ds-chief = ds-chief_58a02ff;
+        ds-chief = ds-chief_ea05ee0;
         ds-proxy = ds-proxy_379f5e2;
         ds-spell = ds-spell_c908b78;
         ds-test = ds-test_a4e4005;
         ds-token = ds-token_cee36a1;
       };
       repo' = {
-        name = "ds-pause-36ec7d7-source";
+        name = "ds-pause-81fd9d4-source";
         url = "https://github.com/dapphub/ds-pause";
-        rev = "36ec7d7c49e6a25298f2ce8eec7a7c8e6a23a8e9";
+        rev = "81fd9d43e56615267a10e29710716342bcca0ce3";
         ref = "HEAD";
       };
       src' = fetchGit repo';
@@ -324,7 +324,7 @@ let
         ds-auth = ds-auth_f783169;
         ds-guard = ds-guard_4678e1c;
         ds-note = ds-note_beef816;
-        ds-pause = ds-pause_36ec7d7;
+        ds-pause = ds-pause_81fd9d4;
         ds-roles = ds-roles_0138372;
         ds-test = ds-test_a4e4005;
         ds-token = ds-token_cee36a1;

@@ -75,3 +75,11 @@ message DEPLOYING DGD
 source "$ADDRESS_DIR/load-ilk-dgd-a-$(seth chain)"
 
 # -----------------------------------------------------------------------------------------
+
+message DEPLOYING GNT
+
+"$BIN_DIR/deploy-ilk-gnt"
+# shellcheck source=/dev/null
+source "$ADDRESS_DIR/load-ilk-gnt-a-$(seth chain)"
+
+# -----------------------------------------------------------------------------------------

@@ -605,12 +605,15 @@ contract DssDeployTest is DssDeployTestBase {
         GemJoin batJoin = new GemJoin(address(vat), "BAT", address(bat));
         DGD dgd = new DGD(100 ether);
         GemJoin3 dgdJoin = new GemJoin3(address(vat), "DGD", address(dgd));
+        GNT gnt = new GNT(100 ether);
+        GemJoin4 gntJoin = new GemJoin4(address(vat), "GNT", address(gnt));
 
         dssDeploy.deployCollateral("REP", address(repJoin), address(pip));
         dssDeploy.deployCollateral("ZRX", address(zrxJoin), address(pip));
         dssDeploy.deployCollateral("OMG", address(omgJoin), address(pip));
         dssDeploy.deployCollateral("BAT", address(batJoin), address(pip));
         dssDeploy.deployCollateral("DGD", address(dgdJoin), address(pip));
+        dssDeploy.deployCollateral("GNT", address(gntJoin), address(pip));
 
         rep.approve(address(repJoin), uint(-1));
         assertEq(rep.balanceOf(address(repJoin)), 0);
@@ -643,7 +646,7 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(vat.gem("OMG", address(this)), 6);
 
         bat.approve(address(batJoin), uint(-1));
-        assertEq(rep.balanceOf(address(batJoin)), 0);
+        assertEq(bat.balanceOf(address(batJoin)), 0);
         assertEq(vat.gem("BAT", address(this)), 0);
         batJoin.join(address(this), 10);
         assertEq(bat.balanceOf(address(batJoin)), 10);
@@ -653,7 +656,7 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(vat.gem("BAT", address(this)), 6);
 
         dgd.approve(address(dgdJoin), uint(-1));
-        assertEq(rep.balanceOf(address(dgdJoin)), 0);
+        assertEq(dgd.balanceOf(address(dgdJoin)), 0);
         assertEq(vat.gem("DGD", address(this)), 0);
         dgdJoin.join(address(this), 10);
         assertEq(dgd.balanceOf(address(dgdJoin)), 10);
@@ -661,6 +664,17 @@ contract DssDeployTest is DssDeployTestBase {
         dgdJoin.exit(address(this), 4);
         assertEq(dgd.balanceOf(address(dgdJoin)), 6);
         assertEq(vat.gem("DGD", address(this)), 6 * 10 ** 9);
+
+        assertEq(gnt.balanceOf(address(gntJoin)), 0);
+        assertEq(vat.gem("GNT", address(this)), 0);
+        address bag = gntJoin.make();
+        gnt.transfer(bag, 10);
+        gntJoin.join(address(this), 10);
+        assertEq(gnt.balanceOf(address(gntJoin)), 10);
+        assertEq(vat.gem("GNT", address(this)), 10);
+        gntJoin.exit(address(this), 4);
+        assertEq(gnt.balanceOf(address(gntJoin)), 6);
+        assertEq(vat.gem("GNT", address(this)), 6);
     }
 
     function testAuth() public {

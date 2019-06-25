@@ -36,42 +36,42 @@ source "$ADDRESS_DIR/load-ilk-eth-a-$(seth chain)"
 
 # -----------------------------------------------------------------------------------------
 
-message DEPLOYING COL1
+message DEPLOYING REP
 
-"$BIN_DIR/deploy-ilk-col1"
+"$BIN_DIR/deploy-ilk-rep"
 # shellcheck source=/dev/null
-source "$ADDRESS_DIR/load-ilk-col1-a-$(seth chain)"
+source "$ADDRESS_DIR/load-ilk-rep-a-$(seth chain)"
 
 # -----------------------------------------------------------------------------------------
 
-message DEPLOYING COL2
+message DEPLOYING ZRX
 
-"$BIN_DIR/deploy-ilk-col2"
+"$BIN_DIR/deploy-ilk-zrx"
 # shellcheck source=/dev/null
-source "$ADDRESS_DIR/load-ilk-col2-a-$(seth chain)"
+source "$ADDRESS_DIR/load-ilk-zrx-a-$(seth chain)"
 
 # -----------------------------------------------------------------------------------------
 
-message DEPLOYING COL3
+message DEPLOYING OMG
 
-"$BIN_DIR/deploy-ilk-col3"
+"$BIN_DIR/deploy-ilk-omg"
 # shellcheck source=/dev/null
-source "$ADDRESS_DIR/load-ilk-col3-a-$(seth chain)"
+source "$ADDRESS_DIR/load-ilk-omg-a-$(seth chain)"
 
 # -----------------------------------------------------------------------------------------
 
-message DEPLOYING COL4
+message DEPLOYING BAT
 
-"$BIN_DIR/deploy-ilk-col4"
+"$BIN_DIR/deploy-ilk-bat"
 # shellcheck source=/dev/null
-source "$ADDRESS_DIR/load-ilk-col4-a-$(seth chain)"
+source "$ADDRESS_DIR/load-ilk-bat-a-$(seth chain)"
 
 # -----------------------------------------------------------------------------------------
 
-message DEPLOYING COL5
+message DEPLOYING DGD
 
-"$BIN_DIR/deploy-ilk-col5"
+"$BIN_DIR/deploy-ilk-dgd"
 # shellcheck source=/dev/null
-source "$ADDRESS_DIR/load-ilk-col5-a-$(seth chain)"
+source "$ADDRESS_DIR/load-ilk-dgd-a-$(seth chain)"
 
 # -----------------------------------------------------------------------------------------

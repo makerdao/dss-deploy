@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# shellcheck source=bin/lib/common.sh
+. "${LIB_DIR:-$(cd "${0%/*}/lib"&&pwd)}/common.sh"
+
+export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
+
+dappBuild
+
+test -z "$REP" && REP=$(dapp create REP "$(seth --to-uint256 "$(seth --to-wei 1000000 ETH)")")
+test -z "$PIP_REP" && PIP_REP=$(dapp create DSValue)
+export REP
+export PIP_REP
+
+# shellcheck source=/dev/null
+source "$BIN_DIR/deploy-ilk" "REP" "${1:-"A"}" "GemJoin"

@@ -4,11 +4,7 @@ import "./DssDeploy.t.base.sol";
 
 import "./join.sol";
 
-import "./token1.sol";
-import "./token2.sol";
-import "./token3.sol";
-import "./token4.sol";
-import "./token5.sol";
+import "./tokens.sol";
 
 contract DssDeployTest is DssDeployTestBase {
     function testDeploy() public {
@@ -599,72 +595,72 @@ contract DssDeployTest is DssDeployTestBase {
     function testTokens() public {
         deployKeepAuth();
         DSValue pip = new DSValue();
-        Token1 token1 = new Token1(100 ether);
-        GemJoin col1Join = new GemJoin(address(vat), "COL1", address(token1));
-        Token2 token2 = new Token2(100 ether);
-        GemJoin col2Join = new GemJoin(address(vat), "COL2", address(token2));
-        Token3 token3 = new Token3(100 ether);
-        GemJoin2 col3Join = new GemJoin2(address(vat), "COL3", address(token3));
-        Token4 token4 = new Token4(100 ether);
-        GemJoin col4Join = new GemJoin(address(vat), "COL4", address(token4));
-        Token5 token5 = new Token5(100 ether);
-        GemJoin3 col5Join = new GemJoin3(address(vat), "COL5", address(token5));
+        REP rep = new REP(100 ether);
+        GemJoin repJoin = new GemJoin(address(vat), "REP", address(rep));
+        ZRX zrx = new ZRX(100 ether);
+        GemJoin zrxJoin = new GemJoin(address(vat), "ZRX", address(zrx));
+        OMG omg = new OMG(100 ether);
+        GemJoin2 omgJoin = new GemJoin2(address(vat), "OMG", address(omg));
+        BAT bat = new BAT(100 ether);
+        GemJoin batJoin = new GemJoin(address(vat), "BAT", address(bat));
+        DGD dgd = new DGD(100 ether);
+        GemJoin3 dgdJoin = new GemJoin3(address(vat), "DGD", address(dgd));
 
-        dssDeploy.deployCollateral("COL1", address(col1Join), address(pip));
-        dssDeploy.deployCollateral("COL2", address(col2Join), address(pip));
-        dssDeploy.deployCollateral("COL3", address(col3Join), address(pip));
-        dssDeploy.deployCollateral("COL4", address(col4Join), address(pip));
-        dssDeploy.deployCollateral("COL5", address(col5Join), address(pip));
+        dssDeploy.deployCollateral("REP", address(repJoin), address(pip));
+        dssDeploy.deployCollateral("ZRX", address(zrxJoin), address(pip));
+        dssDeploy.deployCollateral("OMG", address(omgJoin), address(pip));
+        dssDeploy.deployCollateral("BAT", address(batJoin), address(pip));
+        dssDeploy.deployCollateral("DGD", address(dgdJoin), address(pip));
 
-        token1.approve(address(col1Join), uint(-1));
-        assertEq(token1.balanceOf(address(col1Join)), 0);
-        assertEq(vat.gem("COL1", address(this)), 0);
-        col1Join.join(address(this), 10);
-        assertEq(token1.balanceOf(address(col1Join)), 10);
-        assertEq(vat.gem("COL1", address(this)), 10);
-        col1Join.exit(address(this), 4);
-        assertEq(token1.balanceOf(address(col1Join)), 6);
-        assertEq(vat.gem("COL1", address(this)), 6);
+        rep.approve(address(repJoin), uint(-1));
+        assertEq(rep.balanceOf(address(repJoin)), 0);
+        assertEq(vat.gem("REP", address(this)), 0);
+        repJoin.join(address(this), 10);
+        assertEq(rep.balanceOf(address(repJoin)), 10);
+        assertEq(vat.gem("REP", address(this)), 10);
+        repJoin.exit(address(this), 4);
+        assertEq(rep.balanceOf(address(repJoin)), 6);
+        assertEq(vat.gem("REP", address(this)), 6);
 
-        token2.approve(address(col2Join), uint(-1));
-        assertEq(token2.balanceOf(address(col2Join)), 0);
-        assertEq(vat.gem("COL2", address(this)), 0);
-        col2Join.join(address(this), 10);
-        assertEq(token2.balanceOf(address(col2Join)), 10);
-        assertEq(vat.gem("COL2", address(this)), 10);
-        col2Join.exit(address(this), 4);
-        assertEq(token2.balanceOf(address(col2Join)), 6);
-        assertEq(vat.gem("COL2", address(this)), 6);
+        zrx.approve(address(zrxJoin), uint(-1));
+        assertEq(zrx.balanceOf(address(zrxJoin)), 0);
+        assertEq(vat.gem("ZRX", address(this)), 0);
+        zrxJoin.join(address(this), 10);
+        assertEq(zrx.balanceOf(address(zrxJoin)), 10);
+        assertEq(vat.gem("ZRX", address(this)), 10);
+        zrxJoin.exit(address(this), 4);
+        assertEq(zrx.balanceOf(address(zrxJoin)), 6);
+        assertEq(vat.gem("ZRX", address(this)), 6);
 
-        token3.approve(address(col3Join), uint(-1));
-        assertEq(token3.balanceOf(address(col3Join)), 0);
-        assertEq(vat.gem("COL3", address(this)), 0);
-        col3Join.join(address(this), 10);
-        assertEq(token3.balanceOf(address(col3Join)), 10);
-        assertEq(vat.gem("COL3", address(this)), 10);
-        col3Join.exit(address(this), 4);
-        assertEq(token3.balanceOf(address(col3Join)), 6);
-        assertEq(vat.gem("COL3", address(this)), 6);
+        omg.approve(address(omgJoin), uint(-1));
+        assertEq(omg.balanceOf(address(omgJoin)), 0);
+        assertEq(vat.gem("OMG", address(this)), 0);
+        omgJoin.join(address(this), 10);
+        assertEq(omg.balanceOf(address(omgJoin)), 10);
+        assertEq(vat.gem("OMG", address(this)), 10);
+        omgJoin.exit(address(this), 4);
+        assertEq(omg.balanceOf(address(omgJoin)), 6);
+        assertEq(vat.gem("OMG", address(this)), 6);
 
-        token4.approve(address(col4Join), uint(-1));
-        assertEq(token1.balanceOf(address(col4Join)), 0);
-        assertEq(vat.gem("COL4", address(this)), 0);
-        col4Join.join(address(this), 10);
-        assertEq(token4.balanceOf(address(col4Join)), 10);
-        assertEq(vat.gem("COL4", address(this)), 10);
-        col4Join.exit(address(this), 4);
-        assertEq(token4.balanceOf(address(col4Join)), 6);
-        assertEq(vat.gem("COL4", address(this)), 6);
+        bat.approve(address(batJoin), uint(-1));
+        assertEq(rep.balanceOf(address(batJoin)), 0);
+        assertEq(vat.gem("BAT", address(this)), 0);
+        batJoin.join(address(this), 10);
+        assertEq(bat.balanceOf(address(batJoin)), 10);
+        assertEq(vat.gem("BAT", address(this)), 10);
+        batJoin.exit(address(this), 4);
+        assertEq(bat.balanceOf(address(batJoin)), 6);
+        assertEq(vat.gem("BAT", address(this)), 6);
 
-        token5.approve(address(col5Join), uint(-1));
-        assertEq(token1.balanceOf(address(col5Join)), 0);
-        assertEq(vat.gem("COL5", address(this)), 0);
-        col5Join.join(address(this), 10);
-        assertEq(token5.balanceOf(address(col5Join)), 10);
-        assertEq(vat.gem("COL5", address(this)), 10 * 10 ** 9);
-        col5Join.exit(address(this), 4);
-        assertEq(token5.balanceOf(address(col5Join)), 6);
-        assertEq(vat.gem("COL5", address(this)), 6 * 10 ** 9);
+        dgd.approve(address(dgdJoin), uint(-1));
+        assertEq(rep.balanceOf(address(dgdJoin)), 0);
+        assertEq(vat.gem("DGD", address(this)), 0);
+        dgdJoin.join(address(this), 10);
+        assertEq(dgd.balanceOf(address(dgdJoin)), 10);
+        assertEq(vat.gem("DGD", address(this)), 10 * 10 ** 9);
+        dgdJoin.exit(address(this), 4);
+        assertEq(dgd.balanceOf(address(dgdJoin)), 6);
+        assertEq(vat.gem("DGD", address(this)), 6 * 10 ** 9);
     }
 
     function testAuth() public {

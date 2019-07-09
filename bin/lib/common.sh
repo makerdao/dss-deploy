@@ -20,7 +20,7 @@ dappBuild() {
   [[ -n $SKIP_BUILD || -n $DAPP_SKIP_BUILD ]] && return
 
   (cd "$BIN_DIR/.." || exit 1
-    dapp "$@" build
+    dapp "$@" build --extract
   )
 }
 

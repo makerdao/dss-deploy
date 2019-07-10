@@ -5,11 +5,10 @@ import {DSToken} from "ds-token/token.sol";
 import {DSValue} from "ds-value/value.sol";
 import {DSRoles} from "ds-roles/roles.sol";
 import {DSGuard} from "ds-guard/guard.sol";
-
-import {GemJoin} from "dss/join.sol";
 import {WETH9_} from "ds-weth/weth9.sol";
 
 import "./DssDeploy.sol";
+import {GemJoin} from "./join.sol";
 import {GovActions} from "./govActions.sol";
 
 contract Hevm {

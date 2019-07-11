@@ -17,10 +17,44 @@
 
 pragma solidity >=0.5.0;
 
-import "ds-note/note.sol";
+import "dss/lib.sol";
 
 contract VatLike {
     function slip(bytes32,address,int) public;
+}
+
+// GemJoin
+
+contract GemLike {
+    function decimals() public view returns (uint);
+    function transfer(address,uint) public returns (bool);
+    function transferFrom(address,address,uint) public returns (bool);
+}
+
+contract GemJoin is DSNote {
+    VatLike public vat;
+    bytes32 public ilk;
+    GemLike public gem;
+    uint    public dec;
+
+    constructor(address vat_, bytes32 ilk_, address gem_) public {
+        vat = VatLike(vat_);
+        ilk = ilk_;
+        gem = GemLike(gem_);
+        dec = gem.decimals();
+    }
+
+    function join(address usr, uint wad) public note {
+        require(int(wad) >= 0, "GemJoin/overflow");
+        vat.slip(ilk, usr, int(wad));
+        require(gem.transferFrom(msg.sender, address(this), wad), "GemJoin/failed-transfer");
+    }
+
+    function exit(address usr, uint wad) public note {
+        require(wad <= 2 ** 255, "GemJoin/overflow");
+        vat.slip(ilk, msg.sender, -int(wad));
+        require(gem.transfer(usr, wad), "GemJoin/failed-transfer");
+    }
 }
 
 // GemJoin2
@@ -29,6 +63,7 @@ contract VatLike {
 // This is one way of doing it. Check the balances before and after calling a transfer
 
 contract GemLike2 {
+    function decimals() public view returns (uint);
     function transfer(address,uint) public;
     function transferFrom(address,address,uint) public;
     function balanceOf(address) public view returns (uint);
@@ -39,14 +74,19 @@ contract GemJoin2 is DSNote {
     VatLike public vat;
     bytes32 public ilk;
     GemLike2 public gem;
+    uint     public dec;
+
     constructor(address vat_, bytes32 ilk_, address gem_) public {
         vat = VatLike(vat_);
         ilk = ilk_;
         gem = GemLike2(gem_);
+        dec = gem.decimals();
     }
+
     function mul(uint x, uint y) internal pure returns (uint z) {
         require(y == 0 || (z = x * y) / y == x, "GemJoin2/overflow");
     }
+
     function join(address urn, uint wad) public note {
         require(wad <= 2 ** 255, "GemJoin2/overflow");
         vat.slip(ilk, urn, int(wad));
@@ -62,6 +102,7 @@ contract GemJoin2 is DSNote {
 
         require(prevBalance - wad == gem.balanceOf(msg.sender), "GemJoin2/failed-transfer");
     }
+
     function exit(address guy, uint wad) public note {
         require(wad <= 2 ** 255, "GemJoin2/overflow");
         vat.slip(ilk, msg.sender, -int(wad));
@@ -79,10 +120,9 @@ contract GemJoin2 is DSNote {
 }
 
 // GemJoin3
-// For a token that has a lower precision than 18 (like DGD)
+// For a token that has a lower precision than 18 and doesn't have decimals field in place (like DGD)
 
 contract GemLike3 {
-    function decimals() public returns (uint);
     function transfer(address,uint) public returns (bool);
     function transferFrom(address,address,uint) public returns (bool);
 }
@@ -91,23 +131,29 @@ contract GemJoin3 is DSNote {
     VatLike public vat;
     bytes32 public ilk;
     GemLike3 public gem;
-    constructor(address vat_, bytes32 ilk_, address gem_) public {
+    uint     public dec;
+
+    constructor(address vat_, bytes32 ilk_, address gem_, uint decimals) public {
         vat = VatLike(vat_);
         ilk = ilk_;
         gem = GemLike3(gem_);
-        require(gem.decimals() < 18, "GemJoin3/decimals-higher-18");
+        require(decimals < 18, "GemJoin3/decimals-higher-18");
+        dec = decimals;
     }
+
     function mul(uint x, uint y) internal pure returns (uint z) {
         require(y == 0 || (z = x * y) / y == x, "GemJoin3/overflow");
     }
+
     function join(address urn, uint wad) public note {
-        uint wad18 = mul(wad, 10 ** (18 - gem.decimals()));
+        uint wad18 = mul(wad, 10 ** (18 - dec));
         require(wad18 <= 2 ** 255, "GemJoin3/overflow");
         vat.slip(ilk, urn, int(wad18));
         require(gem.transferFrom(msg.sender, address(this), wad), "GemJoin3/failed-transfer");
     }
+
     function exit(address guy, uint wad) public note {
-        uint wad18 = mul(wad, 10 ** (18 - gem.decimals()));
+        uint wad18 = mul(wad, 10 ** (18 - dec));
         require(wad18 <= 2 ** 255, "GemJoin3/overflow");
         vat.slip(ilk, msg.sender, -int(wad18));
         require(gem.transfer(guy, wad), "GemJoin3/failed-transfer");
@@ -143,13 +189,14 @@ contract GemJoin3 is DSNote {
 // bag to the adapter.
 
 contract GemLike4 {
+    function decimals() public view returns (uint);
     function balanceOf(address) public returns (uint256);
     function transfer(address, uint256) public returns (bool);
 }
 
 contract GemBag {
-    address public ada;
-    address public lad;
+    address  public ada;
+    address  public lad;
     GemLike4 public gem;
 
     constructor(address lad_, address gem_) public {
@@ -165,9 +212,10 @@ contract GemBag {
 }
 
 contract GemJoin4 is DSNote {
-    VatLike public vat;
-    bytes32 public ilk;
+    VatLike  public vat;
+    bytes32  public ilk;
     GemLike4 public gem;
+    uint     public dec;
 
     mapping(address => address) public bags;
 
@@ -175,12 +223,14 @@ contract GemJoin4 is DSNote {
         vat = VatLike(vat_);
         ilk = ilk_;
         gem = GemLike4(gem_);
+        dec = gem.decimals();
     }
 
     // --- math ---
     function add(uint256 x, uint256 y) internal pure returns (uint256 z) {
         require((z = x + y) >= x, "GemJoin4/overflow");
     }
+
     function sub(uint256 x, uint256 y) internal pure returns (uint256 z) {
         require((z = x - y) <= x, "GemJoin4/underflow");
     }

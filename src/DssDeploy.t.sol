@@ -597,16 +597,22 @@ contract DssDeployTest is DssDeployTestBase {
         DSValue pip = new DSValue();
         REP rep = new REP(100 ether);
         GemJoin repJoin = new GemJoin(address(vat), "REP", address(rep));
+        assertEq(repJoin.dec(), 18);
         ZRX zrx = new ZRX(100 ether);
         GemJoin zrxJoin = new GemJoin(address(vat), "ZRX", address(zrx));
+        assertEq(zrxJoin.dec(), 18);
         OMG omg = new OMG(100 ether);
         GemJoin2 omgJoin = new GemJoin2(address(vat), "OMG", address(omg));
+        assertEq(omgJoin.dec(), 18);
         BAT bat = new BAT(100 ether);
         GemJoin batJoin = new GemJoin(address(vat), "BAT", address(bat));
+        assertEq(batJoin.dec(), 18);
         DGD dgd = new DGD(100 ether);
-        GemJoin3 dgdJoin = new GemJoin3(address(vat), "DGD", address(dgd));
+        GemJoin3 dgdJoin = new GemJoin3(address(vat), "DGD", address(dgd), 9);
+        assertEq(dgdJoin.dec(), 9);
         GNT gnt = new GNT(100 ether);
         GemJoin4 gntJoin = new GemJoin4(address(vat), "GNT", address(gnt));
+        assertEq(gntJoin.dec(), 18);
 
         dssDeploy.deployCollateral("REP", address(repJoin), address(pip));
         dssDeploy.deployCollateral("ZRX", address(zrxJoin), address(pip));

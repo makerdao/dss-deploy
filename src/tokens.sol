@@ -258,7 +258,6 @@ contract DGD {
 
     string  public  name = "DGD";
     string  public  symbol = "DGD";
-    uint256  public  decimals = 9;
     uint256                                            _supply;
     mapping (address => uint256)                       _balances;
     mapping (address => mapping (address => uint256))  _approvals;

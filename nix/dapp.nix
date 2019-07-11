@@ -323,7 +323,6 @@ let
       deps = {
         ds-auth = ds-auth_f783169;
         ds-guard = ds-guard_4678e1c;
-        ds-note = ds-note_beef816;
         ds-pause = ds-pause_81fd9d4;
         ds-roles = ds-roles_0138372;
         ds-test = ds-test_a4e4005;

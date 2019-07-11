@@ -12,12 +12,13 @@ tok=$1
 ilk="${1}-${2}"
 ilkVar="${1}_${2}"
 ilkJoin=$3 # adapter contract name
+decimals=$4
 
 # Deploy ETH ilk (adapter, spotter, flip and init variables)
 test -z "$MCD_DEPLOY" && exit 1
 
 MCD_VAT=0x$(seth call "$MCD_DEPLOY" "vat()(address)")
-contract=$(dapp create "$ilkJoin" "$MCD_VAT" "$(seth --to-bytes32 "$(seth --from-ascii "$ilk")")" "$(eval echo "\$${tok}")")
+contract=$(dapp create "$ilkJoin" "$MCD_VAT" "$(seth --to-bytes32 "$(seth --from-ascii "$ilk")")" "$(eval echo "\$${tok}")" "$decimals")
 eval export "\MCD_JOIN_${ilkVar}=${contract}"
 seth send "$MCD_DEPLOY" "deployCollateral(bytes32,address,address)" "$(seth --to-bytes32 "$(seth --from-ascii "$ilk")")" "$(eval echo "\$MCD_JOIN_${ilkVar}")" "$(eval echo "\$PIP_${tok}")"
 while IFS=$'\n' read -r line; do data+=("$line"); done < <(seth call "$MCD_DEPLOY" "ilks(bytes32)(address,address)" "$(seth --to-bytes32 "$(seth --from-ascii "$ilk")")")

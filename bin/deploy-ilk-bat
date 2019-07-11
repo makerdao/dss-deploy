@@ -13,4 +13,4 @@ export BAT
 export PIP_BAT
 
 # shellcheck source=/dev/null
-source "$BIN_DIR/deploy-ilk" "BAT" "${1:-"A"}" "GemJoin"
+source "$BIN_DIR/deploy-ilk" "BAT" "${1:-"A"}" "GemJoin1"

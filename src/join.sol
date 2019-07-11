@@ -23,7 +23,7 @@ contract VatLike {
     function slip(bytes32,address,int) public;
 }
 
-// GemJoin
+// GemJoin1
 
 contract GemLike {
     function decimals() public view returns (uint);
@@ -31,7 +31,7 @@ contract GemLike {
     function transferFrom(address,address,uint) public returns (bool);
 }
 
-contract GemJoin is DSNote {
+contract GemJoin1 is DSNote {
     VatLike public vat;
     bytes32 public ilk;
     GemLike public gem;
@@ -45,15 +45,15 @@ contract GemJoin is DSNote {
     }
 
     function join(address usr, uint wad) public note {
-        require(int(wad) >= 0, "GemJoin/overflow");
+        require(int(wad) >= 0, "GemJoin1/overflow");
         vat.slip(ilk, usr, int(wad));
-        require(gem.transferFrom(msg.sender, address(this), wad), "GemJoin/failed-transfer");
+        require(gem.transferFrom(msg.sender, address(this), wad), "GemJoin1/failed-transfer");
     }
 
     function exit(address usr, uint wad) public note {
-        require(wad <= 2 ** 255, "GemJoin/overflow");
+        require(wad <= 2 ** 255, "GemJoin1/overflow");
         vat.slip(ilk, msg.sender, -int(wad));
-        require(gem.transfer(usr, wad), "GemJoin/failed-transfer");
+        require(gem.transfer(usr, wad), "GemJoin1/failed-transfer");
     }
 }
 

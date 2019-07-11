@@ -13,4 +13,4 @@ export DGD
 export PIP_DGD
 
 # shellcheck source=/dev/null
-source "$BIN_DIR/deploy-ilk" "DGD" "${1:-"A"}" "GemJoin3"
+source "$BIN_DIR/deploy-ilk" "DGD" "${1:-"A"}" "GemJoin3" 9

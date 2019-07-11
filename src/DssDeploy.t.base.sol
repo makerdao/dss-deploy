@@ -8,7 +8,7 @@ import {DSGuard} from "ds-guard/guard.sol";
 import {WETH9_} from "ds-weth/weth9.sol";
 
 import "./DssDeploy.sol";
-import {GemJoin} from "./join.sol";
+import {GemJoin1} from "./join.sol";
 import {GovActions} from "./govActions.sol";
 
 contract Hevm {
@@ -41,7 +41,7 @@ contract FakeUser {
     function doEthJoin(address payable obj, address gem, address urn, uint wad) public {
         WETH9_(obj).deposit.value(wad)();
         WETH9_(obj).approve(address(gem), uint(-1));
-        GemJoin(gem).join(urn, wad);
+        GemJoin1(gem).join(urn, wad);
     }
 
     function doFrob(address obj, bytes32 ilk, address urn, address gem, address dai, int dink, int dart) public {
@@ -182,8 +182,8 @@ contract DssDeployTestBase is DSTest, ProxyActions {
     DSRoles authority;
 
     WETH9_ weth;
-    GemJoin ethJoin;
-    GemJoin colJoin;
+    GemJoin1 ethJoin;
+    GemJoin1 colJoin;
 
     Vat vat;
     Jug jug;
@@ -288,11 +288,11 @@ contract DssDeployTestBase is DSTest, ProxyActions {
         authority.setRootUser(address(pause.proxy()), true);
 
         weth = new WETH9_();
-        ethJoin = new GemJoin(address(vat), "ETH", address(weth));
+        ethJoin = new GemJoin1(address(vat), "ETH", address(weth));
         dssDeploy.deployCollateral("ETH", address(ethJoin), address(pipETH));
 
         col = new DSToken("COL");
-        colJoin = new GemJoin(address(vat), "COL", address(col));
+        colJoin = new GemJoin1(address(vat), "COL", address(col));
         dssDeploy.deployCollateral("COL", address(colJoin), address(pipCOL));
 
         // Set Params

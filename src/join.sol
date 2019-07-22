@@ -226,15 +226,6 @@ contract GemJoin4 is DSNote {
         dec = gem.decimals();
     }
 
-    // --- math ---
-    function add(uint256 x, uint256 y) internal pure returns (uint256 z) {
-        require((z = x + y) >= x, "GemJoin4/overflow");
-    }
-
-    function sub(uint256 x, uint256 y) internal pure returns (uint256 z) {
-        require((z = x - y) <= x, "GemJoin4/underflow");
-    }
-
     // -- admin --
     function make() external returns (address bag) {
         bag = make(msg.sender);

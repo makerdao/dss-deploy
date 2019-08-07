@@ -314,6 +314,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
         assertEq(spot, 45 * ONE * ONE / 1100000000 ether);
 
         DSGuard(address(gov.authority())).permit(address(flop), address(gov), bytes4(keccak256("mint(address,uint256)")));
+        DSGuard(address(gov.authority())).permit(address(flap), address(gov), bytes4(keccak256("burn(address,uint256)")));
 
         gov.mint(100 ether);
     }

@@ -340,7 +340,7 @@ contract DssDeployTest is DssDeployTestBase {
         this.file(address(vow), bytes32("bump"), rad(0.05 ether));
         uint batchId = vow.flap();
 
-        (,uint lot,,,,) = flap.bids(batchId);
+        (,uint lot,,,) = flap.bids(batchId);
         assertEq(lot, rad(0.05 ether));
         user1.doApprove(address(gov), address(flap));
         user2.doApprove(address(gov), address(flap));
@@ -357,8 +357,9 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(gov.balanceOf(address(user1)), 1 ether - 0.0016 ether);
         assertEq(gov.balanceOf(address(user2)), 1 ether);
         hevm.warp(now + flap.ttl() + 1);
+        assertEq(gov.balanceOf(address(flap)), 0.0016 ether);
         user1.doDeal(address(flap), batchId);
-        assertEq(gov.balanceOf(address(0)), 0.0016 ether);
+        assertEq(gov.balanceOf(address(flap)), 0);
         user1.doHope(address(vat), address(daiJoin));
         user1.doDaiExit(address(daiJoin), address(user1), 0.05 ether);
         assertEq(dai.balanceOf(address(user1)), 0.05 ether);

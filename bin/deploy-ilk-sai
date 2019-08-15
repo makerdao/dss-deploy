@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# shellcheck source=bin/lib/common.sh
+. "${LIB_DIR:-$(cd "${0%/*}/lib"&&pwd)}/common.sh"
+
+export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
+
+dappBuild
+
+test -z "$SAI" && SAI=$(dapp create DSToken "$(seth --to-bytes32 "$(seth --from-ascii "SAI")")")
+test -z "$PIP_SAI" && PIP_SAI=$(dapp create DSValue)
+export SAI
+export PIP_SAI
+
+# shellcheck source=/dev/null
+source "$BIN_DIR/deploy-ilk" "SAI" "" "AuthGemJoin"

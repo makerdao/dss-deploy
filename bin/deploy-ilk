@@ -6,11 +6,16 @@ export ETH_FROM=${ETH_FROM:-$(seth rpc eth_coinbase)}
 
 dappBuild
 
-{ test -z "$1" || test -z "$2" || test -z "$3"; } && exit 1
+{ test -z "$1" || test -z "$3"; } && exit 1
 
 tok=$1
-ilk="${1}-${2}"
-ilkVar="${1}_${2}"
+if [[ -n "$2" ]]; then
+    ilk="${1}-${2}"
+    ilkVar="${1}_${2}"
+else
+    ilk="${1}"
+    ilkVar="${1}"
+fi
 ilkJoin=$3 # adapter contract name
 decimals=$4
 

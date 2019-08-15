@@ -596,6 +596,7 @@ contract DssDeployTest is DssDeployTestBase {
     function testTokens() public {
         deployKeepAuth();
         DSValue pip = new DSValue();
+
         REP rep = new REP(100 ether);
         GemJoin1 repJoin = new GemJoin1(address(vat), "REP", address(rep));
         assertEq(repJoin.dec(), 18);
@@ -682,6 +683,44 @@ contract DssDeployTest is DssDeployTestBase {
         gntJoin.exit(address(this), 4);
         assertEq(gnt.balanceOf(address(gntJoin)), 6);
         assertEq(vat.gem("GNT", address(this)), 6);
+    }
+
+    function testTokenSai() public {
+        deployKeepAuth();
+        DSValue pip = new DSValue();
+
+        DSToken sai = new DSToken("SAI");
+        sai.mint(10);
+        AuthGemJoin saiJoin = new AuthGemJoin(address(vat), "SAI", address(sai));
+        assertEq(saiJoin.dec(), 18);
+
+        dssDeploy.deployCollateral("SAI", address(saiJoin), address(pip));
+
+        sai.approve(address(saiJoin), uint(-1));
+        assertEq(sai.balanceOf(address(saiJoin)), 0);
+        assertEq(vat.gem("SAI", address(this)), 0);
+        saiJoin.join(address(this), 10);
+        assertEq(sai.balanceOf(address(saiJoin)), 10);
+        assertEq(vat.gem("SAI", address(this)), 10);
+        saiJoin.exit(address(this), 4);
+        assertEq(sai.balanceOf(address(saiJoin)), 6);
+        assertEq(vat.gem("SAI", address(this)), 6);
+    }
+
+    function testFailTokenSai() public {
+        deployKeepAuth();
+        DSValue pip = new DSValue();
+
+        DSToken sai = new DSToken("SAI");
+        sai.mint(10);
+        AuthGemJoin saiJoin = new AuthGemJoin(address(vat), "SAI", address(sai));
+        assertEq(saiJoin.dec(), 18);
+
+        dssDeploy.deployCollateral("SAI", address(saiJoin), address(pip));
+
+        sai.approve(address(saiJoin), uint(-1));
+        saiJoin.deny(address(this));
+        saiJoin.join(address(this), 10);
     }
 
     function testAuth() public {

@@ -83,3 +83,11 @@ message DEPLOYING GNT
 source "$ADDRESS_DIR/load-ilk-gnt-a-$(seth chain)"
 
 # -----------------------------------------------------------------------------------------
+
+message DEPLOYING SAI
+
+"$BIN_DIR/deploy-ilk-sai"
+# shellcheck source=/dev/null
+source "$ADDRESS_DIR/load-ilk-sai-$(seth chain)"
+
+# -----------------------------------------------------------------------------------------

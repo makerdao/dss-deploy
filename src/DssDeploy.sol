@@ -273,12 +273,14 @@ contract DssDeploy is DSAuth {
         end.file("vat", address(vat));
         end.file("cat", address(cat));
         end.file("vow", address(vow));
+        end.file("pot", address(pot));
         end.file("spot", address(spotter));
 
         // Internal auth
         vat.rely(address(end));
         cat.rely(address(end));
         vow.rely(address(end));
+        pot.rely(address(end));
 
         // Deploy ESM
         esm = new ESM(gov, address(end), address(pit), min);

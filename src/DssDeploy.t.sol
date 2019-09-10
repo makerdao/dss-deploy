@@ -305,6 +305,7 @@ contract DssDeployTest is DssDeployTestBase {
 
         vow.flog(eraBite);
         vow.heal(rad(180 ether));
+        this.file(address(vow), "dump", 0.65 ether);
         this.file(address(vow), bytes32("sump"), rad(20 ether));
         batchId = vow.flop();
 

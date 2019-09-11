@@ -316,7 +316,7 @@ contract DssDeploy is DSAuth {
         // Deploy
         ilks[ilk].flip = flipFab.newFlip(address(vat), ilk);
         ilks[ilk].adapter = adapter;
-        Spotter(spotter).file(ilk, address(pip)); // Set pip
+        Spotter(spotter).file(ilk, "pip", address(pip)); // Set pip
 
         // Internal references set up
         cat.file(ilk, "flip", address(ilks[ilk].flip));

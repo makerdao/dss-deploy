@@ -43,7 +43,7 @@ seth send "$MCD_DEPLOY" "deployLiquidator()"
 
 # Deploy End
 MCD_ESM_PIT=${MCD_ESM_PIT:-"0x0000000000000000000000000000000000000000"}
-MCD_ESM_MIN=${MCD_ESM_MIN:-"1000"}
+MCD_ESM_MIN=${MCD_ESM_MIN:-"$(seth --to-wei 50000 "eth")"}
 seth send "$MCD_DEPLOY" "deployShutdown(address,address,uint256)" "$MCD_GOV" "$MCD_ESM_PIT" "$MCD_ESM_MIN"
 
 # Deploy pause

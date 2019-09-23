@@ -324,6 +324,7 @@ contract DssDeploy is DSAuth {
 
         // Internal auth
         vat.rely(adapter);
+        ilks[ilk].flip.rely(address(cat));
         ilks[ilk].flip.rely(address(end));
         ilks[ilk].flip.rely(address(pause.proxy()));
     }

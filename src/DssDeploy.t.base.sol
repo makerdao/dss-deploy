@@ -105,6 +105,26 @@ contract ProxyActions {
         pause.exec(usr, tag, fax, eta);
     }
 
+    function dripAndFile(address who, bytes32 what, uint256 data) external {
+        address      usr = address(govActions);
+        bytes32      tag;  assembly { tag := extcodehash(usr) }
+        bytes memory fax = abi.encodeWithSignature("dripAndFile(address,bytes32,uint256)", who, what, data);
+        uint         eta = now;
+
+        pause.plot(usr, tag, fax, eta);
+        pause.exec(usr, tag, fax, eta);
+    }
+
+    function dripAndFile(address who, bytes32 ilk, bytes32 what, uint256 data) external {
+        address      usr = address(govActions);
+        bytes32      tag;  assembly { tag := extcodehash(usr) }
+        bytes memory fax = abi.encodeWithSignature("dripAndFile(address,bytes32,bytes32,uint256)", who, ilk, what, data);
+        uint         eta = now;
+
+        pause.plot(usr, tag, fax, eta);
+        pause.exec(usr, tag, fax, eta);
+    }
+
     function cage(address end) external {
         address      usr = address(govActions);
         bytes32      tag;  assembly { tag := extcodehash(usr) }

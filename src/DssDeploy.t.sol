@@ -329,7 +329,7 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testFlap() public {
         deploy();
-        this.file(address(jug), bytes32("ETH"), bytes32("duty"), uint(1.05 * 10 ** 27));
+        this.dripAndFile(address(jug), bytes32("ETH"), bytes32("duty"), uint(1.05 * 10 ** 27));
         weth.deposit.value(0.5 ether)();
         weth.approve(address(ethJoin), uint(-1));
         ethJoin.join(address(this), 0.5 ether);
@@ -452,8 +452,8 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testDsr() public {
         deploy();
-        this.file(address(jug), bytes32("ETH"), bytes32("duty"), uint(1.1 * 10 ** 27));
-        this.file(address(pot), "dsr", uint(1.05 * 10 ** 27));
+        this.dripAndFile(address(jug), bytes32("ETH"), bytes32("duty"), uint(1.1 * 10 ** 27));
+        this.dripAndFile(address(pot), "dsr", uint(1.05 * 10 ** 27));
         weth.deposit.value(0.5 ether)();
         weth.approve(address(ethJoin), uint(-1));
         ethJoin.join(address(this), 0.5 ether);

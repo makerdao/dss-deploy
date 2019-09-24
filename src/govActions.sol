@@ -8,6 +8,8 @@ contract Setter {
     function rely(address) public;
     function deny(address) public;
     function init(bytes32) public;
+    function drip() public;
+    function drip(bytes32) public;
 }
 
 contract EndLike {
@@ -34,6 +36,16 @@ contract GovActions {
     }
 
     function file(address who, bytes32 ilk, bytes32 what, address data) public {
+        Setter(who).file(ilk, what, data);
+    }
+
+    function dripAndFile(address who, bytes32 what, uint data) public {
+        Setter(who).drip();
+        Setter(who).file(what, data);
+    }
+
+    function dripAndFile(address who, bytes32 ilk, bytes32 what, uint data) public {
+        Setter(who).drip(ilk);
         Setter(who).file(ilk, what, data);
     }
 

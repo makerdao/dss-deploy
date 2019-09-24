@@ -8,6 +8,7 @@ before_install:
   - nix-env -iA cachix -f https://cachix.org/api/v1/install
   - cachix use cachix
   - cachix use dapp
-  - nix-env -f https://github.com/dapphub/dapptools/tarball/master -iA dapp
+  - git clone --recursive https://github.com/dapphub/dapptools $HOME/.dapp/dapptools
+  - nix-env -f $HOME/.dapp/dapptools -iA dapp solc
 script:
   - dapp --use solc:0.5.11 test

@@ -10,4 +10,4 @@ before_install:
   - cachix use dapp
   - nix-env -f https://github.com/dapphub/dapptools/tarball/master -iA dapp
 script:
-  - dapp test
+  - dapp --use solc:0.5.11 test

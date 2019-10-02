@@ -135,16 +135,6 @@ contract ProxyActions {
         pause.exec(usr, tag, fax, eta);
     }
 
-    function cage(address end, bytes32 ilk) external {
-        address      usr = address(govActions);
-        bytes32      tag;  assembly { tag := extcodehash(usr) }
-        bytes memory fax = abi.encodeWithSignature("cage(address,bytes32)", end, ilk);
-        uint         eta = now;
-
-        pause.plot(usr, tag, fax, eta);
-        pause.exec(usr, tag, fax, eta);
-    }
-
     function setAuthority(address newAuthority) external {
         address      usr = address(govActions);
         bytes32      tag;  assembly { tag := extcodehash(usr) }

@@ -394,8 +394,8 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(vat.dai(address(user2)), rad(860 ether));
 
         this.cage(address(end));
-        this.cage(address(end), "ETH");
-        this.cage(address(end), "COL");
+        end.cage("ETH");
+        end.cage("COL");
 
         (uint ink, uint art) = vat.urns("ETH", address(this));
         assertEq(ink, 1 ether);

@@ -65,10 +65,6 @@ contract GovActions {
         EndLike(end).cage();
     }
 
-    function cage(address end, bytes32 ilk) public {
-        EndLike(end).cage(ilk);
-    }
-
     function setAuthority(address pause, address newAuthority) public {
         PauseLike(pause).setAuthority(newAuthority);
     }

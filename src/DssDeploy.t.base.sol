@@ -181,6 +181,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
     SpotFab spotFab;
     PotFab potFab;
     EndFab endFab;
+    ESMFab esmFab;
     PauseFab pauseFab;
 
     DssDeploy dssDeploy;
@@ -235,6 +236,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
         spotFab = new SpotFab();
         potFab = new PotFab();
         endFab = new EndFab();
+        esmFab = new ESMFab();
         pauseFab = new PauseFab();
         govActions = new GovActions();
 
@@ -251,6 +253,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
             spotFab,
             potFab,
             endFab,
+            esmFab,
             pauseFab
         );
 

@@ -128,6 +128,12 @@ contract EndFab {
     }
 }
 
+contract ESMFab {
+    function newESM(address gov, address end, address pit, uint min) public returns (ESM esm) {
+        esm = new ESM(gov, end, pit, min);
+    }
+}
+
 contract PauseFab {
     function newPause(uint delay, address owner, DSAuthority authority) public returns(DSPause pause) {
         pause = new DSPause(delay, owner, authority);
@@ -147,6 +153,7 @@ contract DssDeploy is DSAuth {
     SpotFab    public spotFab;
     PotFab     public potFab;
     EndFab     public endFab;
+    ESMFab     public esmFab;
     PauseFab   public pauseFab;
 
     Vat     public vat;
@@ -187,6 +194,7 @@ contract DssDeploy is DSAuth {
         SpotFab spotFab_,
         PotFab potFab_,
         EndFab endFab_,
+        ESMFab esmFab_,
         PauseFab pauseFab_
     ) public {
         vatFab = vatFab_;
@@ -201,6 +209,7 @@ contract DssDeploy is DSAuth {
         spotFab = spotFab_;
         potFab = potFab_;
         endFab = endFab_;
+        esmFab = esmFab_;
         pauseFab = pauseFab_;
     }
 
@@ -282,7 +291,7 @@ contract DssDeploy is DSAuth {
         pot.rely(address(end));
 
         // Deploy ESM
-        esm = new ESM(gov, address(end), address(pit), min);
+        esm = esmFab.newESM(gov, address(end), address(pit), min);
         end.rely(address(esm));
     }
 

@@ -13,14 +13,14 @@ dappBuild
   test -z "$CAT_FAB"    || test -z "$DAI_FAB"     || test -z "$MCD_JOIN_FAB" || \
   test -z "$FLAP_FAB"   || test -z "$FLOP_FAB"    || test -z "$FLIP_FAB" || \
   test -z "$SPOT_FAB"   || test -z "$POT_FAB"     || test -z "$END_FAB"  || \
-  test -z "$PAUSE_FAB"; } && \
+  test -z "$ESM_FAB"    || test -z "$PAUSE_FAB"; } && \
   exit 1
 
 # If no Governance token is defined, create one
 test -z "$MCD_GOV" && MCD_GOV=$(dapp create DSToken "$(seth --to-bytes32 "$(seth --from-ascii "MKR")")")
 
 # Create deploy contract
-MCD_DEPLOY=$(dapp create DssDeploy "$VAT_FAB" "$JUG_FAB" "$VOW_FAB" "$CAT_FAB" "$DAI_FAB" "$MCD_JOIN_FAB" "$FLAP_FAB" "$FLOP_FAB" "$FLIP_FAB" "$SPOT_FAB" "$POT_FAB" "$END_FAB" "$PAUSE_FAB")
+MCD_DEPLOY=$(dapp create DssDeploy "$VAT_FAB" "$JUG_FAB" "$VOW_FAB" "$CAT_FAB" "$DAI_FAB" "$MCD_JOIN_FAB" "$FLAP_FAB" "$FLOP_FAB" "$FLIP_FAB" "$SPOT_FAB" "$POT_FAB" "$END_FAB" "$ESM_FAB" "$PAUSE_FAB")
 
 # If no Authority is defined, create one
 if [ -z "$MCD_ADM" ]

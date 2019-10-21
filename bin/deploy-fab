@@ -22,7 +22,8 @@ FLIP_FABtx=$(ETH_NONCE=$((ETH_NONCE + 8)) dapp create FlipFab)
 SPOT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 9)) dapp create SpotFab)
 POT_FABtx=$(ETH_NONCE=$((ETH_NONCE + 10)) dapp create PotFab)
 END_FABtx=$(ETH_NONCE=$((ETH_NONCE + 11)) dapp create EndFab)
-PAUSE_FABtx=$(ETH_NONCE=$((ETH_NONCE + 12)) dapp create PauseFab)
+ESM_FABtx=$(ETH_NONCE=$((ETH_NONCE + 12)) dapp create ESMFab)
+PAUSE_FABtx=$(ETH_NONCE=$((ETH_NONCE + 13)) dapp create PauseFab)
 
 export SETH_ASYNC=no
 
@@ -38,6 +39,7 @@ test "$(seth receipt "$FLIP_FABtx" status)" -eq 0 && exit 1
 test "$(seth receipt "$SPOT_FABtx" status)" -eq 0 && exit 1
 test "$(seth receipt "$POT_FABtx" status)" -eq 0 && exit 1
 test "$(seth receipt "$END_FABtx" status)" -eq 0 && exit 1
+test "$(seth receipt "$ESM_FABtx" status)" -eq 0 && exit 1
 test "$(seth receipt "$PAUSE_FABtx" status)" -eq 0 && exit 1
 
 VAT_FAB=$(seth receipt "$VAT_FABtx" contractAddress)
@@ -52,6 +54,7 @@ FLIP_FAB=$(seth receipt "$FLIP_FABtx" contractAddress)
 SPOT_FAB=$(seth receipt "$SPOT_FABtx" contractAddress)
 POT_FAB=$(seth receipt "$POT_FABtx" contractAddress)
 END_FAB=$(seth receipt "$END_FABtx" contractAddress)
+ESM_FAB=$(seth receipt "$ESM_FABtx" contractAddress)
 PAUSE_FAB=$(seth receipt "$PAUSE_FABtx" contractAddress)
 
 cat > "$ADDRESS_DIR/load-fab-$(seth chain)" << EOF
@@ -72,5 +75,6 @@ export FLIP_FAB=$FLIP_FAB
 export SPOT_FAB=$SPOT_FAB
 export POT_FAB=$POT_FAB
 export END_FAB=$END_FAB
+export ESM_FAB=$ESM_FAB
 export PAUSE_FAB=$PAUSE_FAB
 EOF

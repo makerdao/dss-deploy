@@ -13,4 +13,4 @@ export ZRX
 export PIP_ZRX
 
 # shellcheck source=/dev/null
-source "$BIN_DIR/deploy-ilk" "ZRX" "${1:-"A"}" "GemJoin1"
+source "$BIN_DIR/deploy-ilk" "ZRX" "${1:-"A"}" "GemJoin"

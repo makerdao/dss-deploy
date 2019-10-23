@@ -13,4 +13,4 @@ export REP
 export PIP_REP
 
 # shellcheck source=/dev/null
-source "$BIN_DIR/deploy-ilk" "REP" "${1:-"A"}" "GemJoin1"
+source "$BIN_DIR/deploy-ilk" "REP" "${1:-"A"}" "GemJoin"

@@ -178,7 +178,7 @@ contract DssDeploy is DSAuth {
 
     struct Ilk {
         Flipper flip;
-        address adapter;
+        address join;
     }
 
     constructor(
@@ -315,15 +315,15 @@ contract DssDeploy is DSAuth {
         this.setOwner(address(0));
     }
 
-    function deployCollateral(bytes32 ilk, address adapter, address pip) public auth {
+    function deployCollateral(bytes32 ilk, address join, address pip) public auth {
         require(ilk != bytes32(""), "Missing ilk name");
-        require(adapter != address(0), "Missing adapter address");
+        require(join != address(0), "Missing join address");
         require(pip != address(0), "Missing PIP address");
         require(address(pause) != address(0), "Missing previous step");
 
         // Deploy
         ilks[ilk].flip = flipFab.newFlip(address(vat), ilk);
-        ilks[ilk].adapter = adapter;
+        ilks[ilk].join = join;
         Spotter(spotter).file(ilk, "pip", address(pip)); // Set pip
 
         // Internal references set up
@@ -332,7 +332,7 @@ contract DssDeploy is DSAuth {
         jug.init(ilk);
 
         // Internal auth
-        vat.rely(adapter);
+        vat.rely(join);
         ilks[ilk].flip.rely(address(cat));
         ilks[ilk].flip.rely(address(end));
         ilks[ilk].flip.rely(address(pause.proxy()));

@@ -23,40 +23,6 @@ contract VatLike {
     function slip(bytes32,address,int) public;
 }
 
-// GemJoin1
-
-contract GemLike {
-    function decimals() public view returns (uint);
-    function transfer(address,uint) public returns (bool);
-    function transferFrom(address,address,uint) public returns (bool);
-}
-
-contract GemJoin1 is DSNote {
-    VatLike public vat;
-    bytes32 public ilk;
-    GemLike public gem;
-    uint    public dec;
-
-    constructor(address vat_, bytes32 ilk_, address gem_) public {
-        vat = VatLike(vat_);
-        ilk = ilk_;
-        gem = GemLike(gem_);
-        dec = gem.decimals();
-    }
-
-    function join(address usr, uint wad) public note {
-        require(int(wad) >= 0, "GemJoin1/overflow");
-        vat.slip(ilk, usr, int(wad));
-        require(gem.transferFrom(msg.sender, address(this), wad), "GemJoin1/failed-transfer");
-    }
-
-    function exit(address usr, uint wad) public note {
-        require(wad <= 2 ** 255, "GemJoin1/overflow");
-        vat.slip(ilk, msg.sender, -int(wad));
-        require(gem.transfer(usr, wad), "GemJoin1/failed-transfer");
-    }
-}
-
 // GemJoin2
 
 // For a token that does not return a bool on transfer or transferFrom (like OMG)
@@ -71,16 +37,29 @@ contract GemLike2 {
 }
 
 contract GemJoin2 is DSNote {
-    VatLike public vat;
-    bytes32 public ilk;
+    // --- Auth ---
+    mapping (address => uint) public wards;
+    function rely(address usr) external note auth { wards[usr] = 1; }
+    function deny(address usr) external note auth { wards[usr] = 0; }
+    modifier auth { require(wards[msg.sender] == 1); _; }
+
+    VatLike  public vat;
+    bytes32  public ilk;
     GemLike2 public gem;
     uint     public dec;
+    uint     public live;  // Access Flag
 
     constructor(address vat_, bytes32 ilk_, address gem_) public {
+        wards[msg.sender] = 1;
+        live = 1;
         vat = VatLike(vat_);
         ilk = ilk_;
         gem = GemLike2(gem_);
         dec = gem.decimals();
+    }
+
+    function cage() external note auth {
+        live = 0;
     }
 
     function mul(uint x, uint y) internal pure returns (uint z) {
@@ -88,6 +67,7 @@ contract GemJoin2 is DSNote {
     }
 
     function join(address urn, uint wad) public note {
+        require(live == 1, "GemJoin2/not-live");
         require(wad <= 2 ** 255, "GemJoin2/overflow");
         vat.slip(ilk, urn, int(wad));
         uint256 prevBalance = gem.balanceOf(msg.sender);
@@ -128,12 +108,21 @@ contract GemLike3 {
 }
 
 contract GemJoin3 is DSNote {
-    VatLike public vat;
-    bytes32 public ilk;
+    // --- Auth ---
+    mapping (address => uint) public wards;
+    function rely(address usr) external note auth { wards[usr] = 1; }
+    function deny(address usr) external note auth { wards[usr] = 0; }
+    modifier auth { require(wards[msg.sender] == 1); _; }
+
+    VatLike  public vat;
+    bytes32  public ilk;
     GemLike3 public gem;
     uint     public dec;
+    uint     public live;  // Access Flag
 
     constructor(address vat_, bytes32 ilk_, address gem_, uint decimals) public {
+        wards[msg.sender] = 1;
+        live = 1;
         vat = VatLike(vat_);
         ilk = ilk_;
         gem = GemLike3(gem_);
@@ -141,11 +130,16 @@ contract GemJoin3 is DSNote {
         dec = decimals;
     }
 
+    function cage() external note auth {
+        live = 0;
+    }
+
     function mul(uint x, uint y) internal pure returns (uint z) {
         require(y == 0 || (z = x * y) / y == x, "GemJoin3/overflow");
     }
 
     function join(address urn, uint wad) public note {
+        require(live == 1, "GemJoin3/not-live");
         uint wad18 = mul(wad, 10 ** (18 - dec));
         require(wad18 <= 2 ** 255, "GemJoin3/overflow");
         vat.slip(ilk, urn, int(wad18));
@@ -212,18 +206,31 @@ contract GemBag {
 }
 
 contract GemJoin4 is DSNote {
+    // --- Auth ---
+    mapping (address => uint) public wards;
+    function rely(address usr) external note auth { wards[usr] = 1; }
+    function deny(address usr) external note auth { wards[usr] = 0; }
+    modifier auth { require(wards[msg.sender] == 1); _; }
+
     VatLike  public vat;
     bytes32  public ilk;
     GemLike4 public gem;
     uint     public dec;
+    uint     public live;  // Access Flag
 
     mapping(address => address) public bags;
 
     constructor(address vat_, bytes32 ilk_, address gem_) public {
+        wards[msg.sender] = 1;
+        live = 1;
         vat = VatLike(vat_);
         ilk = ilk_;
         gem = GemLike4(gem_);
         dec = gem.decimals();
+    }
+
+    function cage() external note auth {
+        live = 0;
     }
 
     // -- admin --
@@ -240,6 +247,7 @@ contract GemJoin4 is DSNote {
 
     // -- gems --
     function join(address urn, uint256 wad) external note {
+        require(live == 1, "GemJoin4/not-live");
         require(int256(wad) >= 0, "GemJoin4/negative-amount");
 
         GemBag(bags[msg.sender]).exit(address(this), wad);
@@ -255,12 +263,18 @@ contract GemJoin4 is DSNote {
 }
 
 // AuthGemJoin
+contract GemLike {
+    function decimals() public view returns (uint);
+    function transfer(address,uint) public returns (bool);
+    function transferFrom(address,address,uint) public returns (bool);
+}
 
 contract AuthGemJoin is DSNote {
     VatLike public vat;
     bytes32 public ilk;
     GemLike public gem;
     uint    public dec;
+    uint    public live;  // Access Flag
 
     // --- Auth ---
     mapping (address => uint) public wards;
@@ -269,6 +283,8 @@ contract AuthGemJoin is DSNote {
     modifier auth { require(wards[msg.sender] == 1, "AuthGemJoin/non-authed"); _; }
 
     constructor(address vat_, bytes32 ilk_, address gem_) public {
+        wards[msg.sender] = 1;
+        live = 1;
         vat = VatLike(vat_);
         ilk = ilk_;
         gem = GemLike(gem_);
@@ -276,7 +292,12 @@ contract AuthGemJoin is DSNote {
         wards[msg.sender] = 1;
     }
 
+    function cage() external note auth {
+        live = 0;
+    }
+
     function join(address usr, uint wad) public auth note {
+        require(live == 1, "AuthGemJoin/not-live");
         require(int(wad) >= 0, "AuthGemJoin/overflow");
         vat.slip(ilk, usr, int(wad));
         require(gem.transferFrom(msg.sender, address(this), wad), "AuthGemJoin/failed-transfer");

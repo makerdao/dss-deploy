@@ -599,16 +599,16 @@ contract DssDeployTest is DssDeployTestBase {
         DSValue pip = new DSValue();
 
         REP rep = new REP(100 ether);
-        GemJoin1 repJoin = new GemJoin1(address(vat), "REP", address(rep));
+        GemJoin repJoin = new GemJoin(address(vat), "REP", address(rep));
         assertEq(repJoin.dec(), 18);
         ZRX zrx = new ZRX(100 ether);
-        GemJoin1 zrxJoin = new GemJoin1(address(vat), "ZRX", address(zrx));
+        GemJoin zrxJoin = new GemJoin(address(vat), "ZRX", address(zrx));
         assertEq(zrxJoin.dec(), 18);
         OMG omg = new OMG(100 ether);
         GemJoin2 omgJoin = new GemJoin2(address(vat), "OMG", address(omg));
         assertEq(omgJoin.dec(), 18);
         BAT bat = new BAT(100 ether);
-        GemJoin1 batJoin = new GemJoin1(address(vat), "BAT", address(bat));
+        GemJoin batJoin = new GemJoin(address(vat), "BAT", address(bat));
         assertEq(batJoin.dec(), 18);
         DGD dgd = new DGD(100 ether);
         GemJoin3 dgdJoin = new GemJoin3(address(vat), "DGD", address(dgd), 9);
@@ -684,6 +684,69 @@ contract DssDeployTest is DssDeployTestBase {
         gntJoin.exit(address(this), 4);
         assertEq(gnt.balanceOf(address(gntJoin)), 6);
         assertEq(vat.gem("GNT", address(this)), 6);
+    }
+
+    function testFailJoinAfterCageGemJoin2() public {
+        deployKeepAuth();
+        DSValue pip = new DSValue();
+
+        OMG omg = new OMG(100 ether);
+        GemJoin2 omgJoin = new GemJoin2(address(vat), "OMG", address(omg));
+
+        dssDeploy.deployCollateral("OMG", address(omgJoin), address(pip));
+
+        omg.approve(address(omgJoin), uint(-1));
+        omgJoin.join(address(this), 10);
+        omgJoin.cage();
+        omgJoin.join(address(this), 10);
+    }
+
+    function testFailJoinAfterCageGemJoin3() public {
+        deployKeepAuth();
+        DSValue pip = new DSValue();
+
+        DGD dgd = new DGD(100 ether);
+        GemJoin3 dgdJoin = new GemJoin3(address(vat), "DGD", address(dgd), 9);
+
+        dssDeploy.deployCollateral("OMG", address(dgdJoin), address(pip));
+
+        dgd.approve(address(dgdJoin), uint(-1));
+        dgdJoin.join(address(this), 10);
+        dgdJoin.cage();
+        dgdJoin.join(address(this), 10);
+    }
+
+    function testFailJoinAfterCageGemJoin4() public {
+        deployKeepAuth();
+        DSValue pip = new DSValue();
+
+        GNT gnt = new GNT(100 ether);
+        GemJoin4 gntJoin = new GemJoin4(address(vat), "GNT", address(gnt));
+
+        dssDeploy.deployCollateral("OMG", address(gntJoin), address(pip));
+
+        address bag = gntJoin.make();
+        gnt.transfer(bag, 10);
+        gntJoin.join(address(this), 10);
+        gntJoin.cage();
+        gnt.transfer(bag, 10);
+        gntJoin.join(address(this), 10);
+    }
+
+    function testFailJoinAfterCageAuthGemJoin() public {
+        deployKeepAuth();
+        DSValue pip = new DSValue();
+
+        DSToken sai = new DSToken("SAI");
+        sai.mint(20);
+        AuthGemJoin saiJoin = new AuthGemJoin(address(vat), "SAI", address(sai));
+
+        dssDeploy.deployCollateral("SAI", address(saiJoin), address(pip));
+
+        sai.approve(address(saiJoin), uint(-1));
+        saiJoin.join(address(this), 10);
+        saiJoin.cage();
+        saiJoin.join(address(this), 10);
     }
 
     function testTokenSai() public {

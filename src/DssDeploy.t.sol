@@ -766,6 +766,7 @@ contract DssDeployTest is DssDeployTestBase {
         saiJoin.join(address(this), 10);
         assertEq(sai.balanceOf(address(saiJoin)), 10);
         assertEq(vat.gem("SAI", address(this)), 10);
+        saiJoin.deny(address(this)); // Check there is no need of authorization to exit
         saiJoin.exit(address(this), 4);
         assertEq(sai.balanceOf(address(saiJoin)), 6);
         assertEq(vat.gem("SAI", address(this)), 6);
@@ -778,7 +779,6 @@ contract DssDeployTest is DssDeployTestBase {
         DSToken sai = new DSToken("SAI");
         sai.mint(10);
         AuthGemJoin saiJoin = new AuthGemJoin(address(vat), "SAI", address(sai));
-        assertEq(saiJoin.dec(), 18);
 
         dssDeploy.deployCollateral("SAI", address(saiJoin), address(pip));
 

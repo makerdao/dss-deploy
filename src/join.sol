@@ -303,7 +303,7 @@ contract AuthGemJoin is DSNote {
         require(gem.transferFrom(msg.sender, address(this), wad), "AuthGemJoin/failed-transfer");
     }
 
-    function exit(address usr, uint wad) public auth note {
+    function exit(address usr, uint wad) public note {
         require(wad <= 2 ** 255, "AuthGemJoin/overflow");
         vat.slip(ilk, msg.sender, -int(wad));
         require(gem.transfer(usr, wad), "AuthGemJoin/failed-transfer");

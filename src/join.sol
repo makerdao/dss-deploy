@@ -289,7 +289,6 @@ contract AuthGemJoin is DSNote {
         ilk = ilk_;
         gem = GemLike(gem_);
         dec = gem.decimals();
-        wards[msg.sender] = 1;
     }
 
     function cage() external note auth {

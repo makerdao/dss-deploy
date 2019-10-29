@@ -263,6 +263,8 @@ contract GemJoin4 is DSNote {
 }
 
 // AuthGemJoin
+// For a token that needs restriction on the sources which are able to execute the join function (like SAI through Migration contract)
+
 contract GemLike {
     function decimals() public view returns (uint);
     function transfer(address,uint) public returns (bool);

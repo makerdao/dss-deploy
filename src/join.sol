@@ -121,12 +121,12 @@ contract GemJoin3 is DSNote {
     uint     public live;  // Access Flag
 
     constructor(address vat_, bytes32 ilk_, address gem_, uint decimals) public {
+        require(decimals < 18, "GemJoin3/decimals-18-or-higher");
         wards[msg.sender] = 1;
         live = 1;
         vat = VatLike(vat_);
         ilk = ilk_;
         gem = GemLike3(gem_);
-        require(decimals < 18, "GemJoin3/decimals-higher-18");
         dec = decimals;
     }
 

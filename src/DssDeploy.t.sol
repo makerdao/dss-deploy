@@ -735,13 +735,12 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testFailJoinAfterCageAuthGemJoin() public {
         deployKeepAuth();
-        DSValue pip = new DSValue();
 
         DSToken sai = new DSToken("SAI");
         sai.mint(20);
         AuthGemJoin saiJoin = new AuthGemJoin(address(vat), "SAI", address(sai));
 
-        dssDeploy.deployCollateral("SAI", address(saiJoin), address(pip));
+        dssDeploy.deployCollateral("SAI", address(saiJoin), address(0));
 
         sai.approve(address(saiJoin), uint(-1));
         saiJoin.join(address(this), 10);
@@ -751,14 +750,13 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testTokenSai() public {
         deployKeepAuth();
-        DSValue pip = new DSValue();
 
         DSToken sai = new DSToken("SAI");
         sai.mint(10);
         AuthGemJoin saiJoin = new AuthGemJoin(address(vat), "SAI", address(sai));
         assertEq(saiJoin.dec(), 18);
 
-        dssDeploy.deployCollateral("SAI", address(saiJoin), address(pip));
+        dssDeploy.deployCollateral("SAI", address(saiJoin), address(0));
 
         sai.approve(address(saiJoin), uint(-1));
         assertEq(sai.balanceOf(address(saiJoin)), 0);
@@ -774,13 +772,12 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testFailTokenSai() public {
         deployKeepAuth();
-        DSValue pip = new DSValue();
 
         DSToken sai = new DSToken("SAI");
         sai.mint(10);
         AuthGemJoin saiJoin = new AuthGemJoin(address(vat), "SAI", address(sai));
 
-        dssDeploy.deployCollateral("SAI", address(saiJoin), address(pip));
+        dssDeploy.deployCollateral("SAI", address(saiJoin), address(0));
 
         sai.approve(address(saiJoin), uint(-1));
         saiJoin.deny(address(this));

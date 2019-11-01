@@ -36,7 +36,7 @@ contract GemLike2 {
     function allowance(address,address) public view returns (uint);
 }
 
-contract GemJoin2 is DSNote {
+contract GemJoin2 is LibNote {
     // --- Auth ---
     mapping (address => uint) public wards;
     function rely(address usr) external note auth { wards[usr] = 1; }
@@ -107,7 +107,7 @@ contract GemLike3 {
     function transferFrom(address,address,uint) public returns (bool);
 }
 
-contract GemJoin3 is DSNote {
+contract GemJoin3 is LibNote {
     // --- Auth ---
     mapping (address => uint) public wards;
     function rely(address usr) external note auth { wards[usr] = 1; }
@@ -205,7 +205,7 @@ contract GemBag {
     }
 }
 
-contract GemJoin4 is DSNote {
+contract GemJoin4 is LibNote {
     // --- Auth ---
     mapping (address => uint) public wards;
     function rely(address usr) external note auth { wards[usr] = 1; }
@@ -271,7 +271,7 @@ contract GemLike {
     function transferFrom(address,address,uint) public returns (bool);
 }
 
-contract AuthGemJoin is DSNote {
+contract AuthGemJoin is LibNote {
     VatLike public vat;
     bytes32 public ilk;
     GemLike public gem;

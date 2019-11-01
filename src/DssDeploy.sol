@@ -289,6 +289,7 @@ contract DssDeploy is DSAuth {
         cat.rely(address(end));
         vow.rely(address(end));
         pot.rely(address(end));
+        spotter.rely(address(end));
 
         // Deploy ESM
         esm = esmFab.newESM(gov, address(end), address(pit), min);

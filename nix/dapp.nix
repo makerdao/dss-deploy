@@ -115,7 +115,7 @@ let
       src' = fetchGit repo';
       src = "${src'}/src";
     };
-    ds-pause_81fd9d4 = rec {
+    ds-pause_f43edc1 = rec {
       name = "ds-pause";
       deps = {
         ds-chief = ds-chief_ea05ee0;
@@ -125,9 +125,9 @@ let
         ds-token = ds-token_cee36a1;
       };
       repo' = {
-        name = "ds-pause-81fd9d4-source";
+        name = "ds-pause-f43edc1-source";
         url = "https://github.com/dapphub/ds-pause";
-        rev = "81fd9d43e56615267a10e29710716342bcca0ce3";
+        rev = "f43edc1c0305b3210cdd7ad524f9639a70da371c";
         ref = "HEAD";
       };
       src' = fetchGit repo';
@@ -273,7 +273,7 @@ let
       src' = fetchGit repo';
       src = "${src'}/src";
     };
-    dss_17be7db = rec {
+    dss_20862ec = rec {
       name = "dss";
       deps = {
         ds-test = ds-test_a4e4005;
@@ -281,9 +281,9 @@ let
         ds-value = ds-value_f307171;
       };
       repo' = {
-        name = "dss-17be7db-source";
+        name = "dss-20862ec-source";
         url = "https://github.com/makerdao/dss";
-        rev = "17be7db1c663d8069308c6b78fa5c5f9d71134a3";
+        rev = "20862ecf4d057bd286960b4d1542b0f0de3ff925";
         ref = "HEAD";
       };
       src' = fetchGit repo';
@@ -302,17 +302,16 @@ let
       src' = fetchGit repo';
       src = "${src'}/src";
     };
-    esm_e0a85d6 = rec {
+    esm_8e2d767 = rec {
       name = "esm";
       deps = {
-        ds-note = ds-note_beef816;
         ds-test = ds-test_a4e4005;
         ds-token = ds-token_cee36a1;
       };
       repo' = {
-        name = "esm-e0a85d6-source";
+        name = "esm-8e2d767-source";
         url = "https://github.com/makerdao/esm";
-        rev = "e0a85d6215cec2a7786c1dcaee188a3ff393710d";
+        rev = "8e2d767b2e8fcff79cc5a2cdf0a84c6081f64213";
         ref = "HEAD";
       };
       src' = fetchGit repo';
@@ -323,13 +322,13 @@ let
       deps = {
         ds-auth = ds-auth_f783169;
         ds-guard = ds-guard_4678e1c;
-        ds-pause = ds-pause_81fd9d4;
+        ds-pause = ds-pause_f43edc1;
         ds-roles = ds-roles_0138372;
         ds-test = ds-test_a4e4005;
         ds-token = ds-token_cee36a1;
         ds-weth = ds-weth_dfada5b;
-        dss = dss_17be7db;
-        esm = esm_e0a85d6;
+        dss = dss_20862ec;
+        esm = esm_8e2d767;
       };
       src' = ../.;
       src = ../src;

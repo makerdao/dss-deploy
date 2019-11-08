@@ -36,7 +36,10 @@ seth send "$MCD_DEPLOY" "deployVat()"
 seth send "$MCD_DEPLOY" "deployDai(uint256)" "$(seth rpc net_version)"
 
 # Deploy Taxation
-seth send "$MCD_DEPLOY" "deployTaxationAndAuctions(address)" "$MCD_GOV"
+seth send "$MCD_DEPLOY" "deployTaxation()"
+
+# Deploy Auctions
+seth send "$MCD_DEPLOY" "deployAuctions(address)" "$MCD_GOV"
 
 # Deploy Liquidation
 seth send "$MCD_DEPLOY" "deployLiquidator()"

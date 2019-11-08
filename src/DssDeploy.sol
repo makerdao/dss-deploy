@@ -230,18 +230,28 @@ contract DssDeploy is DSAuth {
         require(address(vat) != address(0), "Missing previous step");
 
         // Deploy
-        dai     = daiFab.newDai(chainId);
+        dai = daiFab.newDai(chainId);
         daiJoin = daiJoinFab.newDaiJoin(address(vat), address(dai));
         dai.rely(address(daiJoin));
     }
 
-    function deployTaxationAndAuctions(address gov) public auth {
-        require(gov != address(0), "Missing GOV address");
+    function deployTaxation() public auth {
         require(address(vat) != address(0), "Missing previous step");
 
         // Deploy
         jug = jugFab.newJug(address(vat));
         pot = potFab.newPot(address(vat));
+
+        // Internal auth
+        vat.rely(address(jug));
+        vat.rely(address(pot));
+    }
+
+    function deployAuctions(address gov) public auth {
+        require(gov != address(0), "Missing GOV address");
+        require(address(jug) != address(0), "Missing previous step");
+
+        // Deploy
         flap = flapFab.newFlap(address(vat), gov);
         flop = flopFab.newFlop(address(vat), gov);
         vow = vowFab.newVow(address(vat), address(flap), address(flop));
@@ -251,8 +261,6 @@ contract DssDeploy is DSAuth {
         pot.file("vow", address(vow));
 
         // Internal auth
-        vat.rely(address(jug));
-        vat.rely(address(pot));
         flap.rely(address(vow));
         flop.rely(address(vow));
     }

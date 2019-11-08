@@ -12,11 +12,18 @@ contract DssDeployTest is DssDeployTestBase {
     }
 
     function testFailMissingVat() public {
-        dssDeploy.deployTaxationAndAuctions(address(gov));
+        dssDeploy.deployTaxation();
     }
 
-    function testFailMissingTaxationAndAuctions() public {
+    function testFailMissingTaxation() public {
         dssDeploy.deployVat();
+        dssDeploy.deployDai(99);
+        dssDeploy.deployAuctions(address(gov));
+    }
+
+    function testFailMissingAuctions() public {
+        dssDeploy.deployVat();
+        dssDeploy.deployTaxation();
         dssDeploy.deployDai(99);
         dssDeploy.deployLiquidator();
     }
@@ -24,14 +31,16 @@ contract DssDeployTest is DssDeployTestBase {
     function testFailMissingLiquidator() public {
         dssDeploy.deployVat();
         dssDeploy.deployDai(99);
-        dssDeploy.deployTaxationAndAuctions(address(gov));
+        dssDeploy.deployTaxation();
+        dssDeploy.deployAuctions(address(gov));
         dssDeploy.deployShutdown(address(gov), address(0x0), 10);
     }
 
     function testFailMissingEnd() public {
         dssDeploy.deployVat();
         dssDeploy.deployDai(99);
-        dssDeploy.deployTaxationAndAuctions(address(gov));
+        dssDeploy.deployTaxation();
+        dssDeploy.deployAuctions(address(gov));
         dssDeploy.deployPause(0, authority);
     }
 

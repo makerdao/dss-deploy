@@ -327,7 +327,7 @@ contract DssDeploy is DSAuth {
     function deployCollateral(bytes32 ilk, address join, address pip) public auth {
         require(ilk != bytes32(""), "Missing ilk name");
         require(join != address(0), "Missing join address");
-        require(pip != address(0), "Missing PIP address");
+        require(pip != address(0), "Missing pip address");
         require(address(pause) != address(0), "Missing previous step");
 
         // Deploy

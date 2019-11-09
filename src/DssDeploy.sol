@@ -327,14 +327,13 @@ contract DssDeploy is DSAuth {
     function deployCollateral(bytes32 ilk, address join, address pip) public auth {
         require(ilk != bytes32(""), "Missing ilk name");
         require(join != address(0), "Missing join address");
+        require(pip != address(0), "Missing PIP address");
         require(address(pause) != address(0), "Missing previous step");
 
         // Deploy
         ilks[ilk].flip = flipFab.newFlip(address(vat), ilk);
         ilks[ilk].join = join;
-        if (pip != address(0)) {
-            Spotter(spotter).file(ilk, "pip", address(pip)); // Set pip
-        }
+        Spotter(spotter).file(ilk, "pip", address(pip)); // Set pip
 
         // Internal references set up
         cat.file(ilk, "flip", address(ilks[ilk].flip));

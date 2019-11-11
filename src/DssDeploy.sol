@@ -319,9 +319,6 @@ contract DssDeploy is DSAuth {
         flap.rely(address(pause.proxy()));
         flop.rely(address(pause.proxy()));
         end.rely(address(pause.proxy()));
-
-        this.setAuthority(authority);
-        this.setOwner(address(0));
     }
 
     function deployCollateral(bytes32 ilk, address join, address pip) public auth {

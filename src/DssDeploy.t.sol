@@ -863,11 +863,8 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(pause.owner(), address(0));
 
         // dssDeploy
-        assertEq(address(dssDeploy.authority()), address(authority));
-        assertEq(dssDeploy.owner(), address(0));
-
-        // root
-        assertTrue(authority.isUserRoot(address(this)));
+        assertEq(address(dssDeploy.authority()), address(0));
+        assertEq(dssDeploy.owner(), address(this));
 
         dssDeploy.releaseAuth();
         dssDeploy.releaseAuthFlip("ETH");

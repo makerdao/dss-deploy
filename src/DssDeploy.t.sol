@@ -282,8 +282,7 @@ contract DssDeployTest is DssDeployTestBase {
         user1.doDeal(address(ethFlip), batchId);
     }
 
-    function testFlop() public {
-        deploy();
+    function _flop() internal returns (uint batchId) {
         this.file(address(cat), "ETH", "lump", 1 ether); // 1 unit of collateral per batch
         this.file(address(cat), "ETH", "chop", ONE);
         weth.deposit.value(1 ether)();
@@ -293,7 +292,7 @@ contract DssDeployTest is DssDeployTestBase {
         pipETH.poke(bytes32(uint(300 * 10 ** 18 - 1))); // Decrease price in 1 wei
         spotter.poke("ETH");
         uint48 eraBite = uint48(now);
-        uint batchId = cat.bite("ETH", address(this));
+        batchId = cat.bite("ETH", address(this));
         address(user1).transfer(10 ether);
         user1.doEthJoin(address(weth), address(ethJoin), address(user1), 10 ether);
         user1.doFrob(address(vat), "ETH", address(user1), address(user1), address(user1), 10 ether, 1000 ether);
@@ -317,11 +316,15 @@ contract DssDeployTest is DssDeployTestBase {
         this.file(address(vow), "dump", 0.65 ether);
         this.file(address(vow), bytes32("sump"), rad(20 ether));
         batchId = vow.flop();
-
         (uint bid,,,,) = flop.bids(batchId);
         assertEq(bid, rad(20 ether));
         user1.doHope(address(vat), address(flop));
         user2.doHope(address(vat), address(flop));
+    }
+
+    function testFlop() public {
+        deploy();
+        uint batchId = _flop();
         user1.doDent(address(flop), batchId, 0.6 ether, rad(20 ether));
         hevm.warp(now + flop.ttl() - 1);
         user2.doDent(address(flop), batchId, 0.2 ether, rad(20 ether));
@@ -336,8 +339,7 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(vat.sin(address(vow)), 0);
     }
 
-    function testFlap() public {
-        deploy();
+    function _flap() internal returns (uint batchId) {
         this.dripAndFile(address(jug), bytes32("ETH"), bytes32("duty"), uint(1.05 * 10 ** 27));
         weth.deposit.value(0.5 ether)();
         weth.approve(address(ethJoin), uint(-1));
@@ -348,7 +350,7 @@ contract DssDeployTest is DssDeployTestBase {
         jug.drip("ETH");
         assertEq(vat.dai(address(vow)), rad(10 * 0.05 ether));
         this.file(address(vow), bytes32("bump"), rad(0.05 ether));
-        uint batchId = vow.flap();
+        batchId = vow.flap();
 
         (,uint lot,,,) = flap.bids(batchId);
         assertEq(lot, rad(0.05 ether));
@@ -359,6 +361,11 @@ contract DssDeployTest is DssDeployTestBase {
 
         assertEq(dai.balanceOf(address(user1)), 0);
         assertEq(gov.balanceOf(address(0)), 0);
+    }
+
+    function testFlap() public {
+        deploy();
+        uint batchId = _flap();
 
         user1.doTend(address(flap), batchId, rad(0.05 ether), 0.001 ether);
         user2.doTend(address(flap), batchId, rad(0.05 ether), 0.0015 ether);
@@ -449,6 +456,44 @@ contract DssDeployTest is DssDeployTestBase {
         end.cash("COL", 400 ether);
         assertEq(vat.gem("ETH", address(this)), remainInkVal + 400 * end.fix("ETH") / 10 ** 9);
         assertEq(vat.gem("COL", address(this)), 400 * end.fix("COL") / 10 ** 9);
+    }
+
+    function testFlopEnd() public {
+        deploy();
+        uint batchId = _flop();
+        this.cage(address(end));
+        flop.yank(batchId);
+    }
+
+    function testFlopEndWithBid() public {
+        deploy();
+        uint batchId = _flop();
+        user1.doDent(address(flop), batchId, 0.6 ether, rad(20 ether));
+        assertEq(vat.dai(address(user1)), rad(800 ether));
+        this.cage(address(end));
+        flop.yank(batchId);
+        assertEq(vat.dai(address(user1)), rad(820 ether));
+    }
+
+    function testFlapEnd() public {
+        deploy();
+        uint batchId = _flap();
+
+        this.cage(address(end));
+        flap.yank(batchId);
+    }
+
+    function testFlapEndWithBid() public {
+        deploy();
+        uint batchId = _flap();
+
+        user1.doTend(address(flap), batchId, rad(0.05 ether), 0.001 ether);
+        assertEq(gov.balanceOf(address(user1)), 1 ether - 0.001 ether);
+
+        this.cage(address(end));
+        flap.yank(batchId);
+
+        assertEq(gov.balanceOf(address(user1)), 1 ether);
     }
 
     function testFireESM() public {

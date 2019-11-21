@@ -261,6 +261,7 @@ contract DssDeploy is DSAuth {
         pot.file("vow", address(vow));
 
         // Internal auth
+        vat.rely(address(flop));
         flap.rely(address(vow));
         flop.rely(address(vow));
     }

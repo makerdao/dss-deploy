@@ -7,10 +7,12 @@ let
   inherit (callPackage ./nix/dapp.nix {}) specs package;
 
   this = package (specs.this // {
+    name = "dss-deploy-non-optimized";
     inherit doCheck;
   });
 
   this-optimize = package (specs.this // {
+    name = "dss-deploy-optimized";
     inherit doCheck;
     solcFlags = "--optimize";
   });
@@ -38,4 +40,7 @@ let
 in symlinkJoin {
   name = "dss-deploy";
   paths = [ optimized nonOptimized ];
+  passthru = {
+    inherit optimized nonOptimized;
+  };
 }

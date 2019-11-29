@@ -9,12 +9,13 @@ let
   this = package (specs.this // {
     name = "dss-deploy";
     inherit doCheck;
+    solcFlags = "--metadata";
   });
 
   this-optimize = package (specs.this // {
     name = "dss-deploy-optimized";
     inherit doCheck;
-    solcFlags = "--optimize";
+    solcFlags = "--optimize --metadata";
   });
 
   mkScripts = { regex, name, solidityPackages }: makerScriptPackage {

@@ -7,7 +7,7 @@ let
   inherit (callPackage ./nix/dapp.nix {}) specs package;
 
   this = package (specs.this // {
-    name = "dss-deploy-non-optimized";
+    name = "dss-deploy";
     inherit doCheck;
   });
 
@@ -33,12 +33,12 @@ let
   };
 
   nonOptimized = mkScripts {
-    name = "dss-deploy-non-optimized";
+    name = "dss-deploy";
     regex = [ "deploy-fab" "deploy-ilk.*" ];
     solidityPackages = [ this ];
   };
 in symlinkJoin {
-  name = "dss-deploy";
+  name = "dss-deploy-both";
   paths = [ optimized nonOptimized ];
   passthru = {
     inherit optimized nonOptimized;

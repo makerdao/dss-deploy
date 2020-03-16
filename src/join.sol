@@ -286,7 +286,7 @@ contract GemJoin5 is LibNote {
 
     constructor(address vat_, bytes32 ilk_, address gem_) public {
         dec = gem.decimals();
-        require(dec < 18, "GemJoin3/decimals-18-or-higher");
+        require(dec < 18, "GemJoin5/decimals-18-or-higher");
         wards[msg.sender] = 1;
         live = 1;
         vat = VatLike(vat_);
@@ -299,22 +299,22 @@ contract GemJoin5 is LibNote {
     }
 
     function mul(uint x, uint y) internal pure returns (uint z) {
-        require(y == 0 || (z = x * y) / y == x, "GemJoin3/overflow");
+        require(y == 0 || (z = x * y) / y == x, "GemJoin5/overflow");
     }
 
     function join(address urn, uint wad) public note {
-        require(live == 1, "GemJoin3/not-live");
+        require(live == 1, "GemJoin5/not-live");
         uint wad18 = mul(wad, 10 ** (18 - dec));
-        require(int(wad18) >= 0, "GemJoin3/overflow");
+        require(int(wad18) >= 0, "GemJoin5/overflow");
         vat.slip(ilk, urn, int(wad18));
-        require(gem.transferFrom(msg.sender, address(this), wad), "GemJoin3/failed-transfer");
+        require(gem.transferFrom(msg.sender, address(this), wad), "GemJoin5/failed-transfer");
     }
 
     function exit(address guy, uint wad) public note {
         uint wad18 = mul(wad, 10 ** (18 - dec));
-        require(int(wad18) >= 0, "GemJoin3/overflow");
+        require(int(wad18) >= 0, "GemJoin5/overflow");
         vat.slip(ilk, msg.sender, -int(wad18));
-        require(gem.transfer(guy, wad), "GemJoin3/failed-transfer");
+        require(gem.transfer(guy, wad), "GemJoin5/failed-transfer");
     }
 }
 

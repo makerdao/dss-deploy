@@ -285,13 +285,13 @@ contract GemJoin5 is LibNote {
     uint     public live;  // Access Flag
 
     constructor(address vat_, bytes32 ilk_, address gem_) public {
+        gem = GemLike5(gem_);
         dec = gem.decimals();
         require(dec < 18, "GemJoin5/decimals-18-or-higher");
         wards[msg.sender] = 1;
         live = 1;
         vat = VatLike(vat_);
         ilk = ilk_;
-        gem = GemLike5(gem_);
     }
 
     function cage() external note auth {

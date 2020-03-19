@@ -664,80 +664,101 @@ contract DssDeployTest is DssDeployTestBase {
         BAT bat = new BAT(100 ether);
         GemJoin batJoin = new GemJoin(address(vat), "BAT", address(bat));
         assertEq(batJoin.dec(), 18);
-        DGD dgd = new DGD(100 ether);
-        GemJoin3 dgdJoin = new GemJoin3(address(vat), "DGD", address(dgd), 9);
-        assertEq(dgdJoin.dec(), 9);
-        GNT gnt = new GNT(100 ether);
-        GemJoin4 gntJoin = new GemJoin4(address(vat), "GNT", address(gnt));
-        assertEq(gntJoin.dec(), 18);
 
         dssDeploy.deployCollateral("REP", address(repJoin), address(pip));
         dssDeploy.deployCollateral("ZRX", address(zrxJoin), address(pip));
         dssDeploy.deployCollateral("OMG", address(omgJoin), address(pip));
         dssDeploy.deployCollateral("BAT", address(batJoin), address(pip));
-        dssDeploy.deployCollateral("DGD", address(dgdJoin), address(pip));
-        dssDeploy.deployCollateral("GNT", address(gntJoin), address(pip));
 
         rep.approve(address(repJoin), uint(-1));
         assertEq(rep.balanceOf(address(repJoin)), 0);
         assertEq(vat.gem("REP", address(this)), 0);
-        repJoin.join(address(this), 10);
-        assertEq(rep.balanceOf(address(repJoin)), 10);
-        assertEq(vat.gem("REP", address(this)), 10);
-        repJoin.exit(address(this), 4);
-        assertEq(rep.balanceOf(address(repJoin)), 6);
-        assertEq(vat.gem("REP", address(this)), 6);
+        repJoin.join(address(this), 10 ether);
+        assertEq(rep.balanceOf(address(repJoin)), 10 ether);
+        assertEq(vat.gem("REP", address(this)), 10 ether);
+        repJoin.exit(address(this), 4 ether);
+        assertEq(rep.balanceOf(address(repJoin)), 6 ether);
+        assertEq(vat.gem("REP", address(this)), 6 ether);
 
         zrx.approve(address(zrxJoin), uint(-1));
         assertEq(zrx.balanceOf(address(zrxJoin)), 0);
         assertEq(vat.gem("ZRX", address(this)), 0);
-        zrxJoin.join(address(this), 10);
-        assertEq(zrx.balanceOf(address(zrxJoin)), 10);
-        assertEq(vat.gem("ZRX", address(this)), 10);
-        zrxJoin.exit(address(this), 4);
-        assertEq(zrx.balanceOf(address(zrxJoin)), 6);
-        assertEq(vat.gem("ZRX", address(this)), 6);
+        zrxJoin.join(address(this), 10 ether);
+        assertEq(zrx.balanceOf(address(zrxJoin)), 10 ether);
+        assertEq(vat.gem("ZRX", address(this)), 10 ether);
+        zrxJoin.exit(address(this), 4 ether);
+        assertEq(zrx.balanceOf(address(zrxJoin)), 6 ether);
+        assertEq(vat.gem("ZRX", address(this)), 6 ether);
 
         omg.approve(address(omgJoin), uint(-1));
         assertEq(omg.balanceOf(address(omgJoin)), 0);
         assertEq(vat.gem("OMG", address(this)), 0);
-        omgJoin.join(address(this), 10);
-        assertEq(omg.balanceOf(address(omgJoin)), 10);
-        assertEq(vat.gem("OMG", address(this)), 10);
-        omgJoin.exit(address(this), 4);
-        assertEq(omg.balanceOf(address(omgJoin)), 6);
-        assertEq(vat.gem("OMG", address(this)), 6);
+        omgJoin.join(address(this), 10 ether);
+        assertEq(omg.balanceOf(address(omgJoin)), 10 ether);
+        assertEq(vat.gem("OMG", address(this)), 10 ether);
+        omgJoin.exit(address(this), 4 ether);
+        assertEq(omg.balanceOf(address(omgJoin)), 6 ether);
+        assertEq(vat.gem("OMG", address(this)), 6 ether);
 
         bat.approve(address(batJoin), uint(-1));
         assertEq(bat.balanceOf(address(batJoin)), 0);
         assertEq(vat.gem("BAT", address(this)), 0);
-        batJoin.join(address(this), 10);
-        assertEq(bat.balanceOf(address(batJoin)), 10);
-        assertEq(vat.gem("BAT", address(this)), 10);
-        batJoin.exit(address(this), 4);
-        assertEq(bat.balanceOf(address(batJoin)), 6);
-        assertEq(vat.gem("BAT", address(this)), 6);
+        batJoin.join(address(this), 10 ether);
+        assertEq(bat.balanceOf(address(batJoin)), 10 ether);
+        assertEq(vat.gem("BAT", address(this)), 10 ether);
+        batJoin.exit(address(this), 4 ether);
+        assertEq(bat.balanceOf(address(batJoin)), 6 ether);
+        assertEq(vat.gem("BAT", address(this)), 6 ether);
+    }
+
+    function testTokens2() public {
+        deployKeepAuth();
+        DSValue pip = new DSValue();
+
+        DGD dgd = new DGD(100 * 10 ** 9);
+        GemJoin3 dgdJoin = new GemJoin3(address(vat), "DGD", address(dgd), 9);
+        assertEq(dgdJoin.dec(), 9);
+        GNT gnt = new GNT(100 ether);
+        GemJoin4 gntJoin = new GemJoin4(address(vat), "GNT", address(gnt));
+        assertEq(gntJoin.dec(), 18);
+        USDC usdc = new USDC(100 * 10 ** 6);
+        GemJoin5 usdcJoin = new GemJoin5(address(vat), "USDC", address(usdc));
+        assertEq(usdcJoin.dec(), 6);
+
+        dssDeploy.deployCollateral("DGD", address(dgdJoin), address(pip));
+        dssDeploy.deployCollateral("GNT", address(gntJoin), address(pip));
+        dssDeploy.deployCollateral("USDC", address(usdcJoin), address(pip));
 
         dgd.approve(address(dgdJoin), uint(-1));
         assertEq(dgd.balanceOf(address(dgdJoin)), 0);
         assertEq(vat.gem("DGD", address(this)), 0);
-        dgdJoin.join(address(this), 10);
-        assertEq(dgd.balanceOf(address(dgdJoin)), 10);
-        assertEq(vat.gem("DGD", address(this)), 10 * 10 ** 9);
-        dgdJoin.exit(address(this), 4);
-        assertEq(dgd.balanceOf(address(dgdJoin)), 6);
-        assertEq(vat.gem("DGD", address(this)), 6 * 10 ** 9);
+        dgdJoin.join(address(this), 10 * 10 ** 9);
+        assertEq(dgd.balanceOf(address(dgdJoin)), 10 * 10 ** 9);
+        assertEq(vat.gem("DGD", address(this)), 10 ether);
+        dgdJoin.exit(address(this), 4 * 10 ** 9);
+        assertEq(dgd.balanceOf(address(dgdJoin)), 6 * 10 ** 9);
+        assertEq(vat.gem("DGD", address(this)), 6 ether);
 
         assertEq(gnt.balanceOf(address(gntJoin)), 0);
         assertEq(vat.gem("GNT", address(this)), 0);
         address bag = gntJoin.make();
-        gnt.transfer(bag, 10);
-        gntJoin.join(address(this), 10);
-        assertEq(gnt.balanceOf(address(gntJoin)), 10);
-        assertEq(vat.gem("GNT", address(this)), 10);
-        gntJoin.exit(address(this), 4);
-        assertEq(gnt.balanceOf(address(gntJoin)), 6);
-        assertEq(vat.gem("GNT", address(this)), 6);
+        gnt.transfer(bag, 10 ether);
+        gntJoin.join(address(this), 10 ether);
+        assertEq(gnt.balanceOf(address(gntJoin)), 10 ether);
+        assertEq(vat.gem("GNT", address(this)), 10 ether);
+        gntJoin.exit(address(this), 4 ether);
+        assertEq(gnt.balanceOf(address(gntJoin)), 6 ether);
+        assertEq(vat.gem("GNT", address(this)), 6 ether);
+
+        usdc.approve(address(usdcJoin), uint(-1));
+        assertEq(usdc.balanceOf(address(usdcJoin)), 0);
+        assertEq(vat.gem("USDC", address(this)), 0);
+        usdcJoin.join(address(this), 10 * 10 ** 6);
+        assertEq(usdc.balanceOf(address(usdcJoin)), 10 * 10 ** 6);
+        assertEq(vat.gem("USDC", address(this)), 10 ether);
+        usdcJoin.exit(address(this), 4 * 10 ** 6);
+        assertEq(usdc.balanceOf(address(usdcJoin)), 6 * 10 ** 6);
+        assertEq(vat.gem("USDC", address(this)), 6 ether);
     }
 
     function testFailJoinAfterCageGemJoin2() public {
@@ -762,7 +783,7 @@ contract DssDeployTest is DssDeployTestBase {
         DGD dgd = new DGD(100 ether);
         GemJoin3 dgdJoin = new GemJoin3(address(vat), "DGD", address(dgd), 9);
 
-        dssDeploy.deployCollateral("OMG", address(dgdJoin), address(pip));
+        dssDeploy.deployCollateral("DGD", address(dgdJoin), address(pip));
 
         dgd.approve(address(dgdJoin), uint(-1));
         dgdJoin.join(address(this), 10);
@@ -777,7 +798,7 @@ contract DssDeployTest is DssDeployTestBase {
         GNT gnt = new GNT(100 ether);
         GemJoin4 gntJoin = new GemJoin4(address(vat), "GNT", address(gnt));
 
-        dssDeploy.deployCollateral("OMG", address(gntJoin), address(pip));
+        dssDeploy.deployCollateral("GNT", address(gntJoin), address(pip));
 
         address bag = gntJoin.make();
         gnt.transfer(bag, 10);
@@ -785,6 +806,21 @@ contract DssDeployTest is DssDeployTestBase {
         gntJoin.cage();
         gnt.transfer(bag, 10);
         gntJoin.join(address(this), 10);
+    }
+
+    function testFailJoinAfterCageGemJoin5() public {
+        deployKeepAuth();
+        DSValue pip = new DSValue();
+
+        USDC usdc = new USDC(100 ether);
+        GemJoin5 usdcJoin = new GemJoin5(address(vat), "USDC", address(usdc));
+
+        dssDeploy.deployCollateral("USDC", address(usdcJoin), address(pip));
+
+        usdc.approve(address(usdcJoin), uint(-1));
+        usdcJoin.join(address(this), 10);
+        usdcJoin.cage();
+        usdcJoin.join(address(this), 10);
     }
 
     function testFailJoinAfterCageAuthGemJoin() public {

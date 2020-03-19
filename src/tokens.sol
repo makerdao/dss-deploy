@@ -41,11 +41,11 @@ contract REP {
         returns (bool)
     {
         if (src != msg.sender) {
-            require(_approvals[src][msg.sender] >= wad, "ds-token-insufficient-approval");
+            require(_approvals[src][msg.sender] >= wad, "insufficient-approval");
             _approvals[src][msg.sender] = sub(_approvals[src][msg.sender], wad);
         }
 
-        require(_balances[src] >= wad, "ds-token-insufficient-balance");
+        require(_balances[src] >= wad, "insufficient-balance");
         _balances[src] = sub(_balances[src], wad);
         _balances[dst] = add(_balances[dst], wad);
 
@@ -104,11 +104,11 @@ contract ZRX {
         returns (bool)
     {
         if (src != msg.sender) {
-            require(_approvals[src][msg.sender] >= wad, "ds-token-insufficient-approval");
+            require(_approvals[src][msg.sender] >= wad, "insufficient-approval");
             _approvals[src][msg.sender] = sub(_approvals[src][msg.sender], wad);
         }
 
-        require(_balances[src] >= wad, "ds-token-insufficient-balance");
+        require(_balances[src] >= wad, "insufficient-balance");
         _balances[src] = sub(_balances[src], wad);
         _balances[dst] = add(_balances[dst], wad);
 
@@ -165,11 +165,11 @@ contract OMG {
     function transferFrom(address src, address dst, uint wad) public
     {
         if (src != msg.sender) {
-            require(_approvals[src][msg.sender] >= wad, "ds-token-insufficient-approval");
+            require(_approvals[src][msg.sender] >= wad, "insufficient-approval");
             _approvals[src][msg.sender] = sub(_approvals[src][msg.sender], wad);
         }
 
-        require(_balances[src] >= wad, "ds-token-insufficient-balance");
+        require(_balances[src] >= wad, "insufficient-balance");
         _balances[src] = sub(_balances[src], wad);
         _balances[dst] = add(_balances[dst], wad);
 
@@ -224,11 +224,11 @@ contract BAT {
         returns (bool)
     {
         if (src != msg.sender) {
-            require(_approvals[src][msg.sender] >= wad, "ds-token-insufficient-approval");
+            require(_approvals[src][msg.sender] >= wad, "insufficient-approval");
             _approvals[src][msg.sender] = sub(_approvals[src][msg.sender], wad);
         }
 
-        require(_balances[src] >= wad, "ds-token-insufficient-balance");
+        require(_balances[src] >= wad, "insufficient-balance");
         _balances[src] = sub(_balances[src], wad);
         _balances[dst] = add(_balances[dst], wad);
 
@@ -286,11 +286,11 @@ contract DGD {
         returns (bool)
     {
         if (src != msg.sender) {
-            require(_approvals[src][msg.sender] >= wad, "ds-token-insufficient-approval");
+            require(_approvals[src][msg.sender] >= wad, "insufficient-approval");
             _approvals[src][msg.sender] = sub(_approvals[src][msg.sender], wad);
         }
 
-        require(_balances[src] >= wad, "ds-token-insufficient-balance");
+        require(_balances[src] >= wad, "insufficient-balance");
         _balances[src] = sub(_balances[src], wad);
         _balances[dst] = add(_balances[dst], wad);
 
@@ -336,11 +336,74 @@ contract GNT {
     }
 
     function transfer(address dst, uint wad) public returns (bool) {
-        require(_balances[msg.sender] >= wad, "ds-token-insufficient-balance");
+        require(_balances[msg.sender] >= wad, "insufficient-balance");
         _balances[msg.sender] = sub(_balances[msg.sender], wad);
         _balances[dst] = add(_balances[dst], wad);
 
         emit Transfer(msg.sender, dst, wad);
+
+        return true;
+    }
+}
+
+contract USDC {
+    function add(uint x, uint y) internal pure returns (uint z) {
+        require((z = x + y) >= x, "ds-math-add-overflow");
+    }
+    function sub(uint x, uint y) internal pure returns (uint z) {
+        require((z = x - y) <= x, "ds-math-sub-underflow");
+    }
+    event Approval(address indexed src, address indexed guy, uint wad);
+    event Transfer(address indexed src, address indexed dst, uint wad);
+
+    string  public  name = "USDC";
+    string  public  symbol = "USDC";
+    uint256  public  decimals = 6;
+    uint256                                            _supply;
+    mapping (address => uint256)                       _balances;
+    mapping (address => mapping (address => uint256))  _approvals;
+
+    constructor(uint supply) public {
+        _balances[msg.sender] = supply;
+        _supply = supply;
+    }
+
+    function totalSupply() public view returns (uint) {
+        return _supply;
+    }
+    function balanceOf(address src) public view returns (uint) {
+        return _balances[src];
+    }
+    function allowance(address src, address guy) public view returns (uint) {
+        return _approvals[src][guy];
+    }
+
+    function transfer(address dst, uint wad) public returns (bool) {
+        return transferFrom(msg.sender, dst, wad);
+    }
+
+    function transferFrom(address src, address dst, uint wad)
+        public
+        returns (bool)
+    {
+        if (src != msg.sender) {
+            require(_approvals[src][msg.sender] >= wad, "insufficient-approval");
+            _approvals[src][msg.sender] = sub(_approvals[src][msg.sender], wad);
+        }
+
+        require(_balances[src] >= wad, "insufficient-balance");
+        _balances[src] = sub(_balances[src], wad);
+        _balances[dst] = add(_balances[dst], wad);
+
+        emit Transfer(src, dst, wad);
+
+        return true;
+    }
+
+    function approve(address guy, uint wad) public returns (bool) {
+        _approvals[msg.sender][guy] = wad;
+
+        emit Approval(msg.sender, guy, wad);
 
         return true;
     }

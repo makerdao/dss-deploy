@@ -671,42 +671,50 @@ contract DssDeployTest is DssDeployTestBase {
         dssDeploy.deployCollateral("BAT", address(batJoin), address(pip));
 
         rep.approve(address(repJoin), uint(-1));
+        assertEq(rep.balanceOf(address(this)), 100 ether);
         assertEq(rep.balanceOf(address(repJoin)), 0);
         assertEq(vat.gem("REP", address(this)), 0);
         repJoin.join(address(this), 10 ether);
         assertEq(rep.balanceOf(address(repJoin)), 10 ether);
         assertEq(vat.gem("REP", address(this)), 10 ether);
         repJoin.exit(address(this), 4 ether);
+        assertEq(rep.balanceOf(address(this)), 94 ether);
         assertEq(rep.balanceOf(address(repJoin)), 6 ether);
         assertEq(vat.gem("REP", address(this)), 6 ether);
 
         zrx.approve(address(zrxJoin), uint(-1));
+        assertEq(zrx.balanceOf(address(this)), 100 ether);
         assertEq(zrx.balanceOf(address(zrxJoin)), 0);
         assertEq(vat.gem("ZRX", address(this)), 0);
         zrxJoin.join(address(this), 10 ether);
         assertEq(zrx.balanceOf(address(zrxJoin)), 10 ether);
         assertEq(vat.gem("ZRX", address(this)), 10 ether);
         zrxJoin.exit(address(this), 4 ether);
+        assertEq(zrx.balanceOf(address(this)), 94 ether);
         assertEq(zrx.balanceOf(address(zrxJoin)), 6 ether);
         assertEq(vat.gem("ZRX", address(this)), 6 ether);
 
         omg.approve(address(omgJoin), uint(-1));
+        assertEq(omg.balanceOf(address(this)), 100 ether);
         assertEq(omg.balanceOf(address(omgJoin)), 0);
         assertEq(vat.gem("OMG", address(this)), 0);
         omgJoin.join(address(this), 10 ether);
         assertEq(omg.balanceOf(address(omgJoin)), 10 ether);
         assertEq(vat.gem("OMG", address(this)), 10 ether);
         omgJoin.exit(address(this), 4 ether);
+        assertEq(omg.balanceOf(address(this)), 94 ether);
         assertEq(omg.balanceOf(address(omgJoin)), 6 ether);
         assertEq(vat.gem("OMG", address(this)), 6 ether);
 
         bat.approve(address(batJoin), uint(-1));
+        assertEq(bat.balanceOf(address(this)), 100 ether);
         assertEq(bat.balanceOf(address(batJoin)), 0);
         assertEq(vat.gem("BAT", address(this)), 0);
         batJoin.join(address(this), 10 ether);
         assertEq(bat.balanceOf(address(batJoin)), 10 ether);
         assertEq(vat.gem("BAT", address(this)), 10 ether);
         batJoin.exit(address(this), 4 ether);
+        assertEq(bat.balanceOf(address(this)), 94 ether);
         assertEq(bat.balanceOf(address(batJoin)), 6 ether);
         assertEq(vat.gem("BAT", address(this)), 6 ether);
     }
@@ -730,15 +738,18 @@ contract DssDeployTest is DssDeployTestBase {
         dssDeploy.deployCollateral("USDC", address(usdcJoin), address(pip));
 
         dgd.approve(address(dgdJoin), uint(-1));
+        assertEq(dgd.balanceOf(address(this)), 100 * 10 ** 9);
         assertEq(dgd.balanceOf(address(dgdJoin)), 0);
         assertEq(vat.gem("DGD", address(this)), 0);
         dgdJoin.join(address(this), 10 * 10 ** 9);
         assertEq(dgd.balanceOf(address(dgdJoin)), 10 * 10 ** 9);
         assertEq(vat.gem("DGD", address(this)), 10 ether);
         dgdJoin.exit(address(this), 4 * 10 ** 9);
+        assertEq(dgd.balanceOf(address(this)), 94 * 10 ** 9);
         assertEq(dgd.balanceOf(address(dgdJoin)), 6 * 10 ** 9);
         assertEq(vat.gem("DGD", address(this)), 6 ether);
 
+        assertEq(gnt.balanceOf(address(this)), 100 ether);
         assertEq(gnt.balanceOf(address(gntJoin)), 0);
         assertEq(vat.gem("GNT", address(this)), 0);
         address bag = gntJoin.make();
@@ -747,16 +758,19 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(gnt.balanceOf(address(gntJoin)), 10 ether);
         assertEq(vat.gem("GNT", address(this)), 10 ether);
         gntJoin.exit(address(this), 4 ether);
+        assertEq(gnt.balanceOf(address(this)), 94 ether);
         assertEq(gnt.balanceOf(address(gntJoin)), 6 ether);
         assertEq(vat.gem("GNT", address(this)), 6 ether);
 
         usdc.approve(address(usdcJoin), uint(-1));
+        assertEq(usdc.balanceOf(address(this)), 100 * 10 ** 6);
         assertEq(usdc.balanceOf(address(usdcJoin)), 0);
         assertEq(vat.gem("USDC", address(this)), 0);
         usdcJoin.join(address(this), 10 * 10 ** 6);
         assertEq(usdc.balanceOf(address(usdcJoin)), 10 * 10 ** 6);
         assertEq(vat.gem("USDC", address(this)), 10 ether);
         usdcJoin.exit(address(this), 4 * 10 ** 6);
+        assertEq(usdc.balanceOf(address(this)), 94 * 10 ** 6);
         assertEq(usdc.balanceOf(address(usdcJoin)), 6 * 10 ** 6);
         assertEq(vat.gem("USDC", address(this)), 6 ether);
     }

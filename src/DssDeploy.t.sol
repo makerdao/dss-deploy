@@ -732,10 +732,14 @@ contract DssDeployTest is DssDeployTestBase {
         USDC usdc = new USDC(100 * 10 ** 6);
         GemJoin5 usdcJoin = new GemJoin5(address(vat), "USDC", address(usdc));
         assertEq(usdcJoin.dec(), 6);
+        WBTC wbtc = new WBTC(100 * 10 ** 8);
+        GemJoin5 wbtcJoin = new GemJoin5(address(vat), "WBTC", address(wbtc));
+        assertEq(wbtcJoin.dec(), 8);
 
         dssDeploy.deployCollateral("DGD", address(dgdJoin), address(pip));
         dssDeploy.deployCollateral("GNT", address(gntJoin), address(pip));
         dssDeploy.deployCollateral("USDC", address(usdcJoin), address(pip));
+        dssDeploy.deployCollateral("WBTC", address(wbtcJoin), address(pip));
 
         dgd.approve(address(dgdJoin), uint(-1));
         assertEq(dgd.balanceOf(address(this)), 100 * 10 ** 9);
@@ -773,6 +777,18 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(usdc.balanceOf(address(this)), 94 * 10 ** 6);
         assertEq(usdc.balanceOf(address(usdcJoin)), 6 * 10 ** 6);
         assertEq(vat.gem("USDC", address(this)), 6 ether);
+
+        wbtc.approve(address(wbtcJoin), uint(-1));
+        assertEq(wbtc.balanceOf(address(this)), 100 * 10 ** 8);
+        assertEq(wbtc.balanceOf(address(wbtcJoin)), 0);
+        assertEq(vat.gem("WBTC", address(this)), 0);
+        wbtcJoin.join(address(this), 10 * 10 ** 8);
+        assertEq(wbtc.balanceOf(address(wbtcJoin)), 10 * 10 ** 8);
+        assertEq(vat.gem("WBTC", address(this)), 10 ether);
+        wbtcJoin.exit(address(this), 4 * 10 ** 8);
+        assertEq(wbtc.balanceOf(address(this)), 94 * 10 ** 8);
+        assertEq(wbtc.balanceOf(address(wbtcJoin)), 6 * 10 ** 8);
+        assertEq(vat.gem("WBTC", address(this)), 6 ether);
     }
 
     function testFailJoinAfterCageGemJoin2() public {

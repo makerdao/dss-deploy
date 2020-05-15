@@ -484,7 +484,7 @@ contract MANA {
 
     string  public  name = "MANA";
     string  public  symbol = "MANA";
-    uint256  public  decimals = 18;
+    uint8  public  decimals = 18;
     uint256                                            _supply;
     mapping (address => uint256)                       _balances;
     mapping (address => mapping (address => uint256))  _approvals;

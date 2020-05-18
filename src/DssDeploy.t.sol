@@ -814,7 +814,7 @@ contract DssDeployTest is DssDeployTestBase {
         }
 
         {
-        TUSD tusd = new TUSD(100 ether, address(0));
+        TUSD tusd = new TUSD(100 ether);
         GemJoin6 tusdJoin = new GemJoin6(address(vat), "TUSD", address(tusd));
         assertEq(tusdJoin.dec(), 18);
 
@@ -836,7 +836,7 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testFailTUSD() public {
         DSValue pip = new DSValue();
-        TUSD tusd = new TUSD(100 ether, address(0));
+        TUSD tusd = new TUSD(100 ether);
         GemJoin6 tusdJoin = new GemJoin6(address(vat), "TUSD", address(tusd));
         dssDeploy.deployCollateral("TUSD", address(tusdJoin), address(pip));
         tusd.approve(address(tusdJoin), uint(-1));

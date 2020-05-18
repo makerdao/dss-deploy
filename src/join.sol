@@ -333,7 +333,7 @@ contract GemLike6 {
 
 contract GemJoin6 is LibNote {
     // --- Auth ---
-    mapping (address => uint) public wards;
+    mapping (address => uint256) public wards;
     function rely(address usr) external note auth { wards[usr] = 1; }
     function deny(address usr) external note auth { wards[usr] = 0; }
     modifier auth {
@@ -347,7 +347,7 @@ contract GemJoin6 is LibNote {
     uint     public dec;
     uint     public live;  // Access Flag
 
-    mapping (address => bool) public implementations;
+    mapping (address => uint256) public implementations;
 
     constructor(address vat_, bytes32 ilk_, address gem_) public {
         wards[msg.sender] = 1;
@@ -355,25 +355,25 @@ contract GemJoin6 is LibNote {
         vat = VatLike(vat_);
         ilk = ilk_;
         gem = GemLike6(gem_);
-        setImplementation(gem.implementation(), true);
+        setImplementation(gem.implementation(), 1);
         dec = gem.decimals();
     }
     function cage() external note auth {
         live = 0;
     }
-    function setImplementation(address implementation, bool permitted) public auth note {
-        implementations[implementation] = permitted;
+    function setImplementation(address implementation, uint256 permitted) public auth note {
+        implementations[implementation] = permitted;  // 1 live, 0 disable
     }
     function join(address usr, uint wad) external note {
         require(live == 1, "GemJoin6/not-live");
         require(int(wad) >= 0, "GemJoin6/overflow");
-        require(implementations[gem.implementation()], "GemJoin6/implementation-invalid");
+        require(implementations[gem.implementation()] == 1, "GemJoin6/implementation-invalid");
         vat.slip(ilk, usr, int(wad));
         require(gem.transferFrom(msg.sender, address(this), wad), "GemJoin6/failed-transfer");
     }
     function exit(address usr, uint wad) external note {
         require(wad <= 2 ** 255, "GemJoin6/overflow");
-        require(implementations[gem.implementation()], "GemJoin6/implementation-invalid");
+        require(implementations[gem.implementation()] == 1, "GemJoin6/implementation-invalid");
         vat.slip(ilk, msg.sender, -int(wad));
         require(gem.transfer(usr, wad), "GemJoin6/failed-transfer");
     }

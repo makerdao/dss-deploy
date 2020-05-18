@@ -485,13 +485,19 @@ contract TUSD {
     string  public  name = "TrueUSD";
     string  public  symbol = "TUSD";
     uint8   public  decimals = 18;
+    address public  implementation;
     uint256                                            _supply;
     mapping (address => uint256)                       _balances;
     mapping (address => mapping (address => uint256))  _approvals;
 
-    constructor(uint supply) public {
+    constructor(uint supply, address initialImplementation) public {
         _balances[msg.sender] = supply;
         _supply = supply;
+        setImplementation(initialImplementation);
+    }
+
+    function setImplementation(address newImplementation) public {
+        implementation = newImplementation;
     }
 
     function totalSupply() public view returns (uint256) {

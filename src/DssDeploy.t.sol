@@ -834,7 +834,7 @@ contract DssDeployTest is DssDeployTestBase {
         }
     }
 
-    function testFailTUSD() public {
+    function testFailGemJoin6Join() public {
         DSValue pip = new DSValue();
         TUSD tusd = new TUSD(100 ether);
         GemJoin6 tusdJoin = new GemJoin6(address(vat), "TUSD", address(tusd));
@@ -846,6 +846,18 @@ contract DssDeployTest is DssDeployTestBase {
         tusd.setImplementation(0xCB9a11afDC6bDb92E4A6235959455F28758b34bA);
         // Fail here
         tusdJoin.join(address(this), 10 ether);
+    }
+
+    function testFailGemJoin6Exit() public {
+        DSValue pip = new DSValue();
+        TUSD tusd = new TUSD(100 ether);
+        GemJoin6 tusdJoin = new GemJoin6(address(vat), "TUSD", address(tusd));
+        dssDeploy.deployCollateral("TUSD", address(tusdJoin), address(pip));
+        tusd.approve(address(tusdJoin), uint(-1));
+        tusdJoin.join(address(this), 10 ether);
+        tusd.setImplementation(0xCB9a11afDC6bDb92E4A6235959455F28758b34bA);
+        // Fail here
+        tusdJoin.exit(address(this), 10 ether);
     }
 
     function testFailJoinAfterCageGemJoin2() public {

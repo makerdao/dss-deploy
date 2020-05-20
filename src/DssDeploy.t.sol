@@ -815,7 +815,7 @@ contract DssDeployTest is DssDeployTestBase {
 
         {
         TUSD tusd = new TUSD(100 ether);
-        GemJoin tusdJoin = new GemJoin(address(vat), "TUSD", address(tusd));
+        GemJoin6 tusdJoin = new GemJoin6(address(vat), "TUSD", address(tusd));
         assertEq(tusdJoin.dec(), 18);
 
         dssDeploy.deployCollateral("TUSD", address(tusdJoin), address(pip));
@@ -832,6 +832,32 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(tusd.balanceOf(address(tusdJoin)), 6 ether);
         assertEq(vat.gem("TUSD", address(this)), 6 ether);
         }
+    }
+
+    function testFailGemJoin6Join() public {
+        DSValue pip = new DSValue();
+        TUSD tusd = new TUSD(100 ether);
+        GemJoin6 tusdJoin = new GemJoin6(address(vat), "TUSD", address(tusd));
+        dssDeploy.deployCollateral("TUSD", address(tusdJoin), address(pip));
+        tusd.approve(address(tusdJoin), uint(-1));
+        assertEq(tusd.balanceOf(address(this)), 100 ether);
+        assertEq(tusd.balanceOf(address(tusdJoin)), 0);
+        assertEq(vat.gem("TUSD", address(this)), 0);
+        tusd.setImplementation(0xCB9a11afDC6bDb92E4A6235959455F28758b34bA);
+        // Fail here
+        tusdJoin.join(address(this), 10 ether);
+    }
+
+    function testFailGemJoin6Exit() public {
+        DSValue pip = new DSValue();
+        TUSD tusd = new TUSD(100 ether);
+        GemJoin6 tusdJoin = new GemJoin6(address(vat), "TUSD", address(tusd));
+        dssDeploy.deployCollateral("TUSD", address(tusdJoin), address(pip));
+        tusd.approve(address(tusdJoin), uint(-1));
+        tusdJoin.join(address(this), 10 ether);
+        tusd.setImplementation(0xCB9a11afDC6bDb92E4A6235959455F28758b34bA);
+        // Fail here
+        tusdJoin.exit(address(this), 10 ether);
     }
 
     function testFailJoinAfterCageGemJoin2() public {

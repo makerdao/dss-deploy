@@ -337,7 +337,7 @@ contract GemJoin6 is LibNote {
     function rely(address usr) external note auth { wards[usr] = 1; }
     function deny(address usr) external note auth { wards[usr] = 0; }
     modifier auth {
-        require(wards[msg.sender] == 1, "GemJoin/not-authorized");
+        require(wards[msg.sender] == 1, "GemJoin6/not-authorized");
         _;
     }
 

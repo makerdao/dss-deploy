@@ -832,6 +832,26 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(tusd.balanceOf(address(tusdJoin)), 6 ether);
         assertEq(vat.gem("TUSD", address(this)), 6 ether);
         }
+
+        {
+        KNC knc = new KNC(100 ether);
+        GemJoin kncJoin = new GemJoin(address(vat), "KNC", address(knc));
+        assertEq(kncJoin.dec(), 18);
+
+        dssDeploy.deployCollateral("KNC", address(kncJoin), address(pip));
+
+        knc.approve(address(kncJoin), uint(-1));
+        assertEq(knc.balanceOf(address(this)), 100 ether);
+        assertEq(knc.balanceOf(address(kncJoin)), 0);
+        assertEq(vat.gem("KNC", address(this)), 0);
+        kncJoin.join(address(this), 10 ether);
+        assertEq(knc.balanceOf(address(kncJoin)), 10 ether);
+        assertEq(vat.gem("KNC", address(this)), 10 ether);
+        kncJoin.exit(address(this), 4 ether);
+        assertEq(knc.balanceOf(address(this)), 94 ether);
+        assertEq(knc.balanceOf(address(kncJoin)), 6 ether);
+        assertEq(vat.gem("KNC", address(this)), 6 ether);
+        }
     }
 
     function testFailGemJoin6Join() public {

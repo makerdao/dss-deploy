@@ -935,7 +935,7 @@ contract DssDeployTest is DssDeployTestBase {
         deployKeepAuth();
         DSValue pip = new DSValue();
 
-        USDC usdc = new USDC(100 ether);
+        USDC usdc = new USDC(100 * 10 ** 6);
         GemJoin5 usdcJoin = new GemJoin5(address(vat), "USDC", address(usdc));
 
         dssDeploy.deployCollateral("USDC", address(usdcJoin), address(pip));
@@ -981,8 +981,7 @@ contract DssDeployTest is DssDeployTestBase {
         deployKeepAuth();
         DSValue pip = new DSValue();
 
-        DSToken usdc = new DSToken("USDC");
-        usdc.mint(20);
+        USDC usdc = new USDC(20);
         AuthGemJoin2 usdcJoin = new AuthGemJoin2(address(vat), "USDC", address(usdc));
 
         dssDeploy.deployCollateral("USDC", address(usdcJoin), address(pip));
@@ -1035,38 +1034,50 @@ contract DssDeployTest is DssDeployTestBase {
         deployKeepAuth();
         DSValue pip = new DSValue();
 
-        DSToken usdc = new DSToken("USDC");
-        usdc.mint(10);
-        AuthGemJoin usdcJoin = new AuthGemJoin(address(vat), "USDC", address(usdc));
-        assertEq(usdcJoin.dec(), 18);
+        USDC usdc = new USDC(10 * 10 ** 6);
+        AuthGemJoin2 usdcJoin = new AuthGemJoin2(address(vat), "USDC", address(usdc));
+        assertEq(usdcJoin.dec(), 6);
 
         dssDeploy.deployCollateral("USDC", address(usdcJoin), address(pip));
 
         usdc.approve(address(usdcJoin), uint(-1));
         assertEq(usdc.balanceOf(address(usdcJoin)), 0);
         assertEq(vat.gem("USDC", address(this)), 0);
-        usdcJoin.join(address(this), 10);
-        assertEq(usdc.balanceOf(address(usdcJoin)), 10);
-        assertEq(vat.gem("USDC", address(this)), 10);
-        usdcJoin.deny(address(this)); // Check there is no need of authorization to exit
-        usdcJoin.exit(address(this), 4);
-        assertEq(usdc.balanceOf(address(usdcJoin)), 6);
-        assertEq(vat.gem("USDC", address(this)), 6);
+        usdcJoin.join(address(this), 10 * 10 ** 6);
+        assertEq(usdc.balanceOf(address(usdcJoin)), 10 * 10 ** 6);
+        assertEq(vat.gem("USDC", address(this)), 10 ether);
+        usdcJoin.exit(address(this), 4 * 10 ** 6);
+        assertEq(usdc.balanceOf(address(usdcJoin)), 6 * 10 ** 6);
+        assertEq(vat.gem("USDC", address(this)), 6 ether);
     }
 
-    function testFailAuthJoin2() public {
+    function testFailAuthJoin2_join() public {
         deployKeepAuth();
         DSValue pip = new DSValue();
 
-        DSToken usdc = new DSToken("USDC");
-        usdc.mint(10);
-        AuthGemJoin usdcJoin = new AuthGemJoin(address(vat), "USDC", address(usdc));
+        USDC usdc = new USDC(10);
+        AuthGemJoin2 usdcJoin = new AuthGemJoin2(address(vat), "USDC", address(usdc));
 
         dssDeploy.deployCollateral("USDC", address(usdcJoin), address(pip));
 
         usdc.approve(address(usdcJoin), uint(-1));
         usdcJoin.deny(address(this));
         usdcJoin.join(address(this), 10);
+    }
+
+    function testFailAuthJoin2_exit() public {
+        deployKeepAuth();
+        DSValue pip = new DSValue();
+
+        USDC usdc = new USDC(10);
+        AuthGemJoin2 usdcJoin = new AuthGemJoin2(address(vat), "USDC", address(usdc));
+
+        dssDeploy.deployCollateral("USDC", address(usdcJoin), address(pip));
+
+        usdc.approve(address(usdcJoin), uint(-1));
+        usdcJoin.join(address(this), 10);
+        usdcJoin.deny(address(this));
+        usdcJoin.exit(address(this), 10);
     }
 
     function testAuth() public {

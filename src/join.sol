@@ -429,7 +429,7 @@ contract AuthGemJoin is LibNote {
 }
 
 // AuthGemJoin2
-// For a token that needs restriction on the sources which are able to execute the join function,
+// For a token that needs restriction on the sources which are able to execute the join and exit functions,
 // has a lower precision than 18 and it has decimals (like USDC through PSM)
 
 contract GemLikeAuth2 {

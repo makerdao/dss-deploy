@@ -429,7 +429,7 @@ contract AuthGemJoin is LibNote {
 }
 
 // AuthGemJoin2
-// For a token that needs restriction on the sources which are able to execute the join and exit functions,
+// For a token that needs restriction on the sources which are able to execute join function,
 // has a lower precision than 18 and it has decimals (like USDC through PSM)
 
 contract GemLikeAuth2 {
@@ -477,7 +477,7 @@ contract AuthGemJoin2 is LibNote {
         require(gem.transferFrom(msg.sender, address(this), wad), "AuthGemJoin2/failed-transfer");
     }
 
-    function exit(address guy, uint wad) public auth note {
+    function exit(address guy, uint wad) public note {
         uint wad18 = mul(wad, 10 ** (18 - dec));
         require(int(wad18) >= 0, "AuthGemJoin2/overflow");
         vat.slip(ilk, msg.sender, -int(wad18));

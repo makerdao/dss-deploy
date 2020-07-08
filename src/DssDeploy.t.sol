@@ -1051,7 +1051,7 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(vat.gem("USDC", address(this)), 6 ether);
     }
 
-    function testFailAuthJoin2_join() public {
+    function testFailAuthJoin2() public {
         deployKeepAuth();
         DSValue pip = new DSValue();
 
@@ -1063,21 +1063,6 @@ contract DssDeployTest is DssDeployTestBase {
         usdc.approve(address(usdcJoin), uint(-1));
         usdcJoin.deny(address(this));
         usdcJoin.join(address(this), 10);
-    }
-
-    function testFailAuthJoin2_exit() public {
-        deployKeepAuth();
-        DSValue pip = new DSValue();
-
-        USDC usdc = new USDC(10);
-        AuthGemJoin2 usdcJoin = new AuthGemJoin2(address(vat), "USDC", address(usdc));
-
-        dssDeploy.deployCollateral("USDC", address(usdcJoin), address(pip));
-
-        usdc.approve(address(usdcJoin), uint(-1));
-        usdcJoin.join(address(this), 10);
-        usdcJoin.deny(address(this));
-        usdcJoin.exit(address(this), 10);
     }
 
     function testAuth() public {

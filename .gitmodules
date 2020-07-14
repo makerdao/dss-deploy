@@ -10,9 +10,6 @@
 [submodule "lib/ds-guard"]
 	path = lib/ds-guard
 	url = https://github.com/dapphub/ds-guard
-[submodule "lib/ds-weth"]
-	path = lib/ds-weth
-	url = https://github.com/dapphub/ds-weth
 [submodule "lib/ds-pause"]
 	path = lib/ds-pause
 	url = https://github.com/dapphub/ds-pause

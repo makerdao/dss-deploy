@@ -5,7 +5,6 @@ import {DSToken} from "ds-token/token.sol";
 import {DSValue} from "ds-value/value.sol";
 import {DSRoles} from "ds-roles/roles.sol";
 import {DSGuard} from "ds-guard/guard.sol";
-import {WETH9_} from "ds-weth/weth9.sol";
 import {GemJoin} from "dss/join.sol";
 
 import "./DssDeploy.sol";
@@ -19,6 +18,22 @@ contract AuctionLike {
     function tend(uint, uint, uint) public;
     function dent(uint, uint, uint) public;
     function deal(uint) public;
+}
+
+contract WETH is DSToken("WETH") {
+    function() external payable {
+        deposit();
+    }
+
+    function deposit() public payable {
+        _balances[msg.sender] += msg.value;
+    }
+
+    function withdraw(uint256 wad) public {
+        require(_balances[msg.sender] >= wad, "");
+        _balances[msg.sender] -= wad;
+        msg.sender.transfer(wad);
+    }
 }
 
 contract HopeLike {
@@ -39,8 +54,8 @@ contract FakeUser {
     }
 
     function doEthJoin(address payable obj, address gem, address urn, uint wad) public {
-        WETH9_(obj).deposit.value(wad)();
-        WETH9_(obj).approve(address(gem), uint(-1));
+        WETH(obj).deposit.value(wad)();
+        WETH(obj).approve(address(gem), uint(-1));
         GemJoin(gem).join(urn, wad);
     }
 
@@ -192,7 +207,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
 
     DSRoles authority;
 
-    WETH9_ weth;
+    WETH weth;
     GemJoin ethJoin;
     GemJoin colJoin;
 
@@ -301,7 +316,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
         pause = dssDeploy.pause();
         authority.setRootUser(address(pause.proxy()), true);
 
-        weth = new WETH9_();
+        weth = new WETH();
         ethJoin = new GemJoin(address(vat), "ETH", address(weth));
         dssDeploy.deployCollateral("ETH", address(ethJoin), address(pipETH));
 

@@ -4,9 +4,6 @@
 [submodule "lib/ds-auth"]
 	path = lib/ds-auth
 	url = https://github.com/dapphub/ds-auth.git
-[submodule "lib/ds-guard"]
-	path = lib/ds-guard
-	url = https://github.com/dapphub/ds-guard
 [submodule "lib/ds-pause"]
 	path = lib/ds-pause
 	url = https://github.com/dapphub/ds-pause

@@ -135,8 +135,8 @@ contract ESMFab {
 }
 
 contract PauseFab {
-    function newPause(uint delay, address owner, DSAuthority authority) public returns(DSPause pause) {
-        pause = new DSPause(delay, owner, authority);
+    function newPause(uint delay, address owner, address authority) public returns(DSPause pause) {
+        pause = new DSPause(delay, owner, DSAuthority(authority));
     }
 }
 
@@ -305,7 +305,7 @@ contract DssDeploy is DSAuth {
         end.rely(address(esm));
     }
 
-    function deployPause(uint delay, DSAuthority authority) public auth {
+    function deployPause(uint delay, address authority) public auth {
         require(address(dai) != address(0), "Missing previous step");
         require(address(end) != address(0), "Missing previous step");
 

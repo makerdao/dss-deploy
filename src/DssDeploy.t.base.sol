@@ -3,8 +3,6 @@ pragma solidity ^0.5.12;
 import {DSTest} from "ds-test/test.sol";
 import {DSToken} from "ds-token/token.sol";
 import {DSValue} from "ds-value/value.sol";
-import {DSRoles} from "ds-roles/roles.sol";
-import {DSGuard} from "ds-guard/guard.sol";
 import {GemJoin} from "dss/join.sol";
 
 import "./DssDeploy.sol";
@@ -181,6 +179,20 @@ contract ProxyActions {
     }
 }
 
+contract MockGuard {
+    mapping (address => mapping (address => mapping (bytes4 => bool))) acl;
+
+    function canCall(
+        address src, address dst, bytes4 sig
+    ) public view returns (bool) {
+        return acl[src][dst][sig];
+    }
+
+    function permit(address src, address dst, bytes4 sig) public {
+        acl[src][dst][sig] = true;
+    }
+}
+
 contract DssDeployTestBase is DSTest, ProxyActions {
     Hevm hevm;
 
@@ -205,7 +217,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
     DSValue pipETH;
     DSValue pipCOL;
 
-    DSRoles authority;
+    MockGuard authority;
 
     WETH weth;
     GemJoin ethJoin;
@@ -273,11 +285,10 @@ contract DssDeployTestBase is DSTest, ProxyActions {
         );
 
         gov = new DSToken("GOV");
-        gov.setAuthority(new DSGuard());
+        gov.setAuthority(DSAuthority(address(new MockGuard())));
         pipETH = new DSValue();
         pipCOL = new DSValue();
-        authority = new DSRoles();
-        authority.setRootUser(address(this), true);
+        authority = new MockGuard();
 
         user1 = new FakeUser();
         user2 = new FakeUser();
@@ -299,7 +310,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
         dssDeploy.deployAuctions(address(gov));
         dssDeploy.deployLiquidator();
         dssDeploy.deployShutdown(address(gov), address(0x0), 10);
-        dssDeploy.deployPause(0, authority);
+        dssDeploy.deployPause(0, address(authority));
 
         vat = dssDeploy.vat();
         jug = dssDeploy.jug();
@@ -314,7 +325,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
         end = dssDeploy.end();
         esm = dssDeploy.esm();
         pause = dssDeploy.pause();
-        authority.setRootUser(address(pause.proxy()), true);
+        authority.permit(address(this), address(pause), bytes4(keccak256("plot(address,bytes32,bytes,uint256)")));
 
         weth = new WETH();
         ethJoin = new GemJoin(address(vat), "ETH", address(weth));
@@ -342,8 +353,8 @@ contract DssDeployTestBase is DSTest, ProxyActions {
         (,, spot,,) = vat.ilks("COL");
         assertEq(spot, 45 * ONE * ONE / 1100000000 ether);
 
-        DSGuard(address(gov.authority())).permit(address(flop), address(gov), bytes4(keccak256("mint(address,uint256)")));
-        DSGuard(address(gov.authority())).permit(address(flap), address(gov), bytes4(keccak256("burn(address,uint256)")));
+        MockGuard(address(gov.authority())).permit(address(flop), address(gov), bytes4(keccak256("mint(address,uint256)")));
+        MockGuard(address(gov.authority())).permit(address(flap), address(gov), bytes4(keccak256("burn(address,uint256)")));
 
         gov.mint(100 ether);
     }

@@ -6,7 +6,7 @@
 	url = https://github.com/dapphub/ds-auth.git
 [submodule "lib/ds-pause"]
 	path = lib/ds-pause
-	url = https://github.com/dapphub/ds-pause
+	url = https://github.com/makerdao/ds-pause
 [submodule "lib/dss"]
 	path = lib/dss
 	url = https://github.com/makerdao/dss

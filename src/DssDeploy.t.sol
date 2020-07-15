@@ -337,7 +337,6 @@ contract DssDeployTest is DssDeployTestBase {
         uint prevGovSupply = gov.totalSupply();
         user1.doDeal(address(flop), batchId);
         assertEq(gov.totalSupply(), prevGovSupply + 0.16 ether);
-        vow.kiss(rad(20 ether));
         assertEq(vat.dai(address(vow)), 0);
         assertEq(vat.sin(address(vow)) - vow.Sin() - vow.Ash(), 0);
         assertEq(vat.sin(address(vow)), 0);

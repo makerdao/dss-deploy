@@ -1,4 +1,4 @@
-pragma solidity ^0.5.12;
+pragma solidity >=0.5.12;
 
 contract REP {
     function add(uint x, uint y) internal pure returns (uint z) {

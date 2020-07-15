@@ -432,10 +432,10 @@ contract AuthGemJoin is LibNote {
 // For a token that needs restriction on the sources which are able to execute join function,
 // has a lower precision than 18 and it has decimals (like USDC through PSM)
 
-contract GemLikeAuth2 {
-    function decimals() public view returns (uint);
-    function transfer(address,uint) public returns (bool);
-    function transferFrom(address,address,uint) public returns (bool);
+interface GemLikeAuth2 {
+    function decimals() external view returns (uint);
+    function transfer(address,uint) external returns (bool);
+    function transferFrom(address,address,uint) external returns (bool);
 }
 
 contract AuthGemJoin2 is LibNote {

@@ -15,12 +15,12 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity ^0.5.12;
+pragma solidity >=0.5.12;
 
 import "dss/lib.sol";
 
-contract VatLike {
-    function slip(bytes32,address,int) public;
+interface VatLike {
+    function slip(bytes32,address,int) external;
 }
 
 // GemJoin2
@@ -28,12 +28,12 @@ contract VatLike {
 // For a token that does not return a bool on transfer or transferFrom (like OMG)
 // This is one way of doing it. Check the balances before and after calling a transfer
 
-contract GemLike2 {
-    function decimals() public view returns (uint);
-    function transfer(address,uint) public;
-    function transferFrom(address,address,uint) public;
-    function balanceOf(address) public view returns (uint);
-    function allowance(address,address) public view returns (uint);
+interface GemLike2 {
+    function decimals() external view returns (uint);
+    function transfer(address,uint) external;
+    function transferFrom(address,address,uint) external;
+    function balanceOf(address) external view returns (uint);
+    function allowance(address,address) external view returns (uint);
 }
 
 contract GemJoin2 is LibNote {
@@ -102,9 +102,9 @@ contract GemJoin2 is LibNote {
 // GemJoin3
 // For a token that has a lower precision than 18 and doesn't have decimals field in place (like DGD)
 
-contract GemLike3 {
-    function transfer(address,uint) public returns (bool);
-    function transferFrom(address,address,uint) public returns (bool);
+interface GemLike3 {
+    function transfer(address,uint) external returns (bool);
+    function transferFrom(address,address,uint) external returns (bool);
 }
 
 contract GemJoin3 is LibNote {
@@ -182,10 +182,10 @@ contract GemJoin3 is LibNote {
 // gem to it, and then call `GemJoin4.join`, which transfer the gems from the
 // bag to the adapter.
 
-contract GemLike4 {
-    function decimals() public view returns (uint);
-    function balanceOf(address) public returns (uint256);
-    function transfer(address, uint256) public returns (bool);
+interface GemLike4 {
+    function decimals() external view returns (uint);
+    function balanceOf(address) external returns (uint256);
+    function transfer(address, uint256) external returns (bool);
 }
 
 contract GemBag {
@@ -265,10 +265,10 @@ contract GemJoin4 is LibNote {
 // GemJoin5
 // For a token that has a lower precision than 18 and it has decimals (like USDC)
 
-contract GemLike5 {
-    function decimals() public view returns (uint8);
-    function transfer(address,uint) public returns (bool);
-    function transferFrom(address,address,uint) public returns (bool);
+interface GemLike5 {
+    function decimals() external view returns (uint8);
+    function transfer(address,uint) external returns (bool);
+    function transferFrom(address,address,uint) external returns (bool);
 }
 
 contract GemJoin5 is LibNote {
@@ -323,12 +323,12 @@ contract GemJoin5 is LibNote {
 //  If the implementation behind the proxy is changed, this prevents joins
 //   and exits until the implementation is reviewed and approved by governance.
 
-contract GemLike6 {
-    function decimals() public view returns (uint);
-    function balanceOf(address) public returns (uint256);
-    function transfer(address, uint256) public returns (bool);
-    function transferFrom(address,address,uint) public returns (bool);
-    function implementation() public view returns (address);
+interface GemLike6 {
+    function decimals() external view returns (uint);
+    function balanceOf(address) external returns (uint256);
+    function transfer(address, uint256) external returns (bool);
+    function transferFrom(address,address,uint) external returns (bool);
+    function implementation() external view returns (address);
 }
 
 contract GemJoin6 is LibNote {
@@ -382,10 +382,10 @@ contract GemJoin6 is LibNote {
 // AuthGemJoin
 // For a token that needs restriction on the sources which are able to execute the join function (like SAI through Migration contract)
 
-contract GemLike {
-    function decimals() public view returns (uint);
-    function transfer(address,uint) public returns (bool);
-    function transferFrom(address,address,uint) public returns (bool);
+interface GemLike {
+    function decimals() external view returns (uint);
+    function transfer(address,uint) external returns (bool);
+    function transferFrom(address,address,uint) external returns (bool);
 }
 
 contract AuthGemJoin is LibNote {

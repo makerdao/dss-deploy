@@ -16,67 +16,67 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-pragma solidity ^0.5.12;
+pragma solidity >=0.5.12;
 
-contract Setter {
-    function file(bytes32, address) public;
-    function file(bytes32, uint) public;
-    function file(bytes32, bytes32, uint) public;
-    function file(bytes32, bytes32, address) public;
-    function rely(address) public;
-    function deny(address) public;
-    function init(bytes32) public;
-    function drip() public;
-    function drip(bytes32) public;
+interface SetterLike {
+    function file(bytes32, address) external;
+    function file(bytes32, uint) external;
+    function file(bytes32, bytes32, uint) external;
+    function file(bytes32, bytes32, address) external;
+    function rely(address) external;
+    function deny(address) external;
+    function init(bytes32) external;
+    function drip() external;
+    function drip(bytes32) external;
 }
 
-contract EndLike {
-    function cage() public;
-    function cage(bytes32) public;
+interface EndLike {
+    function cage() external;
+    function cage(bytes32) external;
 }
 
-contract PauseLike {
-    function setAuthority(address) public;
-    function setDelay(uint) public;
+interface PauseLike {
+    function setAuthority(address) external;
+    function setDelay(uint) external;
 }
 
 contract GovActions {
     function file(address who, bytes32 what, address data) public {
-        Setter(who).file(what, data);
+        SetterLike(who).file(what, data);
     }
 
     function file(address who, bytes32 what, uint data) public {
-        Setter(who).file(what, data);
+        SetterLike(who).file(what, data);
     }
 
     function file(address who, bytes32 ilk, bytes32 what, uint data) public {
-        Setter(who).file(ilk, what, data);
+        SetterLike(who).file(ilk, what, data);
     }
 
     function file(address who, bytes32 ilk, bytes32 what, address data) public {
-        Setter(who).file(ilk, what, data);
+        SetterLike(who).file(ilk, what, data);
     }
 
     function dripAndFile(address who, bytes32 what, uint data) public {
-        Setter(who).drip();
-        Setter(who).file(what, data);
+        SetterLike(who).drip();
+        SetterLike(who).file(what, data);
     }
 
     function dripAndFile(address who, bytes32 ilk, bytes32 what, uint data) public {
-        Setter(who).drip(ilk);
-        Setter(who).file(ilk, what, data);
+        SetterLike(who).drip(ilk);
+        SetterLike(who).file(ilk, what, data);
     }
 
     function rely(address who, address to) public {
-        Setter(who).rely(to);
+        SetterLike(who).rely(to);
     }
 
     function deny(address who, address to) public {
-        Setter(who).deny(to);
+        SetterLike(who).deny(to);
     }
 
     function init(address who, bytes32 ilk) public {
-        Setter(who).init(ilk);
+        SetterLike(who).init(ilk);
     }
 
     function cage(address end) public {

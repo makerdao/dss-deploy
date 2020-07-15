@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-pragma solidity ^0.5.12;
+pragma solidity >=0.5.12;
 
 import {DSAuth, DSAuthority} from "ds-auth/auth.sol";
 import {DSPause} from "ds-pause/pause.sol";
@@ -136,7 +136,7 @@ contract ESMFab {
 
 contract PauseFab {
     function newPause(uint delay, address owner, address authority) public returns(DSPause pause) {
-        pause = new DSPause(delay, owner, DSAuthority(authority));
+        pause = new DSPause(delay, owner, authority);
     }
 }
 

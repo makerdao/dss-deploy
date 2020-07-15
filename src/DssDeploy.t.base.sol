@@ -1,4 +1,4 @@
-pragma solidity ^0.5.12;
+pragma solidity >=0.5.12;
 
 import {DSTest} from "ds-test/test.sol";
 import {DSToken} from "ds-token/token.sol";
@@ -8,34 +8,21 @@ import {GemJoin} from "dss/join.sol";
 import "./DssDeploy.sol";
 import {GovActions} from "./govActions.sol";
 
-contract Hevm {
-    function warp(uint256) public;
+interface Hevm {
+    function warp(uint256) external;
 }
 
-contract AuctionLike {
-    function tend(uint, uint, uint) public;
-    function dent(uint, uint, uint) public;
-    function deal(uint) public;
+interface AuctionLike {
+    function tend(uint, uint, uint) external;
+    function dent(uint, uint, uint) external;
+    function deal(uint) external;
+}
+
+interface HopeLike {
+    function hope(address guy) external;
 }
 
 contract WETH is DSToken("WETH") {
-    function() external payable {
-        deposit();
-    }
-
-    function deposit() public payable {
-        _balances[msg.sender] += msg.value;
-    }
-
-    function withdraw(uint256 wad) public {
-        require(_balances[msg.sender] >= wad, "");
-        _balances[msg.sender] -= wad;
-        msg.sender.transfer(wad);
-    }
-}
-
-contract HopeLike {
-    function hope(address guy) public;
 }
 
 contract FakeUser {
@@ -51,8 +38,7 @@ contract FakeUser {
         DaiJoin(obj).exit(guy, wad);
     }
 
-    function doEthJoin(address payable obj, address gem, address urn, uint wad) public {
-        WETH(obj).deposit.value(wad)();
+    function doWethJoin(address obj, address gem, address urn, uint wad) public {
         WETH(obj).approve(address(gem), uint(-1));
         GemJoin(gem).join(urn, wad);
     }
@@ -88,9 +74,6 @@ contract FakeUser {
     function doESMJoin(address gem, address esm, uint256 wad) public {
         DSToken(gem).approve(esm, uint256(-1));
         ESM(esm).join(wad);
-    }
-
-    function() external payable {
     }
 }
 
@@ -292,8 +275,6 @@ contract DssDeployTestBase is DSTest, ProxyActions {
 
         user1 = new FakeUser();
         user2 = new FakeUser();
-        address(user1).transfer(100 ether);
-        address(user2).transfer(100 ether);
 
         hevm = Hevm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
         hevm.warp(0);
@@ -362,8 +343,5 @@ contract DssDeployTestBase is DSTest, ProxyActions {
     function deploy() public {
         deployKeepAuth();
         dssDeploy.releaseAuth();
-    }
-
-    function() external payable {
     }
 }

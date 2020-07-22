@@ -856,6 +856,26 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(knc.balanceOf(address(kncJoin)), 6 ether);
         assertEq(vat.gem("KNC", address(this)), 6 ether);
         }
+
+        {
+        MANA mana = new MANA(100 ether);
+        GemJoin manaJoin = new GemJoin(address(vat), "MANA", address(mana));
+        assertEq(manaJoin.dec(), 18);
+
+        dssDeploy.deployCollateral("MANA", address(manaJoin), address(pip));
+
+        mana.approve(address(manaJoin), uint(-1));
+        assertEq(mana.balanceOf(address(this)), 100 ether);
+        assertEq(mana.balanceOf(address(manaJoin)), 0);
+        assertEq(vat.gem("MANA", address(this)), 0);
+        manaJoin.join(address(this), 10 ether);
+        assertEq(mana.balanceOf(address(manaJoin)), 10 ether);
+        assertEq(vat.gem("MANA", address(this)), 10 ether);
+        manaJoin.exit(address(this), 4 ether);
+        assertEq(mana.balanceOf(address(this)), 94 ether);
+        assertEq(mana.balanceOf(address(manaJoin)), 6 ether);
+        assertEq(vat.gem("MANA", address(this)), 6 ether);
+        }
     }
 
     function testFailGemJoin6Join() public {

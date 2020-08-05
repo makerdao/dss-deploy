@@ -1049,6 +1049,21 @@ contract DssDeployTest is DssDeployTestBase {
         tusdJoin.join(address(this), 10);
     }
 
+    function testFailJoinAfterCageGemJoin7() public {
+        deployKeepAuth();
+        DSValue pip = new DSValue();
+
+        USDT usdt = new USDT(100 * 10 ** 6);
+        GemJoin7 usdtJoin = new GemJoin7(address(vat), "USDT", address(usdt));
+
+        dssDeploy.deployCollateral("USDT", address(usdtJoin), address(pip));
+
+        usdt.approve(address(usdtJoin), uint(-1));
+        usdtJoin.join(address(this), 10);
+        usdtJoin.cage();
+        usdtJoin.join(address(this), 10);
+    }
+
     function testFailJoinAfterCageAuthGemJoin() public {
         deployKeepAuth();
         DSValue pip = new DSValue();

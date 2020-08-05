@@ -928,7 +928,7 @@ contract DssDeployTest is DssDeployTestBase {
         DSValue pip = new DSValue();
         USDT usdt = new USDT(100 * 10 ** 6);
         GemJoin7 usdtJoin = new GemJoin7(address(vat), "USDT", address(usdt));
-        dssDeploy.deployCollateral("TUSD", address(usdtJoin), address(pip));
+        dssDeploy.deployCollateral("USDT", address(usdtJoin), address(pip));
         usdt.approve(address(usdtJoin), uint(-1));
         // Fail here
         usdtJoin.join(address(this), 10 ether);
@@ -938,7 +938,7 @@ contract DssDeployTest is DssDeployTestBase {
         DSValue pip = new DSValue();
         USDT usdt = new USDT(100 * 10 ** 6);
         GemJoin7 usdtJoin = new GemJoin7(address(vat), "USDT", address(usdt));
-        dssDeploy.deployCollateral("TUSD", address(usdtJoin), address(pip));
+        dssDeploy.deployCollateral("USDT", address(usdtJoin), address(pip));
         usdt.approve(address(usdtJoin), uint(-1));
         usdtJoin.join(address(this), 10 * 10 ** 6);
         // Fail here

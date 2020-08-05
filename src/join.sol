@@ -429,21 +429,13 @@ contract AuthGemJoin is LibNote {
 }
 
 interface GemLike7 {
-    // matches ERC20 spec
     function decimals() external view returns (uint);
-    // matches ERC20 spec
     function transfer(address,uint) external;
-    // matches ERC20 spec
     function transferFrom(address,address,uint) external;
-    // USDT uses balanceOf() constant
     function balanceOf(address) external view returns (uint);
-    // USDT uses allowance() constant
     function allowance(address,address) external view returns (uint);
-    // doesn't match ERC20 spec
     function upgradedAddress() external view returns (address);
-    // doesn't match ERC20 spec
     function deprecated() external view returns (bool);
-    // doesn't match ERC20 spec
     function setImplementation(address,uint) external;
 }
 
@@ -469,7 +461,7 @@ contract GemJoin7 is LibNote {
         live = 1;
         vat = VatLike(vat_);
         ilk = ilk_;
-        setImplementation(address(gem), 1);
+        setImplementation(address(gem.upgradedAddress()), 1);
     }
 
     function cage() external note auth {
@@ -490,13 +482,7 @@ contract GemJoin7 is LibNote {
         uint wad18 = mul(wad, 10 ** (18 - dec));
         require(int(wad18) >= 0, "GemJoin7/overflow");
 
-        // implementation check
-        // tether uses a `deprecated` boolean; if deprecated is true, calls are forwarded to
-        // an `upgradedAddress` address. so check if deprecated, if so, require upgradedAddress
-        // to be approved by governance
-        if (gem.deprecated()) {
-            require(implementations[gem.upgradedAddress()] == 1, "GemJoin7/implementation-invalid");
-        }
+        require(implementations[gem.upgradedAddress()] == 1, "GemJoin7/implementation-invalid");
 
         vat.slip(ilk, urn, int(wad18));
         uint256 prevBalance = gem.balanceOf(msg.sender);
@@ -515,15 +501,9 @@ contract GemJoin7 is LibNote {
     function exit(address guy, uint wad) public note {
         // mul does overflow check so require(wad < 2 ** 255) not needed
         uint wad18 = mul(wad, 10 ** (18 - dec));
-        require(int(wad18) >= 0, "GemJoin5/overflow");
+        require(int(wad18) >= 0, "GemJoin7/overflow");
 
-        // implementation check
-        // tether uses a `deprecated` boolean; if deprecated is true, calls are forwarded to
-        // an `upgradedAddress` address. so check if deprecated, if so, require upgradedAddress
-        // to be approved by governance
-        if (gem.deprecated()) {
-            require(implementations[gem.upgradedAddress()] == 1, "GemJoin7/implementation-invalid");
-        }
+        require(implementations[gem.upgradedAddress()] == 1, "GemJoin7/implementation-invalid");
 
         vat.slip(ilk, msg.sender, -int(wad18));
         uint256 prevBalance = gem.balanceOf(address(this));

@@ -699,9 +699,11 @@ library SafeMath {
 contract USDT {
     using SafeMath for uint;
 
-    string public name = "Tether";
-    string public symbol = "USDT";
-    uint public decimals = 6;
+    string  public name = "Tether";
+    string  public symbol = "USDT";
+    uint    public decimals = 6;
+    address public upgradedAddress;
+    bool    public deprecated;
 
     mapping (address => mapping (address => uint)) public allowed;
     mapping (address => uint) public balances;
@@ -714,6 +716,12 @@ contract USDT {
 
     event Approval(address indexed owner, address indexed spender, uint value);
     event Transfer(address indexed from, address indexed to, uint value);
+    event Deprecate(address newAddress);
+
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
 
     modifier onlyPayloadSize(uint size) {
         require(!(msg.data.length < size + 4));
@@ -776,5 +784,11 @@ contract USDT {
 
     function allowance(address _owner, address _spender) public view returns (uint remaining) {
         return allowed[_owner][_spender];
+    }
+
+    function deprecate(address _upgradedAddress) public onlyOwner {
+        deprecated = true;
+        upgradedAddress = _upgradedAddress;
+        emit Deprecate(_upgradedAddress);
     }
 }

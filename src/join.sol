@@ -427,3 +427,81 @@ contract AuthGemJoin is LibNote {
         require(gem.transfer(usr, wad), "AuthGemJoin/failed-transfer");
     }
 }
+
+interface GemLike7 {
+    // matches USDT spec
+    function decimals() external view returns (uint);
+    // matches USDT spec
+    function transfer(address,uint) external;
+    // matches USDT spec
+    function transferFrom(address,address,uint) external;
+    // USDT uses balanceOf() constant
+    function balanceOf(address) external view returns (uint);
+    // USDT uses allowance() constant
+    function allowance(address,address) external view returns (uint);
+}
+
+contract GemJoin7 is LibNote {
+    mapping (address => uint) public wards;
+    function rely(address usr) external note auth { wards[usr] = 1; }
+    function deny(address usr) external note auth { wards[usr] = 0; }
+    modifier auth { require(wards[msg.sender] == 1); _; }
+
+    VatLike  public vat;
+    bytes32  public ilk;
+    GemLike7 public gem;
+    uint     public dec;
+    uint     public live; // Access flag
+
+    constructor(address vat_, bytes32 ilk_, address gem_) public {
+        gem = GemLike7(gem_);
+        dec = gem.decimals();
+        require(dec < 18, "GemJoin7/decimals-18-or-higher");
+        wards[msg.sender] = 1;
+        live = 1;
+        vat = VatLike(vat_);
+        ilk = ilk_;
+    }
+
+    function cage() external note auth {
+        live = 0;
+    }
+
+    function mul(uint x, uint y) internal pure returns (uint z) {
+        require(y == 0 || (z = x * y) / y == x, "GemJoin7/overflow");
+    }
+
+    function join(address urn, uint wad) public note {
+        require(live == 1, "GemJoin7/not-live");
+        uint wad18 = mul(wad, 10 ** (18 - dec));
+        require(int(wad18) >= 0, "GemJoin7/overflow");
+        vat.slip(ilk, urn, int(wad18));
+        uint256 prevBalance = gem.balanceOf(msg.sender);
+
+        require(prevBalance >= wad, "GemJoin7/no-funds");
+        require(gem.allowance(msg.sender, address(this)) >= wad, "GemJoin7/no-allowance");
+
+        (bool ok,) = address(gem).call(
+            abi.encodeWithSignature("transferFrom(address,address,uint256)", msg.sender, address(this), wad)
+        );
+        require(ok, "GemJoin7/failed-transfer");
+
+        require(prevBalance - wad == gem.balanceOf(msg.sender), "GemJoin7/failed-transfer");
+    }
+
+    function exit(address guy, uint wad) public note {
+        uint wad18 = mul(wad, 10 ** (18 - dec));
+        require(int(wad18) >= 0, "GemJoin5/overflow");
+        vat.slip(ilk, msg.sender, -int(wad18));
+
+        uint256 prevBalance = gem.balanceOf(address(this));
+        require(prevBalance >= wad, "GemJoin7/no-funds");
+
+        (bool ok,) = address(gem).call(
+            abi.encodeWithSignature("transfer(address,uint256)", guy, wad)
+        );
+        require(ok, "GemJoin7/failed-transfer");
+
+        require(prevBalance - wad == gem.balanceOf(address(this)), "GemJoin7/failed-transfer");
+    }
+}

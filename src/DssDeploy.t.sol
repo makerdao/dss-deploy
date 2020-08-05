@@ -876,6 +876,26 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(mana.balanceOf(address(manaJoin)), 6 ether);
         assertEq(vat.gem("MANA", address(this)), 6 ether);
         }
+
+        {
+        USDT usdt = new USDT(100 * 10 ** 6);
+        GemJoin7 usdtJoin = new GemJoin7(address(vat), "USDT", address(usdt));
+        assertEq(usdtJoin.dec(), 6);
+
+        dssDeploy.deployCollateral("USDT", address(usdtJoin), address(pip));
+
+        usdt.approve(address(usdtJoin), uint(-1));
+        assertEq(usdt.balanceOf(address(this)), 100 * 10 ** 6);
+        assertEq(usdt.balanceOf(address(usdtJoin)), 0);
+        assertEq(vat.gem("USDT", address(this)), 0);
+        usdtJoin.join(address(this), 10 * 10 ** 6);
+        assertEq(usdt.balanceOf(address(usdtJoin)), 10 * 10 ** 6);
+        assertEq(vat.gem("USDT", address(this)), 10 ether);
+        usdtJoin.exit(address(this), 4 * 10 ** 6);
+        assertEq(usdt.balanceOf(address(this)), 94 * 10 ** 6);
+        assertEq(usdt.balanceOf(address(usdtJoin)), 6 * 10 ** 6);
+        assertEq(vat.gem("USDT", address(this)), 6 ether);
+        }
     }
 
     function testFailGemJoin6Join() public {
@@ -902,6 +922,27 @@ contract DssDeployTest is DssDeployTestBase {
         tusd.setImplementation(0xCB9a11afDC6bDb92E4A6235959455F28758b34bA);
         // Fail here
         tusdJoin.exit(address(this), 10 ether);
+    }
+
+    function testFailGemJoin7JoinWad() public {
+        DSValue pip = new DSValue();
+        USDT usdt = new USDT(100 * 10 ** 6);
+        GemJoin7 usdtJoin = new GemJoin7(address(vat), "USDT", address(usdt));
+        dssDeploy.deployCollateral("TUSD", address(usdtJoin), address(pip));
+        usdt.approve(address(usdtJoin), uint(-1));
+        // Fail here
+        usdtJoin.join(address(this), 10 ether);
+    }
+
+    function testFailGemJoin7ExitWad() public {
+        DSValue pip = new DSValue();
+        USDT usdt = new USDT(100 * 10 ** 6);
+        GemJoin7 usdtJoin = new GemJoin7(address(vat), "USDT", address(usdt));
+        dssDeploy.deployCollateral("TUSD", address(usdtJoin), address(pip));
+        usdt.approve(address(usdtJoin), uint(-1));
+        usdtJoin.join(address(this), 10 * 10 ** 6);
+        // Fail here
+        usdtJoin.exit(address(this), 10 ether);
     }
 
     function testFailJoinAfterCageGemJoin2() public {

@@ -666,3 +666,115 @@ contract MANA {
         return true;
     }
 }
+ 
+library SafeMath {
+    function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+        if (a == 0) {
+            return 0;
+        }
+        uint256 c = a * b;
+        assert(c / a == b);
+        return c;
+    }
+
+    function div(uint256 a, uint256 b) internal pure returns (uint256) {
+        // assert(b > 0); // Solidity automatically throws when dividing by 0
+        uint256 c = a / b;
+        // assert(a == b * c + a % b); // There is no case in which this doesn't hold
+        return c;
+    }
+
+    function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+        assert(b <= a);
+        return a - b;
+    }
+
+    function add(uint256 a, uint256 b) internal pure returns (uint256) {
+        uint256 c = a + b;
+        assert(c >= a);
+        return c;
+    }
+}
+
+contract USDT {
+    using SafeMath for uint;
+
+    string public name = "Tether";
+    string public symbol = "USDT";
+    uint public decimals = 6;
+
+    mapping (address => mapping (address => uint)) public allowed;
+    mapping (address => uint) public balances;
+
+    uint public constant MAX_UINT = 2**256 - 1;
+
+    address public owner;
+    uint public basisPointsRate = 0;
+    uint public maximumFee = 0;
+
+    event Approval(address indexed owner, address indexed spender, uint value);
+    event Transfer(address indexed from, address indexed to, uint value);
+
+    modifier onlyPayloadSize(uint size) {
+        require(!(msg.data.length < size + 4));
+        _;
+    }
+
+    constructor(uint _initialSupply) public {
+        balances[msg.sender] = _initialSupply;
+    }
+
+    function balanceOf(address _owner) public view returns (uint balance) {
+        return balances[_owner];
+    }
+
+    function transfer(address _to, uint _value) public onlyPayloadSize(2 * 32) {
+        uint fee = (_value.mul(basisPointsRate)).div(10000);
+        if (fee > maximumFee) {
+            fee = maximumFee;
+        }
+        uint sendAmount = _value.sub(fee);
+        balances[msg.sender] = balances[msg.sender].sub(_value);
+        balances[_to] = balances[_to].add(sendAmount);
+        if (fee > 0) {
+            balances[owner] = balances[owner].add(fee);
+            emit Transfer(msg.sender, owner, fee);
+        }
+        emit Transfer(msg.sender, _to, sendAmount);
+    }
+
+    function transferFrom(address _from, address _to, uint _value) public onlyPayloadSize(3 * 32) {
+        uint _allowance = allowed[_from][msg.sender];
+        // Check is not needed because sub(_allowance, _value) will already throw if this condition is not met
+        // if (_value > _allowance) throw;
+        uint fee = (_value.mul(basisPointsRate)).div(10000);
+        if (fee > maximumFee) {
+            fee = maximumFee;
+        }
+        if (_allowance < MAX_UINT) {
+            allowed[_from][msg.sender] = _allowance.sub(_value);
+        }
+        uint sendAmount = _value.sub(fee);
+        balances[_from] = balances[_from].sub(_value);
+        balances[_to] = balances[_to].add(sendAmount);
+        if (fee > 0) {
+            balances[owner] = balances[owner].add(fee);
+            emit Transfer(_from, owner, fee);
+        }
+        emit Transfer(_from, _to, sendAmount);
+    }
+
+    function approve(address _spender, uint _value) public onlyPayloadSize(2 * 32) {
+        // To change the approve amount you first have to reduce the addresses`
+        // allowance to zero by calling `approve(_spender, 0)` if it is not
+        // already 0 to mitigate the race condition described here:
+        // https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
+        require(!((_value != 0) && (allowed[msg.sender][_spender] != 0)));
+        allowed[msg.sender][_spender] = _value;
+        emit Approval(msg.sender, _spender, _value);
+    }
+
+    function allowance(address _owner, address _spender) public view returns (uint remaining) {
+        return allowed[_owner][_spender];
+    }
+}

@@ -954,7 +954,7 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(usdt.balanceOf(address(this)), 100 * 10 ** 6);
         assertEq(usdt.balanceOf(address(usdtJoin)), 0);
         assertEq(vat.gem("USDT", address(this)), 0);
-        usdt.deprecate(0xCB9a11afDC6bDb92E4A6235959455F28758b34bA);
+        usdt.deprecate(address(0));
         // Fail here
         usdtJoin.join(address(this), 10 * 10 ** 6);
     }
@@ -966,7 +966,7 @@ contract DssDeployTest is DssDeployTestBase {
         dssDeploy.deployCollateral("USDT", address(usdtJoin), address(pip));
         usdt.approve(address(usdtJoin), uint(-1));
         usdtJoin.join(address(this), 10 * 10 ** 6);
-        usdt.deprecate(0xCB9a11afDC6bDb92E4A6235959455F28758b34bA);
+        usdt.deprecate(address(0));
         // Fail here
         usdtJoin.exit(address(this), 10 * 10 ** 6);
     }

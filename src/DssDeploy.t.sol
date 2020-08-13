@@ -205,7 +205,8 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testBite() public {
         deploy();
-        this.file(address(cat), "ETH", "lump", 1 ether); // 1 unit of collateral per batch
+        this.file(address(cat), "ETH", "lump", rad(200 ether)); // 200 DAI max per batch
+        this.file(address(cat), "box", rad(1000 ether)); // 1000 DAI max on auction
         this.file(address(cat), "ETH", "chop", ONE);
         weth.mint(1 ether);
         weth.approve(address(ethJoin), uint(-1));
@@ -226,7 +227,8 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testBitePartial() public {
         deploy();
-        this.file(address(cat), "ETH", "lump", 1 ether); // 1 unit of collateral per batch
+        this.file(address(cat), "ETH", "lump", rad(200 ether)); // 200 DAI max per batch
+        this.file(address(cat), "box", rad(1000 ether)); // 1000 DAI max on auction
         this.file(address(cat), "ETH", "chop", ONE);
         weth.mint(10 ether);
         weth.approve(address(ethJoin), uint(-1));
@@ -247,7 +249,8 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testFlip() public {
         deploy();
-        this.file(address(cat), "ETH", "lump", 1 ether); // 1 unit of collateral per batch
+        this.file(address(cat), "ETH", "lump", rad(200 ether)); // 200 DAI max per batch
+        this.file(address(cat), "box", rad(1000 ether)); // 1000 DAI max on auction
         this.file(address(cat), "ETH", "chop", ONE);
         weth.mint(1 ether);
         weth.approve(address(ethJoin), uint(-1));
@@ -285,7 +288,8 @@ contract DssDeployTest is DssDeployTestBase {
     }
 
     function _flop() internal returns (uint batchId) {
-        this.file(address(cat), "ETH", "lump", 1 ether); // 1 unit of collateral per batch
+        this.file(address(cat), "ETH", "lump", rad(200 ether)); // 200 DAI max per batch
+        this.file(address(cat), "box", rad(1000 ether)); // 1000 DAI max on auction
         this.file(address(cat), "ETH", "chop", ONE);
         weth.mint(1 ether);
         weth.approve(address(ethJoin), uint(-1));
@@ -387,7 +391,8 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testEnd() public {
         deploy();
-        this.file(address(cat), "ETH", "lump", 1 ether); // 1 unit of collateral per batch
+        this.file(address(cat), "ETH", "lump", rad(200 ether)); // 200 DAI max per batch
+        this.file(address(cat), "box", rad(1000 ether)); // 1000 DAI max on auction
         this.file(address(cat), "ETH", "chop", ONE);
         weth.mint(2 ether);
         weth.approve(address(ethJoin), uint(-1));

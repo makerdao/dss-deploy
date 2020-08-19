@@ -896,6 +896,28 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(usdt.balanceOf(address(usdtJoin)), 6 * 10 ** 6);
         assertEq(vat.gem("USDT", address(this)), 6 ether);
         }
+        {
+        PAXUSD paxusd = new PAXUSD();
+        GemJoin8 paxusdJoin = new GemJoin8(address(vat), "PAXUSD", address(paxusd));
+        assertEq(paxusdJoin.dec(), 18);
+
+        dssDeploy.deployCollateral("PAXUSD", address(paxusdJoin), address(pip));
+
+        paxusd.increaseSupply(100 ether);
+
+        paxusd.approve(address(paxusdJoin), uint(-1));
+        assertEq(paxusd.balanceOf(address(this)), 100 ether);
+        assertEq(paxusd.balanceOf(address(paxusdJoin)), 0);
+        assertEq(vat.gem("PAXUSD", address(this)), 0);
+        paxusdJoin.join(address(this), 10 ether);
+        assertEq(paxusd.balanceOf(address(paxusdJoin)), 10 ether);
+        assertEq(vat.gem("PAXUSD", address(this)), 10 ether);
+        paxusdJoin.exit(address(this), 4 ether);
+        assertEq(paxusd.balanceOf(address(this)), 94 ether);
+        assertEq(paxusd.balanceOf(address(paxusdJoin)), 6 ether);
+        assertEq(vat.gem("PAXUSD", address(this)), 6 ether);
+        }
+
     }
 
     function testFailGemJoin6Join() public {

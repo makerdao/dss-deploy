@@ -382,7 +382,7 @@ contract GemJoin6 is LibNote {
 // AuthGemJoin
 // For a token that needs restriction on the sources which are able to execute the join function (like SAI through Migration contract)
 
-interface GemLike {
+interface AuthGemLike {
     function decimals() external view returns (uint);
     function transfer(address,uint) external returns (bool);
     function transferFrom(address,address,uint) external returns (bool);
@@ -390,11 +390,11 @@ interface GemLike {
 }
 
 contract AuthGemJoin is LibNote {
-    VatLike public vat;
-    bytes32 public ilk;
-    GemLike public gem;
-    uint    public dec;
-    uint    public live;  // Access Flag
+    VatLike     public vat;
+    bytes32     public ilk;
+    AuthGemLike public gem;
+    uint        public dec;
+    uint        public live;  // Access Flag
 
     // --- Auth ---
     mapping (address => uint) public wards;
@@ -407,7 +407,7 @@ contract AuthGemJoin is LibNote {
         live = 1;
         vat = VatLike(vat_);
         ilk = ilk_;
-        gem = GemLike(gem_);
+        gem = AuthGemLike(gem_);
         dec = gem.decimals();
     }
 
@@ -429,14 +429,17 @@ contract AuthGemJoin is LibNote {
     }
 }
 
+// GemJoin7
+// For an upgradable token (like USDT)
+//  If the token is deprecated changing the implementation behind, this prevents joins
+//   and exits until the implementation is reviewed and approved by governance.
+
 interface GemLike7 {
     function decimals() external view returns (uint);
     function transfer(address,uint) external;
     function transferFrom(address,address,uint) external;
     function balanceOf(address) external view returns (uint);
-    function allowance(address,address) external view returns (uint);
     function upgradedAddress() external view returns (address);
-    function deprecated() external view returns (bool);
     function setImplementation(address,uint) external;
 }
 
@@ -496,44 +499,57 @@ contract GemJoin7 is LibNote {
     }
 }
 
+// GemJoin8
+// For a token that implements fees on transfer (like PAXUSD)
+
+interface GemLike8 {
+    function decimals() external view returns (uint);
+    function transfer(address,uint) external returns (bool);
+    function transferFrom(address,address,uint) external returns (bool);
+    function balanceOf(address) external view returns (uint);
+}
+
 contract GemJoin8 is LibNote {
     // --- Auth ---
     mapping (address => uint) public wards;
     function rely(address usr) external note auth { wards[usr] = 1; }
     function deny(address usr) external note auth { wards[usr] = 0; }
     modifier auth {
-        require(wards[msg.sender] == 1, "GemJoin/not-authorized");
+        require(wards[msg.sender] == 1, "GemJoin8/not-authorized");
         _;
     }
 
-    VatLike public vat;   // CDP Engine
-    bytes32 public ilk;   // Collateral Type
-    GemLike public gem;
-    uint    public dec;
-    uint    public live;  // Active Flag
+    VatLike  public vat;   // CDP Engine
+    bytes32  public ilk;   // Collateral Type
+    GemLike8 public gem;
+    uint     public dec;
+    uint     public live;  // Active Flag
 
     constructor(address vat_, bytes32 ilk_, address gem_) public {
         wards[msg.sender] = 1;
         live = 1;
         vat = VatLike(vat_);
         ilk = ilk_;
-        gem = GemLike(gem_);
+        gem = GemLike8(gem_);
         dec = gem.decimals();
+    }
+    function sub(uint x, uint y) internal pure returns (uint z) {
+        require((z = x - y) <= x);
     }
     function cage() external note auth {
         live = 0;
     }
     function join(address usr, uint wad) external note {
-        require(live == 1, "GemJoin/not-live");
-        require(int(wad) >= 0, "GemJoin/overflow");
+        require(live == 1, "GemJoin8/not-live");
         uint bal = gem.balanceOf(address(this));
-        require(gem.transferFrom(msg.sender, address(this), wad), "GemJoin/failed-transfer");
-        wad = gem.balanceOf(address(this)) - bal;
+        require(gem.transferFrom(msg.sender, address(this), wad), "GemJoin8/failed-transfer");
+        wad = sub(gem.balanceOf(address(this)), bal);
+        require(int(wad) >= 0, "GemJoin8/overflow");
         vat.slip(ilk, usr, int(wad));
     }
     function exit(address usr, uint wad) external note {
-        require(wad <= 2 ** 255, "GemJoin/overflow");
+        require(wad <= 2 ** 255, "GemJoin8/overflow");
         vat.slip(ilk, msg.sender, -int(wad));
-        require(gem.transfer(usr, wad), "GemJoin/failed-transfer");
+        require(gem.transfer(usr, wad), "GemJoin8/failed-transfer");
     }
 }

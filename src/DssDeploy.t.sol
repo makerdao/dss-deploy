@@ -898,7 +898,7 @@ contract DssDeployTest is DssDeployTestBase {
         }
     }
 
-    function testGemJoin6Join() public {
+    function testFailGemJoin6Join() public {
         deployKeepAuth();
         DSValue pip = new DSValue();
         TUSD tusd = new TUSD(100 ether);
@@ -910,7 +910,7 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(vat.gem("TUSD", address(this)), 0);
         tusd.setImplementation(0xCB9a11afDC6bDb92E4A6235959455F28758b34bA);
         // Fail here
-        // tusdJoin.join(address(this), 10 ether);
+        tusdJoin.join(address(this), 10 ether);
     }
 
     function testFailGemJoin6Exit() public {

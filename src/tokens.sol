@@ -718,20 +718,18 @@ contract USDT {
     event Transfer(address indexed from, address indexed to, uint value);
     event Deprecate(address newAddress);
 
-    modifier onlyOwner() {
-        require(msg.sender == owner);
-        _;
-    }
-
     modifier onlyPayloadSize(uint size) {
         require(!(msg.data.length < size + 4));
         _;
     }
 
-    constructor(uint _initialSupply, uint _basisPt, uint _maxFee) public {
+    constructor(uint _initialSupply) public {
         balances[msg.sender] = _initialSupply;
-        basisPointsRate = _basisPt;
-        maximumFee = _maxFee;
+    }
+
+    function changeFees(uint _basisPointsRate, uint _maximumFee) public {
+        basisPointsRate = _basisPointsRate;
+        maximumFee = _maximumFee;
     }
 
     function balanceOf(address _owner) public view returns (uint balance) {
@@ -788,7 +786,7 @@ contract USDT {
         return allowed[_owner][_spender];
     }
 
-    function deprecate(address _upgradedAddress) public onlyOwner {
+    function deprecate(address _upgradedAddress) public {
         deprecated = true;
         upgradedAddress = _upgradedAddress;
         emit Deprecate(_upgradedAddress);

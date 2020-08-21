@@ -438,6 +438,7 @@ interface GemLike7 {
     function upgradedAddress() external view returns (address);
     function deprecated() external view returns (bool);
     function setImplementation(address,uint) external;
+    function adjustFee(uint) external;
 }
 
 contract GemJoin7 is LibNote {

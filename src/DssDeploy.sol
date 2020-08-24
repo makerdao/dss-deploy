@@ -97,8 +97,8 @@ contract FlopFab {
 }
 
 contract FlipFab {
-    function newFlip(address vat, bytes32 ilk) public returns (Flipper flip) {
-        flip = new Flipper(vat, ilk);
+    function newFlip(address vat, address cat, bytes32 ilk) public returns (Flipper flip) {
+        flip = new Flipper(vat, cat, ilk);
         flip.rely(msg.sender);
         flip.deny(address(this));
     }
@@ -329,7 +329,7 @@ contract DssDeploy is DSAuth {
         require(address(pause) != address(0), "Missing previous step");
 
         // Deploy
-        ilks[ilk].flip = flipFab.newFlip(address(vat), ilk);
+        ilks[ilk].flip = flipFab.newFlip(address(vat), address(cat), ilk);
         ilks[ilk].join = join;
         Spotter(spotter).file(ilk, "pip", address(pip)); // Set pip
 
@@ -340,6 +340,7 @@ contract DssDeploy is DSAuth {
 
         // Internal auth
         vat.rely(join);
+        cat.rely(address(ilks[ilk].flip));
         ilks[ilk].flip.rely(address(cat));
         ilks[ilk].flip.rely(address(end));
         ilks[ilk].flip.rely(address(pause.proxy()));

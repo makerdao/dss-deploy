@@ -986,16 +986,16 @@ contract DssDeployTest is DssDeployTestBase {
 
         // auxiliary function added, not in tether source code
         // basisPointsRate = 1, maximumFee = 1
-        usdt.changeFees(1, 1);
+        usdt.changeFees(100, 100);
 
         usdt.approve(address(usdtJoin), uint(-1));
         usdtJoin.join(address(this), 1 * 10 ** 6);
         uint joinbal = vat.gem("USDT", address(this));
 
-        assertEq(joinbal, 999999 * 10 ** 12);
-        usdtJoin.exit(address(this), 999999); // exit in 10 ** 6
+        assertEq(joinbal, 999900 * 10 ** 12);
+        usdtJoin.exit(address(this), 999900); // exit in 10 ** 6
         uint exitbal = usdt.balanceOf(address(this));
-        assertEq(exitbal, 99999998);
+        assertEq(exitbal, 99999800);
     }
 
 

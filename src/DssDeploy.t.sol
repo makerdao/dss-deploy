@@ -988,8 +988,6 @@ contract DssDeployTest is DssDeployTestBase {
         // basisPointsRate = 1, maximumFee = 1
         usdt.changeFees(1, 1);
 
-        uint initbal = usdt.balanceOf(address(this));
-
         usdt.approve(address(usdtJoin), uint(-1));
         usdtJoin.join(address(this), 1 * 10 ** 6);
         uint joinbal = vat.gem("USDT", address(this));

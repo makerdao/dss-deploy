@@ -248,7 +248,9 @@ contract DssDeployTestBase is DSTest, ProxyActions {
     FakeUser user2;
 
     // --- Math ---
-    uint256 constant ONE = 10 ** 27;
+    uint256 constant WAD = 10 ** 18;
+    uint256 constant RAY = 10 ** 27;
+    uint256 constant RAD = 10 ** 45;
     function mul(uint x, uint y) internal pure returns (uint z) {
         require(y == 0 || (z = x * y) / y == x);
     }
@@ -350,9 +352,9 @@ contract DssDeployTestBase is DSTest, ProxyActions {
         spotter.poke("ETH");
         spotter.poke("COL");
         (,,uint spot,,) = vat.ilks("ETH");
-        assertEq(spot, 300 * ONE * ONE / 1500000000 ether);
+        assertEq(spot, 300 * RAY * RAY / 1500000000 ether);
         (,, spot,,) = vat.ilks("COL");
-        assertEq(spot, 45 * ONE * ONE / 1100000000 ether);
+        assertEq(spot, 45 * RAY * RAY / 1100000000 ether);
 
         MockGuard(address(gov.authority())).permit(address(flop), address(gov), bytes4(keccak256("mint(address,uint256)")));
         MockGuard(address(gov.authority())).permit(address(flap), address(gov), bytes4(keccak256("burn(address,uint256)")));

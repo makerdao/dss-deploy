@@ -94,7 +94,7 @@ contract DssDeployTest is DssDeployTestBase {
 
         vat.frob("ETH", address(this), address(this), address(this), 0.5 ether, 60 ether);
         assertEq(vat.gem("ETH", address(this)), 0.5 ether);
-        assertEq(vat.dai(address(this)), mul(ONE, 60 ether));
+        assertEq(vat.dai(address(this)), mul(RAY, 60 ether));
 
         vat.hope(address(daiJoin));
         daiJoin.exit(address(this), 60 ether);
@@ -161,7 +161,7 @@ contract DssDeployTest is DssDeployTestBase {
         daiJoin.join(address(this), 60 ether);
         assertEq(dai.balanceOf(address(this)), 0);
 
-        assertEq(vat.dai(address(this)), mul(ONE, 60 ether));
+        assertEq(vat.dai(address(this)), mul(RAY, 60 ether));
         vat.frob("ETH", address(this), address(this), address(this), 0 ether, -60 ether);
         assertEq(vat.dai(address(this)), 0);
     }
@@ -181,7 +181,7 @@ contract DssDeployTest is DssDeployTestBase {
         weth.approve(address(ethJoin), uint(-1));
         ethJoin.join(address(this), 100 ether);
 
-        this.file(address(vat), "ETH", "dust", mul(ONE, 20 ether));
+        this.file(address(vat), "ETH", "dust", mul(RAY, 20 ether));
         vat.frob("ETH", address(this), address(this), address(this), 100 ether, 19 ether);
     }
 
@@ -205,9 +205,9 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testBite() public {
         deploy();
-        this.file(address(cat), "ETH", "lump", rad(200 ether)); // 200 DAI max per batch
+        this.file(address(cat), "ETH", "dunk", rad(200 ether)); // 200 DAI max per batch
         this.file(address(cat), "box", rad(1000 ether)); // 1000 DAI max on auction
-        this.file(address(cat), "ETH", "chop", ONE);
+        this.file(address(cat), "ETH", "chop", WAD);
         weth.mint(1 ether);
         weth.approve(address(ethJoin), uint(-1));
         ethJoin.join(address(this), 1 ether);
@@ -227,9 +227,9 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testBitePartial() public {
         deploy();
-        this.file(address(cat), "ETH", "lump", rad(200 ether)); // 200 DAI max per batch
+        this.file(address(cat), "ETH", "dunk", rad(200 ether)); // 200 DAI max per batch
         this.file(address(cat), "box", rad(1000 ether)); // 1000 DAI max on auction
-        this.file(address(cat), "ETH", "chop", ONE);
+        this.file(address(cat), "ETH", "chop", WAD);
         weth.mint(10 ether);
         weth.approve(address(ethJoin), uint(-1));
         ethJoin.join(address(this), 10 ether);
@@ -249,9 +249,9 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testFlip() public {
         deploy();
-        this.file(address(cat), "ETH", "lump", rad(200 ether)); // 200 DAI max per batch
+        this.file(address(cat), "ETH", "dunk", rad(200 ether)); // 200 DAI max per batch
         this.file(address(cat), "box", rad(1000 ether)); // 1000 DAI max on auction
-        this.file(address(cat), "ETH", "chop", ONE);
+        this.file(address(cat), "ETH", "chop", WAD);
         weth.mint(1 ether);
         weth.approve(address(ethJoin), uint(-1));
         ethJoin.join(address(this), 1 ether);
@@ -288,9 +288,9 @@ contract DssDeployTest is DssDeployTestBase {
     }
 
     function _flop() internal returns (uint batchId) {
-        this.file(address(cat), "ETH", "lump", rad(200 ether)); // 200 DAI max per batch
+        this.file(address(cat), "ETH", "dunk", rad(200 ether)); // 200 DAI max per batch
         this.file(address(cat), "box", rad(1000 ether)); // 1000 DAI max on auction
-        this.file(address(cat), "ETH", "chop", ONE);
+        this.file(address(cat), "ETH", "chop", WAD);
         weth.mint(1 ether);
         weth.approve(address(ethJoin), uint(-1));
         ethJoin.join(address(this), 1 ether);
@@ -391,9 +391,9 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testEnd() public {
         deploy();
-        this.file(address(cat), "ETH", "lump", rad(200 ether)); // 200 DAI max per batch
+        this.file(address(cat), "ETH", "dunk", rad(200 ether)); // 200 DAI max per batch
         this.file(address(cat), "box", rad(1000 ether)); // 1000 DAI max on auction
-        this.file(address(cat), "ETH", "chop", ONE);
+        this.file(address(cat), "ETH", "chop", WAD);
         weth.mint(2 ether);
         weth.approve(address(ethJoin), uint(-1));
         ethJoin.join(address(this), 2 ether);
@@ -521,14 +521,14 @@ contract DssDeployTest is DssDeployTestBase {
         weth.approve(address(ethJoin), uint(-1));
         ethJoin.join(address(this), 0.5 ether);
         vat.frob("ETH", address(this), address(this), address(this), 0.1 ether, 10 ether);
-        assertEq(vat.dai(address(this)), mul(10 ether, ONE));
+        assertEq(vat.dai(address(this)), mul(10 ether, RAY));
         vat.hope(address(pot));
         pot.join(10 ether);
         hevm.warp(now + 1);
         jug.drip("ETH");
         pot.drip();
         pot.exit(10 ether);
-        assertEq(vat.dai(address(this)), mul(10.5 ether, ONE));
+        assertEq(vat.dai(address(this)), mul(10.5 ether, RAY));
     }
 
     function testFork() public {
@@ -614,7 +614,7 @@ contract DssDeployTest is DssDeployTestBase {
         weth.approve(address(ethJoin), uint(-1));
         ethJoin.join(address(this), 100 ether);
 
-        this.file(address(vat), "ETH", "dust", mul(ONE, 20 ether));
+        this.file(address(vat), "ETH", "dust", mul(RAY, 20 ether));
         vat.frob("ETH", address(this), address(this), address(this), 100 ether, 60 ether);
 
         user1.doHope(address(vat), address(this));
@@ -627,7 +627,7 @@ contract DssDeployTest is DssDeployTestBase {
         weth.approve(address(ethJoin), uint(-1));
         ethJoin.join(address(this), 100 ether);
 
-        this.file(address(vat), "ETH", "dust", mul(ONE, 20 ether));
+        this.file(address(vat), "ETH", "dust", mul(RAY, 20 ether));
         vat.frob("ETH", address(this), address(this), address(this), 100 ether, 60 ether);
 
         user1.doHope(address(vat), address(this));

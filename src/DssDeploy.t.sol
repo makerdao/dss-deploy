@@ -992,12 +992,12 @@ contract DssDeployTest is DssDeployTestBase {
         usdtJoin.join(address(this), 1 * 10 ** 6);
         uint joinbal = vat.gem("USDT", address(this));
 
+        assertEq(usdt.balanceOf(address(usdtJoin)), 999900);
         assertEq(joinbal, 999900 * 10 ** 12);
         usdtJoin.exit(address(this), 999900); // exit in 10 ** 6
         uint exitbal = usdt.balanceOf(address(this));
         assertEq(exitbal, 99999800);
     }
-
 
     function testFailJoinAfterCageGemJoin2() public {
         deployKeepAuth();

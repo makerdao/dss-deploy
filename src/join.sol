@@ -481,12 +481,16 @@ contract GemJoin7 is LibNote {
         require(y == 0 || (z = x * y) / y == x, "GemJoin7/overflow");
     }
 
+    function sub(uint x, uint y) internal pure returns (uint z) {
+        require((z = x - y) <= x, "GemJoin7/underflow");
+    }
+
     function join(address urn, uint wad) public note {
         require(live == 1, "GemJoin7/not-live");
         require(implementations[gem.upgradedAddress()] == 1, "GemJoin7/implementation-invalid");
         uint bal = gem.balanceOf(address(this));
         gem.transferFrom(msg.sender, address(this), wad);
-        uint wadt = mul(gem.balanceOf(address(this)) - bal, 10 ** (18 - dec));
+        uint wadt = mul(sub(gem.balanceOf(address(this)), bal), 10 ** (18 - dec));
         require(int(wadt) >= 0, "GemJoin7/overflow");
         vat.slip(ilk, urn, int(wadt));
     }

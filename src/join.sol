@@ -386,7 +386,6 @@ interface AuthGemLike {
     function decimals() external view returns (uint);
     function transfer(address,uint) external returns (bool);
     function transferFrom(address,address,uint) external returns (bool);
-    function balanceOf(address) external view returns (uint256);
 }
 
 contract AuthGemJoin is LibNote {
@@ -430,7 +429,7 @@ contract AuthGemJoin is LibNote {
 }
 
 // GemJoin7
-// For an upgradable token (like USDT)
+// For an upgradable token (like USDT) which doesn't return bool on transfers and may charge fees
 //  If the token is deprecated changing the implementation behind, this prevents joins
 //   and exits until the implementation is reviewed and approved by governance.
 

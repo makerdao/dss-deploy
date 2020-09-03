@@ -881,9 +881,30 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(mana.balanceOf(address(manaJoin)), 6 ether);
         assertEq(vat.gem("MANA", address(this)), 6 ether);
         }
+
+        {
+        USDT usdt = new USDT(100 * 10 ** 6);
+        GemJoin7 usdtJoin = new GemJoin7(address(vat), "USDT", address(usdt));
+        assertEq(usdtJoin.dec(), 6);
+
+        dssDeploy.deployCollateral("USDT", address(usdtJoin), address(pip));
+
+        usdt.approve(address(usdtJoin), uint(-1));
+        assertEq(usdt.balanceOf(address(this)), 100 * 10 ** 6);
+        assertEq(usdt.balanceOf(address(usdtJoin)), 0);
+        assertEq(vat.gem("USDT", address(this)), 0);
+        usdtJoin.join(address(this), 10 * 10 ** 6);
+        assertEq(usdt.balanceOf(address(usdtJoin)), 10 * 10 ** 6);
+        assertEq(vat.gem("USDT", address(this)), 10 ether);
+        usdtJoin.exit(address(this), 4 * 10 ** 6);
+        assertEq(usdt.balanceOf(address(this)), 94 * 10 ** 6);
+        assertEq(usdt.balanceOf(address(usdtJoin)), 6 * 10 ** 6);
+        assertEq(vat.gem("USDT", address(this)), 6 ether);
+        }
     }
 
     function testFailGemJoin6Join() public {
+        deployKeepAuth();
         DSValue pip = new DSValue();
         TUSD tusd = new TUSD(100 ether);
         GemJoin6 tusdJoin = new GemJoin6(address(vat), "TUSD", address(tusd));
@@ -898,6 +919,7 @@ contract DssDeployTest is DssDeployTestBase {
     }
 
     function testFailGemJoin6Exit() public {
+        deployKeepAuth();
         DSValue pip = new DSValue();
         TUSD tusd = new TUSD(100 ether);
         GemJoin6 tusdJoin = new GemJoin6(address(vat), "TUSD", address(tusd));
@@ -907,6 +929,79 @@ contract DssDeployTest is DssDeployTestBase {
         tusd.setImplementation(0xCB9a11afDC6bDb92E4A6235959455F28758b34bA);
         // Fail here
         tusdJoin.exit(address(this), 10 ether);
+    }
+
+    function testFailGemJoin7JoinWad() public {
+        deployKeepAuth();
+        DSValue pip = new DSValue();
+        USDT usdt = new USDT(100 * 10 ** 6);
+        GemJoin7 usdtJoin = new GemJoin7(address(vat), "USDT", address(usdt));
+        dssDeploy.deployCollateral("USDT", address(usdtJoin), address(pip));
+        usdt.approve(address(usdtJoin), uint(-1));
+        // Fail here
+        usdtJoin.join(address(this), 10 ether);
+    }
+
+    function testFailGemJoin7ExitWad() public {
+        deployKeepAuth();
+        DSValue pip = new DSValue();
+        USDT usdt = new USDT(100 * 10 ** 6);
+        GemJoin7 usdtJoin = new GemJoin7(address(vat), "USDT", address(usdt));
+        dssDeploy.deployCollateral("USDT", address(usdtJoin), address(pip));
+        usdt.approve(address(usdtJoin), uint(-1));
+        usdtJoin.join(address(this), 10 * 10 ** 6);
+        // Fail here
+        usdtJoin.exit(address(this), 10 ether);
+    }
+
+    function testFailGemJoin7Join() public {
+        deployKeepAuth();
+        DSValue pip = new DSValue();
+        USDT usdt = new USDT(100 * 10 ** 6);
+        GemJoin7 usdtJoin = new GemJoin7(address(vat), "USDT", address(usdt));
+        dssDeploy.deployCollateral("USDT", address(usdtJoin), address(pip));
+        usdt.approve(address(usdtJoin), uint(-1));
+        assertEq(usdt.balanceOf(address(this)), 100 * 10 ** 6);
+        assertEq(usdt.balanceOf(address(usdtJoin)), 0);
+        assertEq(vat.gem("USDT", address(this)), 0);
+        usdt.deprecate(address(1));
+        // Fail here
+        usdtJoin.join(address(this), 10 * 10 ** 6);
+    }
+
+    function testFailGemJoin7Exit() public {
+        deployKeepAuth();
+        DSValue pip = new DSValue();
+        USDT usdt = new USDT(100 * 10 ** 6);
+        GemJoin7 usdtJoin = new GemJoin7(address(vat), "USDT", address(usdt));
+        dssDeploy.deployCollateral("USDT", address(usdtJoin), address(pip));
+        usdt.approve(address(usdtJoin), uint(-1));
+        usdtJoin.join(address(this), 10 * 10 ** 6);
+        usdt.deprecate(address(1));
+        // Fail here
+        usdtJoin.exit(address(this), 10 * 10 ** 6);
+    }
+
+    function testGemJoin7FeeChange() public {
+        deployKeepAuth();
+        DSValue pip = new DSValue();
+        USDT usdt = new USDT(100 * 10 ** 6);
+        GemJoin7 usdtJoin = new GemJoin7(address(vat), "USDT", address(usdt));
+        dssDeploy.deployCollateral("USDT", address(usdtJoin), address(pip));
+
+        // auxiliary function added, not in tether source code
+        // basisPointsRate = 1, maximumFee = 1
+        usdt.changeFees(100, 100);
+
+        usdt.approve(address(usdtJoin), uint(-1));
+        usdtJoin.join(address(this), 1 * 10 ** 6);
+        uint joinbal = vat.gem("USDT", address(this));
+
+        assertEq(usdt.balanceOf(address(usdtJoin)), 999900);
+        assertEq(joinbal, 999900 * 10 ** 12);
+        usdtJoin.exit(address(this), 999900); // exit in 10 ** 6
+        uint exitbal = usdt.balanceOf(address(this));
+        assertEq(exitbal, 99999800);
     }
 
     function testFailJoinAfterCageGemJoin2() public {
@@ -984,6 +1079,21 @@ contract DssDeployTest is DssDeployTestBase {
         tusdJoin.join(address(this), 10);
         tusdJoin.cage();
         tusdJoin.join(address(this), 10);
+    }
+
+    function testFailJoinAfterCageGemJoin7() public {
+        deployKeepAuth();
+        DSValue pip = new DSValue();
+
+        USDT usdt = new USDT(100 * 10 ** 6);
+        GemJoin7 usdtJoin = new GemJoin7(address(vat), "USDT", address(usdt));
+
+        dssDeploy.deployCollateral("USDT", address(usdtJoin), address(pip));
+
+        usdt.approve(address(usdtJoin), uint(-1));
+        usdtJoin.join(address(this), 10);
+        usdtJoin.cage();
+        usdtJoin.join(address(this), 10);
     }
 
     function testFailJoinAfterCageAuthGemJoin() public {

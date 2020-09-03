@@ -382,18 +382,18 @@ contract GemJoin6 is LibNote {
 // AuthGemJoin
 // For a token that needs restriction on the sources which are able to execute the join function (like SAI through Migration contract)
 
-interface GemLike {
+interface AuthGemLike {
     function decimals() external view returns (uint);
     function transfer(address,uint) external returns (bool);
     function transferFrom(address,address,uint) external returns (bool);
 }
 
 contract AuthGemJoin is LibNote {
-    VatLike public vat;
-    bytes32 public ilk;
-    GemLike public gem;
-    uint    public dec;
-    uint    public live;  // Access Flag
+    VatLike     public vat;
+    bytes32     public ilk;
+    AuthGemLike public gem;
+    uint        public dec;
+    uint        public live;  // Access Flag
 
     // --- Auth ---
     mapping (address => uint) public wards;
@@ -406,7 +406,7 @@ contract AuthGemJoin is LibNote {
         live = 1;
         vat = VatLike(vat_);
         ilk = ilk_;
-        gem = GemLike(gem_);
+        gem = AuthGemLike(gem_);
         dec = gem.decimals();
     }
 
@@ -425,5 +425,80 @@ contract AuthGemJoin is LibNote {
         require(wad <= 2 ** 255, "AuthGemJoin/overflow");
         vat.slip(ilk, msg.sender, -int(wad));
         require(gem.transfer(usr, wad), "AuthGemJoin/failed-transfer");
+    }
+}
+
+// GemJoin7
+// For an upgradable token (like USDT) which doesn't return bool on transfers and may charge fees
+//  If the token is deprecated changing the implementation behind, this prevents joins
+//   and exits until the implementation is reviewed and approved by governance.
+
+interface GemLike7 {
+    function decimals() external view returns (uint);
+    function transfer(address,uint) external;
+    function transferFrom(address,address,uint) external;
+    function balanceOf(address) external view returns (uint);
+    function upgradedAddress() external view returns (address);
+    function setImplementation(address,uint) external;
+    function adjustFee(uint) external;
+}
+
+contract GemJoin7 is LibNote {
+    mapping (address => uint) public wards;
+    function rely(address usr) external note auth { wards[usr] = 1; }
+    function deny(address usr) external note auth { wards[usr] = 0; }
+    modifier auth { require(wards[msg.sender] == 1); _; }
+
+    VatLike  public vat;
+    bytes32  public ilk;
+    GemLike7 public gem;
+    uint     public dec;
+    uint     public live; // Access flag
+
+    mapping (address => uint256) public implementations;
+
+    constructor(address vat_, bytes32 ilk_, address gem_) public {
+        gem = GemLike7(gem_);
+        dec = gem.decimals();
+        require(dec < 18, "GemJoin7/decimals-18-or-higher");
+        wards[msg.sender] = 1;
+        live = 1;
+        vat = VatLike(vat_);
+        ilk = ilk_;
+        setImplementation(address(gem.upgradedAddress()), 1);
+    }
+
+    function cage() external note auth {
+        live = 0;
+    }
+
+    function setImplementation(address implementation, uint256 permitted) public auth note {
+        implementations[implementation] = permitted; // 1 live, 0 disable
+    }
+
+    function mul(uint x, uint y) internal pure returns (uint z) {
+        require(y == 0 || (z = x * y) / y == x, "GemJoin7/overflow");
+    }
+
+    function sub(uint x, uint y) internal pure returns (uint z) {
+        require((z = x - y) <= x, "GemJoin7/underflow");
+    }
+
+    function join(address urn, uint wad) public note {
+        require(live == 1, "GemJoin7/not-live");
+        require(implementations[gem.upgradedAddress()] == 1, "GemJoin7/implementation-invalid");
+        uint bal = gem.balanceOf(address(this));
+        gem.transferFrom(msg.sender, address(this), wad);
+        uint wadt = mul(sub(gem.balanceOf(address(this)), bal), 10 ** (18 - dec));
+        require(int(wadt) >= 0, "GemJoin7/overflow");
+        vat.slip(ilk, urn, int(wadt));
+    }
+
+    function exit(address guy, uint wad) public note {
+        uint wad18 = mul(wad, 10 ** (18 - dec));
+        require(int(wad18) >= 0, "GemJoin7/overflow");
+        require(implementations[gem.upgradedAddress()] == 1, "GemJoin7/implementation-invalid");
+        vat.slip(ilk, msg.sender, -int(wad18));
+        gem.transfer(guy, wad);
     }
 }

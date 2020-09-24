@@ -921,6 +921,66 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(paxusd.balanceOf(address(paxusdJoin)), 6 ether);
         assertEq(vat.gem("PAXUSD", address(this)), 6 ether);
         }
+
+        {
+        COMP comp = new COMP(100 ether);
+        GemJoin compJoin = new GemJoin(address(vat), "COMP", address(comp));
+        assertEq(compJoin.dec(), 18);
+
+        dssDeploy.deployCollateral("COMP", address(compJoin), address(pip));
+
+        comp.approve(address(compJoin), uint(-1));
+        assertEq(comp.balanceOf(address(this)), 100 ether);
+        assertEq(comp.balanceOf(address(compJoin)), 0);
+        assertEq(vat.gem("COMP", address(this)), 0);
+        compJoin.join(address(this), 10 ether);
+        assertEq(comp.balanceOf(address(compJoin)), 10 ether);
+        assertEq(vat.gem("COMP", address(this)), 10 ether);
+        compJoin.exit(address(this), 4 ether);
+        assertEq(comp.balanceOf(address(this)), 94 ether);
+        assertEq(comp.balanceOf(address(compJoin)), 6 ether);
+        assertEq(vat.gem("COMP", address(this)), 6 ether);
+        }
+
+        {
+        LRC lrc = new LRC(100 ether);
+        GemJoin lrcJoin = new GemJoin(address(vat), "LRC", address(lrc));
+        assertEq(lrcJoin.dec(), 18);
+
+        dssDeploy.deployCollateral("LRC", address(lrcJoin), address(pip));
+
+        lrc.approve(address(lrcJoin), uint(-1));
+        assertEq(lrc.balanceOf(address(this)), 100 ether);
+        assertEq(lrc.balanceOf(address(lrcJoin)), 0);
+        assertEq(vat.gem("LRC", address(this)), 0);
+        lrcJoin.join(address(this), 10 ether);
+        assertEq(lrc.balanceOf(address(lrcJoin)), 10 ether);
+        assertEq(vat.gem("LRC", address(this)), 10 ether);
+        lrcJoin.exit(address(this), 4 ether);
+        assertEq(lrc.balanceOf(address(this)), 94 ether);
+        assertEq(lrc.balanceOf(address(lrcJoin)), 6 ether);
+        assertEq(vat.gem("LRC", address(this)), 6 ether);
+        }
+
+        {
+        LINK link = new LINK(100 ether);
+        GemJoin linkJoin = new GemJoin(address(vat), "LINK", address(link));
+        assertEq(linkJoin.dec(), 18);
+
+        dssDeploy.deployCollateral("LINK", address(linkJoin), address(pip));
+
+        link.approve(address(linkJoin), uint(-1));
+        assertEq(link.balanceOf(address(this)), 100 ether);
+        assertEq(link.balanceOf(address(linkJoin)), 0);
+        assertEq(vat.gem("LINK", address(this)), 0);
+        linkJoin.join(address(this), 10 ether);
+        assertEq(link.balanceOf(address(linkJoin)), 10 ether);
+        assertEq(vat.gem("LINK", address(this)), 10 ether);
+        linkJoin.exit(address(this), 4 ether);
+        assertEq(link.balanceOf(address(this)), 94 ether);
+        assertEq(link.balanceOf(address(linkJoin)), 6 ether);
+        assertEq(vat.gem("LINK", address(this)), 6 ether);
+        }
     }
 
     function testFailGemJoin6Join() public {

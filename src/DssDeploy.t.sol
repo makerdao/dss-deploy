@@ -981,6 +981,27 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(link.balanceOf(address(linkJoin)), 6 ether);
         assertEq(vat.gem("LINK", address(this)), 6 ether);
         }
+
+        {
+        GUSD gusd = new GUSD(100 * 10 ** 2);
+        GemJoin8 gusdJoin = new GemJoin8(address(vat), "GUSD", address(gusd), "erc20Impl()");
+        gusdJoin.setImplementation(address(gusd), 1);
+        assertEq(gusdJoin.dec(), 2);
+
+        dssDeploy.deployCollateral("GUSD", address(gusdJoin), address(pip));
+
+        gusd.approve(address(gusdJoin), uint(-1));
+        assertEq(gusd.balanceOf(address(this)), 100 * 10 ** 2);
+        assertEq(gusd.balanceOf(address(gusdJoin)), 0);
+        assertEq(vat.gem("GUSD", address(this)), 0);
+        gusdJoin.join(address(this), 10 * 10 ** 2);
+        assertEq(gusd.balanceOf(address(gusdJoin)), 10 * 10 ** 2);
+        assertEq(vat.gem("GUSD", address(this)), 10 ether);
+        gusdJoin.exit(address(this), 4 * 10 ** 2);
+        assertEq(gusd.balanceOf(address(this)), 94 * 10 ** 2);
+        assertEq(gusd.balanceOf(address(gusdJoin)), 6 * 10 ** 2);
+        assertEq(vat.gem("GUSD", address(this)), 6 ether);
+        }
     }
 
     function testFailGemJoin6Join() public {

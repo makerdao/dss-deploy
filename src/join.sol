@@ -502,3 +502,76 @@ contract GemJoin7 is LibNote {
         gem.transfer(guy, wad);
     }
 }
+
+// GemJoin8
+// For a token that has a lower precision than 18, has decimals and it is upgradable (like GUSD)
+
+interface GemLike8 {
+    function decimals() external view returns (uint8);
+    function transfer(address,uint) external returns (bool);
+    function transferFrom(address,address,uint) external returns (bool);
+    function erc20Impl() external view returns (address);
+}
+
+contract GemJoin8 is LibNote {
+    // --- Auth ---
+    mapping (address => uint) public wards;
+    function rely(address usr) external note auth { wards[usr] = 1; }
+    function deny(address usr) external note auth { wards[usr] = 0; }
+    modifier auth { require(wards[msg.sender] == 1); _; }
+
+    VatLike  public vat;
+    bytes32  public ilk;
+    GemLike8 public gem;
+    bytes    public funcSig;
+    uint     public dec;
+    uint     public live;  // Access Flag
+
+    mapping (address => uint256) public implementations;
+
+    constructor(address vat_, bytes32 ilk_, address gem_, string memory func_) public {
+        gem = GemLike8(gem_);
+        dec = gem.decimals();
+        require(dec < 18, "GemJoin8/decimals-18-or-higher");
+        wards[msg.sender] = 1;
+        live = 1;
+        vat = VatLike(vat_);
+        ilk = ilk_;
+        funcSig = abi.encodeWithSignature(func_);
+    }
+
+    function cage() external note auth {
+        live = 0;
+    }
+
+    function setImplementation(address implementation, uint256 permitted) public auth note {
+        implementations[implementation] = permitted;  // 1 live, 0 disable
+    }
+
+    function mul(uint x, uint y) internal pure returns (uint z) {
+        require(y == 0 || (z = x * y) / y == x, "GemJoin8/overflow");
+    }
+
+    function join(address urn, uint wad) public note {
+        require(live == 1, "GemJoin8/not-live");
+        uint wad18 = mul(wad, 10 ** (18 - dec));
+        require(int(wad18) >= 0, "GemJoin8/overflow");
+        (bool success, bytes memory returnValue) = address(gem).call(funcSig);
+        require(success, "GemJoin8/invalid-function");
+        (address impl) = abi.decode(returnValue, (address));
+        require(implementations[impl] == 1, "GemJoin8/implementation-invalid");
+        vat.slip(ilk, urn, int(wad18));
+        require(gem.transferFrom(msg.sender, address(this), wad), "GemJoin8/failed-transfer");
+    }
+
+    function exit(address guy, uint wad) public note {
+        uint wad18 = mul(wad, 10 ** (18 - dec));
+        require(int(wad18) >= 0, "GemJoin8/overflow");
+        (bool success, bytes memory returnValue) = address(gem).call(funcSig);
+        require(success, "GemJoin8/invalid-function");
+        (address impl) = abi.decode(returnValue, (address));
+        require(implementations[impl] == 1, "GemJoin8/implementation-invalid");
+        vat.slip(ilk, msg.sender, -int(wad18));
+        require(gem.transfer(guy, wad), "GemJoin8/failed-transfer");
+    }
+}

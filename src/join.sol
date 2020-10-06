@@ -538,6 +538,7 @@ contract GemJoin8 is LibNote {
         vat = VatLike(vat_);
         ilk = ilk_;
         funcSig = abi.encodeWithSignature(func_);
+        getImplementation();  // Test implementation call is valid
     }
 
     function cage() external note auth {
@@ -548,6 +549,12 @@ contract GemJoin8 is LibNote {
         implementations[implementation] = permitted;  // 1 live, 0 disable
     }
 
+    function getImplementation() internal returns (address) {
+        (bool success, bytes memory returnValue) = address(gem).call(funcSig);
+        require(success, "GemJoin8/invalid-function");
+        return abi.decode(returnValue, (address));
+    }
+
     function mul(uint x, uint y) internal pure returns (uint z) {
         require(y == 0 || (z = x * y) / y == x, "GemJoin8/overflow");
     }
@@ -556,10 +563,7 @@ contract GemJoin8 is LibNote {
         require(live == 1, "GemJoin8/not-live");
         uint wad18 = mul(wad, 10 ** (18 - dec));
         require(int(wad18) >= 0, "GemJoin8/overflow");
-        (bool success, bytes memory returnValue) = address(gem).call(funcSig);
-        require(success, "GemJoin8/invalid-function");
-        (address impl) = abi.decode(returnValue, (address));
-        require(implementations[impl] == 1, "GemJoin8/implementation-invalid");
+        require(implementations[getImplementation()] == 1, "GemJoin8/implementation-invalid");
         vat.slip(ilk, urn, int(wad18));
         require(gem.transferFrom(msg.sender, address(this), wad), "GemJoin8/failed-transfer");
     }
@@ -567,10 +571,7 @@ contract GemJoin8 is LibNote {
     function exit(address guy, uint wad) public note {
         uint wad18 = mul(wad, 10 ** (18 - dec));
         require(int(wad18) >= 0, "GemJoin8/overflow");
-        (bool success, bytes memory returnValue) = address(gem).call(funcSig);
-        require(success, "GemJoin8/invalid-function");
-        (address impl) = abi.decode(returnValue, (address));
-        require(implementations[impl] == 1, "GemJoin8/implementation-invalid");
+        require(implementations[getImplementation()] == 1, "GemJoin8/implementation-invalid");
         vat.slip(ilk, msg.sender, -int(wad18));
         require(gem.transfer(guy, wad), "GemJoin8/failed-transfer");
     }

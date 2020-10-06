@@ -1057,8 +1057,8 @@ contract GUSD {
 
     string  public  name = "GUSD";
     string  public  symbol = "GUSD";
-    uint256  public  decimals = 2;
-    address  public  erc20Impl;
+    uint8   public  decimals = 2;
+    address public  erc20Impl;
     uint256                                            _supply;
     mapping (address => uint256)                       _balances;
     mapping (address => mapping (address => uint256))  _approvals;

@@ -283,6 +283,47 @@ contract DssDeployTest is DssDeployTestBase {
         user1.doDeal(address(ethFlip), batchId);
     }
 
+    function testClip() public {
+        deploy();
+        this.file(address(dog), "Hole", rad(1000 ether)); // 1000 DAI max on auction
+        this.file(address(dog), "COL2", "hole", rad(1000 ether)); // 1000 DAI max on auction
+        this.file(address(dog), "COL2", "chop", WAD);
+        col2.mint(1 ether);
+        col2.approve(address(col2Join), uint(-1));
+        col2Join.join(address(this), 1 ether);
+        vat.frob("COL2", address(this), address(this), address(this), 1 ether, 20 ether); // Maximun DAI generated
+        pipCOL2.poke(bytes32(uint(30 * 10 ** 18 - 1))); // Decrease price in 1 wei
+        spotter.poke("COL2");
+        assertEq(vat.gem("COL2", address(col2Clip)), 0);
+        uint id = dog.bark("COL2", address(this));
+        assertEq(vat.gem("COL2", address(col2Clip)), 1 ether);
+
+        (, uint256 tab, uint256 lot,,,) = col2Clip.sales(id);
+        assertEq(tab, 20 * RAD);
+        assertEq(lot, 1 ether);
+
+        weth.mint(10 ether);
+        weth.transfer(address(user1), 10 ether);
+        user1.doWethJoin(address(weth), address(ethJoin), address(user1), 10 ether);
+        user1.doFrob(address(vat), "ETH", address(user1), address(user1), address(user1), 10 ether, 1000 ether);
+
+        user1.doHope(address(vat), address(col2Clip));
+
+        assertEq(vat.gem("COL2", address(this)), 0);
+        assertEq(vat.gem("COL2", address(user1)), 0);
+
+        user1.doTake(address(col2Clip), 1, 1 ether, 30 * RAY, address(user1), "");
+
+        (, tab, lot,,,) = col2Clip.sales(id);
+        assertEq(tab, 0);
+        assertEq(lot, 0);
+
+        uint256 amt = 1 ether;
+        assertEq(vat.gem("COL2", address(this)), amt / 3 + 1);
+        assertEq(vat.gem("COL2", address(user1)), amt * 2 / 3);
+        assertEq(vat.gem("COL2", address(col2Clip)), 0);
+    }
+
     function _flop() internal returns (uint batchId) {
         this.file(address(cat), "ETH", "dunk", rad(200 ether)); // 200 DAI max per batch
         this.file(address(cat), "box", rad(1000 ether)); // 1000 DAI max on auction
@@ -661,6 +702,7 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(vat.wards(address(ethJoin)), 1);
         assertEq(vat.wards(address(colJoin)), 1);
         assertEq(vat.wards(address(cat)), 1);
+        assertEq(vat.wards(address(dog)), 1);
         assertEq(vat.wards(address(jug)), 1);
         assertEq(vat.wards(address(spotter)), 1);
         assertEq(vat.wards(address(end)), 1);
@@ -670,6 +712,11 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(cat.wards(address(dssDeploy)), 1);
         assertEq(cat.wards(address(end)), 1);
         assertEq(cat.wards(address(pause.proxy())), 1);
+
+        // dog
+        assertEq(dog.wards(address(dssDeploy)), 1);
+        // assertEq(dog.wards(address(end)), 1);
+        assertEq(dog.wards(address(pause.proxy())), 1);
 
         // vow
         assertEq(vow.wards(address(dssDeploy)), 1);
@@ -715,6 +762,11 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(colFlip.wards(address(end)), 1);
         assertEq(colFlip.wards(address(pause.proxy())), 1);
 
+        // clips
+        assertEq(col2Clip.wards(address(dssDeploy)), 1);
+        assertEq(col2Clip.wards(address(end)), 1);
+        assertEq(col2Clip.wards(address(pause.proxy())), 1);
+
         // pause
         assertEq(address(pause.authority()), address(authority));
         assertEq(pause.owner(), address(0));
@@ -726,8 +778,10 @@ contract DssDeployTest is DssDeployTestBase {
         dssDeploy.releaseAuth();
         dssDeploy.releaseAuthFlip("ETH");
         dssDeploy.releaseAuthFlip("COL");
+        dssDeploy.releaseAuthClip("COL2");
         assertEq(vat.wards(address(dssDeploy)), 0);
         assertEq(cat.wards(address(dssDeploy)), 0);
+        assertEq(dog.wards(address(dssDeploy)), 0);
         assertEq(vow.wards(address(dssDeploy)), 0);
         assertEq(jug.wards(address(dssDeploy)), 0);
         assertEq(pot.wards(address(dssDeploy)), 0);
@@ -738,5 +792,6 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(end.wards(address(dssDeploy)), 0);
         assertEq(ethFlip.wards(address(dssDeploy)), 0);
         assertEq(colFlip.wards(address(dssDeploy)), 0);
+        assertEq(col2Clip.wards(address(dssDeploy)), 0);
     }
 }

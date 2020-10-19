@@ -403,6 +403,8 @@ contract DssDeploy is DSAuth {
 
         // Internal references set up
         dog.file(ilk, "clip", address(ilks[ilk].clip));
+        ilks[ilk].clip.file("dog", address(dog));
+        ilks[ilk].clip.file("vow", address(vow));
         ilks[ilk].clip.file("calc", calc);
         vat.init(ilk);
         jug.init(ilk);

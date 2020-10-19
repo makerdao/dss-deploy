@@ -285,6 +285,8 @@ contract DssDeployTest is DssDeployTestBase {
 
     function testClip() public {
         deploy();
+        assertTrue(address(col2Clip.vow()) == address(vow));
+        assertTrue(address(col2Clip.dog()) == address(dog));
         this.file(address(dog), "Hole", rad(1000 ether)); // 1000 DAI max on auction
         this.file(address(dog), "COL2", "hole", rad(1000 ether)); // 1000 DAI max on auction
         this.file(address(dog), "COL2", "chop", WAD);

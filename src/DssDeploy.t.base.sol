@@ -94,7 +94,7 @@ contract ProxyActions {
     function deny(address from, address to) external {
         address      usr = address(govActions);
         bytes32      tag;  assembly { tag := extcodehash(usr) }
-        bytes memory fax = abi.encodeWithSignature("rely(address,address)", from, to);
+        bytes memory fax = abi.encodeWithSignature("deny(address,address)", from, to);
         uint         eta = now;
 
         pause.plot(usr, tag, fax, eta);

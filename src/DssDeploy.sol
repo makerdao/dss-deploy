@@ -329,7 +329,7 @@ contract DssDeploy is DSAuth {
         // Internal references set up
         end.file("vat", address(vat));
         end.file("cat", address(cat));
-        // TODO: end files dog
+        end.file("dog", address(dog));
         end.file("vow", address(vow));
         end.file("pot", address(pot));
         end.file("spot", address(spotter));
@@ -337,7 +337,7 @@ contract DssDeploy is DSAuth {
         // Internal auth
         vat.rely(address(end));
         cat.rely(address(end));
-        // dog.rely(address(end)); TODO: Probably necessary in the future
+        dog.rely(address(end));
         vow.rely(address(end));
         pot.rely(address(end));
         spotter.rely(address(end));

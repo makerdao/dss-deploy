@@ -6,7 +6,7 @@
 mkShell {
   buildInputs = [
     (dapp.override {
-      solc = solc-static-versions.solc_0_5_12;
+      solc = solc-static-versions.solc_0_6_11;
     })
   ];
 }

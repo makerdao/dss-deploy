@@ -297,7 +297,7 @@ contract DssDeployTest is DssDeployTestBase {
         pipCOL2.poke(bytes32(uint(30 * 10 ** 18 - 1))); // Decrease price in 1 wei
         spotter.poke("COL2");
         assertEq(vat.gem("COL2", address(col2Clip)), 0);
-        uint id = dog.bark("COL2", address(this));
+        uint id = dog.bark("COL2", address(this), address(this));
         assertEq(vat.gem("COL2", address(col2Clip)), 1 ether);
 
         (, uint256 tab, uint256 lot,,,) = col2Clip.sales(id);

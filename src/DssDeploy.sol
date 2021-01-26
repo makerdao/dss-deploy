@@ -403,7 +403,6 @@ contract DssDeploy is DSAuth {
 
         // Internal references set up
         dog.file(ilk, "clip", address(ilks[ilk].clip));
-        ilks[ilk].clip.file("dog", address(dog));
         ilks[ilk].clip.file("vow", address(vow));
         ilks[ilk].clip.file("calc", calc);
         vat.init(ilk);
@@ -411,6 +410,7 @@ contract DssDeploy is DSAuth {
 
         // Internal auth
         vat.rely(join);
+        vat.rely(address(ilks[ilk].clip));
         dog.rely(address(ilks[ilk].clip));
         ilks[ilk].clip.rely(address(dog));
         ilks[ilk].clip.rely(address(end));

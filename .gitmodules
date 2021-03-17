@@ -10,6 +10,8 @@
 [submodule "lib/dss"]
 	path = lib/dss
 	url = https://github.com/makerdao/dss
+	branch = "liq-2.0"
 [submodule "lib/esm"]
 	path = lib/esm
 	url = https://github.com/makerdao/esm
+	branch = "liq-2.0"

@@ -4,6 +4,7 @@ import {DSTest} from "ds-test/test.sol";
 import {DSToken} from "ds-token/token.sol";
 import {DSValue} from "ds-value/value.sol";
 import {GemJoin} from "dss/join.sol";
+import {LinearDecrease} from "dss/abaci.sol";
 
 import "./DssDeploy.sol";
 import {GovActions} from "./govActions.sol";
@@ -12,10 +13,14 @@ interface Hevm {
     function warp(uint256) external;
 }
 
-interface AuctionLike {
+interface FlipperLike {
     function tend(uint, uint, uint) external;
     function dent(uint, uint, uint) external;
     function deal(uint) external;
+}
+
+interface ClipperLike {
+    function take(uint, uint, uint, address, bytes calldata) external;
 }
 
 interface HopeLike {
@@ -56,15 +61,19 @@ contract FakeUser {
     }
 
     function doTend(address obj, uint id, uint lot, uint bid) public {
-        AuctionLike(obj).tend(id, lot, bid);
+        FlipperLike(obj).tend(id, lot, bid);
+    }
+
+    function doTake(address obj, uint256 id, uint256 amt, uint256 max, address who, bytes calldata data) external {
+        ClipperLike(obj).take(id, amt, max, who, data);
     }
 
     function doDent(address obj, uint id, uint lot, uint bid) public {
-        AuctionLike(obj).dent(id, lot, bid);
+        FlipperLike(obj).dent(id, lot, bid);
     }
 
     function doDeal(address obj, uint id) public {
-        AuctionLike(obj).deal(id);
+        FlipperLike(obj).deal(id);
     }
 
     function doEndFree(address end, bytes32 ilk) public {
@@ -203,11 +212,13 @@ contract DssDeployTestBase is DSTest, ProxyActions {
     JugFab jugFab;
     VowFab vowFab;
     CatFab catFab;
+    DogFab dogFab;
     DaiFab daiFab;
     DaiJoinFab daiJoinFab;
     FlapFab flapFab;
     FlopFab flopFab;
     FlipFab flipFab;
+    ClipFab clipFab;
     SpotFab spotFab;
     PotFab potFab;
     EndFab endFab;
@@ -219,17 +230,20 @@ contract DssDeployTestBase is DSTest, ProxyActions {
     DSToken gov;
     DSValue pipETH;
     DSValue pipCOL;
+    DSValue pipCOL2;
 
     MockGuard authority;
 
     WETH weth;
     GemJoin ethJoin;
     GemJoin colJoin;
+    GemJoin col2Join;
 
     Vat vat;
     Jug jug;
     Vow vow;
     Cat cat;
+    Dog dog;
     Flapper flap;
     Flopper flop;
     Dai dai;
@@ -242,7 +256,9 @@ contract DssDeployTestBase is DSTest, ProxyActions {
     Flipper ethFlip;
 
     DSToken col;
+    DSToken col2;
     Flipper colFlip;
+    Clipper col2Clip;
 
     FakeUser user1;
     FakeUser user2;
@@ -260,11 +276,13 @@ contract DssDeployTestBase is DSTest, ProxyActions {
         jugFab = new JugFab();
         vowFab = new VowFab();
         catFab = new CatFab();
+        dogFab = new DogFab();
         daiFab = new DaiFab();
         daiJoinFab = new DaiJoinFab();
         flapFab = new FlapFab();
         flopFab = new FlopFab();
         flipFab = new FlipFab();
+        clipFab = new ClipFab();
         spotFab = new SpotFab();
         potFab = new PotFab();
         endFab = new EndFab();
@@ -272,16 +290,23 @@ contract DssDeployTestBase is DSTest, ProxyActions {
         pauseFab = new PauseFab();
         govActions = new GovActions();
 
-        dssDeploy = new DssDeploy(
+        dssDeploy = new DssDeploy();
+
+        dssDeploy.addFabs1(
             vatFab,
             jugFab,
             vowFab,
             catFab,
+            dogFab,
             daiFab,
-            daiJoinFab,
+            daiJoinFab
+        );
+
+        dssDeploy.addFabs2(
             flapFab,
             flopFab,
             flipFab,
+            clipFab,
             spotFab,
             potFab,
             endFab,
@@ -293,6 +318,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
         gov.setAuthority(DSAuthority(address(new MockGuard())));
         pipETH = new DSValue();
         pipCOL = new DSValue();
+        pipCOL2 = new DSValue();
         authority = new MockGuard();
 
         user1 = new FakeUser();
@@ -319,6 +345,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
         jug = dssDeploy.jug();
         vow = dssDeploy.vow();
         cat = dssDeploy.cat();
+        dog = dssDeploy.dog();
         flap = dssDeploy.flap();
         flop = dssDeploy.flop();
         dai = dssDeploy.dai();
@@ -332,29 +359,43 @@ contract DssDeployTestBase is DSTest, ProxyActions {
 
         weth = new WETH();
         ethJoin = new GemJoin(address(vat), "ETH", address(weth));
-        dssDeploy.deployCollateral("ETH", address(ethJoin), address(pipETH));
+        dssDeploy.deployCollateralFlip("ETH", address(ethJoin), address(pipETH));
 
         col = new DSToken("COL");
         colJoin = new GemJoin(address(vat), "COL", address(col));
-        dssDeploy.deployCollateral("COL", address(colJoin), address(pipCOL));
+        dssDeploy.deployCollateralFlip("COL", address(colJoin), address(pipCOL));
+
+        col2 = new DSToken("COL2");
+        col2Join = new GemJoin(address(vat), "COL2", address(col2));
+        LinearDecrease calc = new LinearDecrease();
+        calc.file(bytes32("tau"), 1 hours);
+
+        dssDeploy.deployCollateralClip("COL2", address(col2Join), address(pipCOL2), address(calc));
 
         // Set Params
         this.file(address(vat), bytes32("Line"), uint(10000 * 10 ** 45));
         this.file(address(vat), bytes32("ETH"), bytes32("line"), uint(10000 * 10 ** 45));
         this.file(address(vat), bytes32("COL"), bytes32("line"), uint(10000 * 10 ** 45));
+        this.file(address(vat), bytes32("COL2"), bytes32("line"), uint(10000 * 10 ** 45));
 
         pipETH.poke(bytes32(uint(300 * 10 ** 18))); // Price 300 DAI = 1 ETH (precision 18)
         pipCOL.poke(bytes32(uint(45 * 10 ** 18))); // Price 45 DAI = 1 COL (precision 18)
-        (ethFlip,) = dssDeploy.ilks("ETH");
-        (colFlip,) = dssDeploy.ilks("COL");
+        pipCOL2.poke(bytes32(uint(30 * 10 ** 18))); // Price 30 DAI = 1 COL2 (precision 18)
+        (ethFlip,,) = dssDeploy.ilks("ETH");
+        (colFlip,,) = dssDeploy.ilks("COL");
+        (,col2Clip,) = dssDeploy.ilks("COL2");
         this.file(address(spotter), "ETH", "mat", uint(1500000000 ether)); // Liquidation ratio 150%
         this.file(address(spotter), "COL", "mat", uint(1100000000 ether)); // Liquidation ratio 110%
+        this.file(address(spotter), "COL2", "mat", uint(1500000000 ether)); // Liquidation ratio 150%
         spotter.poke("ETH");
         spotter.poke("COL");
+        spotter.poke("COL2");
         (,,uint spot,,) = vat.ilks("ETH");
         assertEq(spot, 300 * RAY * RAY / 1500000000 ether);
         (,, spot,,) = vat.ilks("COL");
         assertEq(spot, 45 * RAY * RAY / 1100000000 ether);
+        (,, spot,,) = vat.ilks("COL2");
+        assertEq(spot, 30 * RAY * RAY / 1500000000 ether);
 
         MockGuard(address(gov.authority())).permit(address(flop), address(gov), bytes4(keccak256("mint(address,uint256)")));
         MockGuard(address(gov.authority())).permit(address(flap), address(gov), bytes4(keccak256("burn(address,uint256)")));

@@ -149,8 +149,8 @@ contract EndFab {
 }
 
 contract ESMFab {
-    function newESM(address gov, address end, address pit, uint min) public returns (ESM esm) {
-        esm = new ESM(gov, end, pit, min);
+    function newESM(address gov, address end, address proxy, uint min) public returns (ESM esm) {
+        esm = new ESM(gov, end, proxy, min);
     }
 }
 
@@ -190,7 +190,8 @@ contract DssDeploy is DSAuth {
     Spotter public spotter;
     Pot     public pot;
     End     public end;
-    ESM     public esm;
+    ESM     public esmBug;
+    ESM     public esmAttack;
     DSPause public pause;
 
     mapping(bytes32 => Ilk) public ilks;
@@ -320,7 +321,7 @@ contract DssDeploy is DSAuth {
         vow.rely(address(dog));
     }
 
-    function deployShutdown(address gov, address pit, uint256 min) public auth {
+    function deployShutdown() public auth {
         require(address(cat) != address(0), "Missing previous step");
 
         // Deploy
@@ -341,10 +342,6 @@ contract DssDeploy is DSAuth {
         vow.rely(address(end));
         pot.rely(address(end));
         spotter.rely(address(end));
-
-        // Deploy ESM
-        esm = esmFab.newESM(gov, address(end), address(pit), min);
-        end.rely(address(esm));
     }
 
     function deployPause(uint delay, address authority) public auth {
@@ -363,6 +360,17 @@ contract DssDeploy is DSAuth {
         flap.rely(address(pause.proxy()));
         flop.rely(address(pause.proxy()));
         end.rely(address(pause.proxy()));
+    }
+
+    function deployESM(address gov, uint256 min) public auth {
+        require(address(pause) != address(0), "Missing previous step");
+
+        // Deploy ESM
+        esmBug = esmFab.newESM(gov, address(end), address(0), min);
+        end.rely(address(esmBug));
+        esmAttack = esmFab.newESM(gov, address(end), address(pause.proxy()), min);
+        end.rely(address(esmAttack));
+        vat.rely(address(esmAttack));
     }
 
     function deployCollateralFlip(bytes32 ilk, address join, address pip) public auth {
@@ -414,6 +422,7 @@ contract DssDeploy is DSAuth {
         dog.rely(address(ilks[ilk].clip));
         ilks[ilk].clip.rely(address(dog));
         ilks[ilk].clip.rely(address(end));
+        ilks[ilk].clip.rely(address(esmAttack));
         ilks[ilk].clip.rely(address(pause.proxy()));
     }
 

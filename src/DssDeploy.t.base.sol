@@ -251,7 +251,8 @@ contract DssDeployTestBase is DSTest, ProxyActions {
     Spotter spotter;
     Pot pot;
     End end;
-    ESM esm;
+    ESM esmBug;
+    ESM esmAttack;
 
     Flipper ethFlip;
 
@@ -338,8 +339,9 @@ contract DssDeployTestBase is DSTest, ProxyActions {
         dssDeploy.deployTaxation();
         dssDeploy.deployAuctions(address(gov));
         dssDeploy.deployLiquidator();
-        dssDeploy.deployShutdown(address(gov), address(0x0), 10);
+        dssDeploy.deployShutdown();
         dssDeploy.deployPause(0, address(authority));
+        dssDeploy.deployESM(address(gov), 10);
 
         vat = dssDeploy.vat();
         jug = dssDeploy.jug();
@@ -353,7 +355,8 @@ contract DssDeployTestBase is DSTest, ProxyActions {
         spotter = dssDeploy.spotter();
         pot = dssDeploy.pot();
         end = dssDeploy.end();
-        esm = dssDeploy.esm();
+        esmBug = dssDeploy.esmBug();
+        esmAttack = dssDeploy.esmAttack();
         pause = dssDeploy.pause();
         authority.permit(address(this), address(pause), bytes4(keccak256("plot(address,bytes32,bytes,uint256)")));
 

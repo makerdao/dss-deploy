@@ -29,7 +29,7 @@ contract DssDeployTest is DssDeployTestBase {
         dssDeploy.deployDai(99);
         dssDeploy.deployTaxation();
         dssDeploy.deployAuctions(address(gov));
-        dssDeploy.deployShutdown(address(gov), address(0x0), 10);
+        dssDeploy.deployEnd();
     }
 
     function testFailMissingEnd() public {
@@ -37,7 +37,17 @@ contract DssDeployTest is DssDeployTestBase {
         dssDeploy.deployDai(99);
         dssDeploy.deployTaxation();
         dssDeploy.deployAuctions(address(gov));
+        dssDeploy.deployLiquidator();
         dssDeploy.deployPause(0, address(authority));
+    }
+
+    function testFailMissingPause() public {
+        dssDeploy.deployVat();
+        dssDeploy.deployDai(99);
+        dssDeploy.deployTaxation();
+        dssDeploy.deployAuctions(address(gov));
+        dssDeploy.deployLiquidator();
+        dssDeploy.deployESM(address(gov), 10);
     }
 
     function testJoinETH() public {
@@ -544,12 +554,31 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(gov.balanceOf(address(user1)), 1 ether);
     }
 
-    function testFireESM() public {
+    function testFireESMBug() public {
         deploy();
         gov.mint(address(user1), 10);
 
-        user1.doESMJoin(address(gov), address(esm), 10);
-        esm.fire();
+        user1.doESMJoin(address(gov), address(esmBug), 10);
+        assertEq(vat.wards(address(pause.proxy())), 1);
+        esmBug.fire();
+        assertEq(vat.wards(address(pause.proxy())), 1);
+        assertEq(end.live(), 0);
+        assertEq(vat.live(), 0);
+    }
+
+    function testFireESMAttack() public {
+        deploy();
+        gov.mint(address(user1), 10);
+
+        user1.doESMJoin(address(gov), address(esmAttack), 10);
+        assertEq(vat.wards(address(pause.proxy())), 1);
+        assertEq(col2Clip.wards(address(pause.proxy())), 1);
+        esmAttack.fire();
+        esmAttack.deny(address(col2Clip));
+        assertEq(vat.wards(address(pause.proxy())), 0);
+        assertEq(col2Clip.wards(address(pause.proxy())), 0);
+        assertEq(end.live(), 0);
+        assertEq(vat.live(), 0);
     }
 
     function testDsr() public {
@@ -709,6 +738,8 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(vat.wards(address(jug)), 1);
         assertEq(vat.wards(address(spotter)), 1);
         assertEq(vat.wards(address(end)), 1);
+        assertEq(vat.wards(address(esmBug)), 0);
+        assertEq(vat.wards(address(esmAttack)), 1);
         assertEq(vat.wards(address(pause.proxy())), 1);
 
         // cat
@@ -754,7 +785,8 @@ contract DssDeployTest is DssDeployTestBase {
 
         // end
         assertEq(end.wards(address(dssDeploy)), 1);
-        assertEq(end.wards(address(esm)), 1);
+        assertEq(end.wards(address(esmBug)), 1);
+        assertEq(end.wards(address(esmAttack)), 1);
         assertEq(end.wards(address(pause.proxy())), 1);
 
         // flips
@@ -769,6 +801,8 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(col2Clip.wards(address(dssDeploy)), 1);
         assertEq(col2Clip.wards(address(end)), 1);
         assertEq(col2Clip.wards(address(pause.proxy())), 1);
+        assertEq(col2Clip.wards(address(esmBug)), 0);
+        assertEq(col2Clip.wards(address(esmAttack)), 1);
 
         // pause
         assertEq(address(pause.authority()), address(authority));

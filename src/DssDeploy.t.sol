@@ -29,7 +29,7 @@ contract DssDeployTest is DssDeployTestBase {
         dssDeploy.deployDai(99);
         dssDeploy.deployTaxation();
         dssDeploy.deployAuctions(address(gov));
-        dssDeploy.deployShutdown();
+        dssDeploy.deployEnd();
     }
 
     function testFailMissingEnd() public {
@@ -45,7 +45,7 @@ contract DssDeployTest is DssDeployTestBase {
         dssDeploy.deployDai(99);
         dssDeploy.deployTaxation();
         dssDeploy.deployAuctions(address(gov));
-        dssDeploy.deployShutdown();
+        dssDeploy.deployEnd();
     }
 
     function testJoinETH() public {

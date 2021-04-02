@@ -339,7 +339,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
         dssDeploy.deployTaxation();
         dssDeploy.deployAuctions(address(gov));
         dssDeploy.deployLiquidator();
-        dssDeploy.deployShutdown();
+        dssDeploy.deployEnd();
         dssDeploy.deployPause(0, address(authority));
         dssDeploy.deployESM(address(gov), 10);
 

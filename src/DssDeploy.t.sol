@@ -560,6 +560,8 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(vat.wards(address(pause.proxy())), 1);
         esmBug.fire();
         assertEq(vat.wards(address(pause.proxy())), 1);
+        assertEq(end.live(), 0);
+        assertEq(vat.live(), 0);
     }
 
     function testFireESMAttack() public {
@@ -568,8 +570,13 @@ contract DssDeployTest is DssDeployTestBase {
 
         user1.doESMJoin(address(gov), address(esmAttack), 10);
         assertEq(vat.wards(address(pause.proxy())), 1);
+        assertEq(col2Clip.wards(address(pause.proxy())), 1);
         esmAttack.fire();
+        esmAttack.deny(address(col2Clip));
         assertEq(vat.wards(address(pause.proxy())), 0);
+        assertEq(col2Clip.wards(address(pause.proxy())), 0);
+        assertEq(end.live(), 0);
+        assertEq(vat.live(), 0);
     }
 
     function testDsr() public {

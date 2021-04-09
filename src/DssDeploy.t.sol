@@ -572,10 +572,13 @@ contract DssDeployTest is DssDeployTestBase {
 
         user1.doESMJoin(address(gov), address(esmAttack), 10);
         assertEq(vat.wards(address(pause.proxy())), 1);
+        assertEq(ethFlip.wards(address(pause.proxy())), 1);
         assertEq(col2Clip.wards(address(pause.proxy())), 1);
         esmAttack.fire();
+        esmAttack.deny(address(ethFlip));
         esmAttack.deny(address(col2Clip));
         assertEq(vat.wards(address(pause.proxy())), 0);
+        assertEq(ethFlip.wards(address(pause.proxy())), 0);
         assertEq(col2Clip.wards(address(pause.proxy())), 0);
         assertEq(end.live(), 0);
         assertEq(vat.live(), 0);
@@ -793,9 +796,13 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(ethFlip.wards(address(dssDeploy)), 1);
         assertEq(ethFlip.wards(address(end)), 1);
         assertEq(ethFlip.wards(address(pause.proxy())), 1);
+        assertEq(ethFlip.wards(address(esmBug)), 0);
+        assertEq(ethFlip.wards(address(esmAttack)), 1);
         assertEq(colFlip.wards(address(dssDeploy)), 1);
         assertEq(colFlip.wards(address(end)), 1);
         assertEq(colFlip.wards(address(pause.proxy())), 1);
+        assertEq(colFlip.wards(address(esmBug)), 0);
+        assertEq(colFlip.wards(address(esmAttack)), 1);
 
         // clips
         assertEq(col2Clip.wards(address(dssDeploy)), 1);

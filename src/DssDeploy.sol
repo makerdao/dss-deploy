@@ -394,6 +394,7 @@ contract DssDeploy is DSAuth {
         cat.rely(address(ilks[ilk].flip));
         ilks[ilk].flip.rely(address(cat));
         ilks[ilk].flip.rely(address(end));
+        ilks[ilk].flip.rely(address(esmAttack));
         ilks[ilk].flip.rely(address(pause.proxy()));
     }
 

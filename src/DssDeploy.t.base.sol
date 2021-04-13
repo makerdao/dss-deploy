@@ -251,8 +251,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
     Spotter spotter;
     Pot pot;
     End end;
-    ESM esmBug;
-    ESM esmAttack;
+    ESM esm;
 
     Flipper ethFlip;
 
@@ -355,8 +354,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
         spotter = dssDeploy.spotter();
         pot = dssDeploy.pot();
         end = dssDeploy.end();
-        esmBug = dssDeploy.esmBug();
-        esmAttack = dssDeploy.esmAttack();
+        esm = dssDeploy.esm();
         pause = dssDeploy.pause();
         authority.permit(address(this), address(pause), bytes4(keccak256("plot(address,bytes32,bytes,uint256)")));
 

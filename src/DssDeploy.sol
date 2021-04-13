@@ -190,8 +190,7 @@ contract DssDeploy is DSAuth {
     Spotter public spotter;
     Pot     public pot;
     End     public end;
-    ESM     public esmBug;
-    ESM     public esmAttack;
+    ESM     public esm;
     DSPause public pause;
 
     mapping(bytes32 => Ilk) public ilks;
@@ -366,11 +365,9 @@ contract DssDeploy is DSAuth {
         require(address(pause) != address(0), "Missing previous step");
 
         // Deploy ESM
-        esmBug = esmFab.newESM(gov, address(end), address(0), min);
-        end.rely(address(esmBug));
-        esmAttack = esmFab.newESM(gov, address(end), address(pause.proxy()), min);
-        end.rely(address(esmAttack));
-        vat.rely(address(esmAttack));
+        esm = esmFab.newESM(gov, address(end), address(pause.proxy()), min);
+        end.rely(address(esm));
+        vat.rely(address(esm));
     }
 
     function deployCollateralFlip(bytes32 ilk, address join, address pip) public auth {
@@ -394,7 +391,7 @@ contract DssDeploy is DSAuth {
         cat.rely(address(ilks[ilk].flip));
         ilks[ilk].flip.rely(address(cat));
         ilks[ilk].flip.rely(address(end));
-        ilks[ilk].flip.rely(address(esmAttack));
+        ilks[ilk].flip.rely(address(esm));
         ilks[ilk].flip.rely(address(pause.proxy()));
     }
 
@@ -423,7 +420,7 @@ contract DssDeploy is DSAuth {
         dog.rely(address(ilks[ilk].clip));
         ilks[ilk].clip.rely(address(dog));
         ilks[ilk].clip.rely(address(end));
-        ilks[ilk].clip.rely(address(esmAttack));
+        ilks[ilk].clip.rely(address(esm));
         ilks[ilk].clip.rely(address(pause.proxy()));
     }
 

@@ -554,29 +554,17 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(gov.balanceOf(address(user1)), 1 ether);
     }
 
-    function testFireESMBug() public {
+    function testFireESM() public {
         deploy();
         gov.mint(address(user1), 10);
 
-        user1.doESMJoin(address(gov), address(esmBug), 10);
-        assertEq(vat.wards(address(pause.proxy())), 1);
-        esmBug.fire();
-        assertEq(vat.wards(address(pause.proxy())), 1);
-        assertEq(end.live(), 0);
-        assertEq(vat.live(), 0);
-    }
-
-    function testFireESMAttack() public {
-        deploy();
-        gov.mint(address(user1), 10);
-
-        user1.doESMJoin(address(gov), address(esmAttack), 10);
+        user1.doESMJoin(address(gov), address(esm), 10);
         assertEq(vat.wards(address(pause.proxy())), 1);
         assertEq(ethFlip.wards(address(pause.proxy())), 1);
         assertEq(col2Clip.wards(address(pause.proxy())), 1);
-        esmAttack.fire();
-        esmAttack.deny(address(ethFlip));
-        esmAttack.deny(address(col2Clip));
+        esm.fire();
+        esm.deny(address(ethFlip));
+        esm.deny(address(col2Clip));
         assertEq(vat.wards(address(pause.proxy())), 0);
         assertEq(ethFlip.wards(address(pause.proxy())), 0);
         assertEq(col2Clip.wards(address(pause.proxy())), 0);
@@ -741,8 +729,7 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(vat.wards(address(jug)), 1);
         assertEq(vat.wards(address(spotter)), 1);
         assertEq(vat.wards(address(end)), 1);
-        assertEq(vat.wards(address(esmBug)), 0);
-        assertEq(vat.wards(address(esmAttack)), 1);
+        assertEq(vat.wards(address(esm)), 1);
         assertEq(vat.wards(address(pause.proxy())), 1);
 
         // cat
@@ -788,28 +775,24 @@ contract DssDeployTest is DssDeployTestBase {
 
         // end
         assertEq(end.wards(address(dssDeploy)), 1);
-        assertEq(end.wards(address(esmBug)), 1);
-        assertEq(end.wards(address(esmAttack)), 1);
+        assertEq(end.wards(address(esm)), 1);
         assertEq(end.wards(address(pause.proxy())), 1);
 
         // flips
         assertEq(ethFlip.wards(address(dssDeploy)), 1);
         assertEq(ethFlip.wards(address(end)), 1);
         assertEq(ethFlip.wards(address(pause.proxy())), 1);
-        assertEq(ethFlip.wards(address(esmBug)), 0);
-        assertEq(ethFlip.wards(address(esmAttack)), 1);
+        assertEq(ethFlip.wards(address(esm)), 1);
         assertEq(colFlip.wards(address(dssDeploy)), 1);
         assertEq(colFlip.wards(address(end)), 1);
         assertEq(colFlip.wards(address(pause.proxy())), 1);
-        assertEq(colFlip.wards(address(esmBug)), 0);
-        assertEq(colFlip.wards(address(esmAttack)), 1);
+        assertEq(colFlip.wards(address(esm)), 1);
 
         // clips
         assertEq(col2Clip.wards(address(dssDeploy)), 1);
         assertEq(col2Clip.wards(address(end)), 1);
         assertEq(col2Clip.wards(address(pause.proxy())), 1);
-        assertEq(col2Clip.wards(address(esmBug)), 0);
-        assertEq(col2Clip.wards(address(esmAttack)), 1);
+        assertEq(col2Clip.wards(address(esm)), 1);
 
         // pause
         assertEq(address(pause.authority()), address(authority));

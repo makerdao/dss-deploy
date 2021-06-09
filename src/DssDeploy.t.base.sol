@@ -271,7 +271,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
         require(y == 0 || (z = x * y) / y == x);
     }
 
-    function setUp() public {
+    function setUp() public virtual {
         vatFab = new VatFab();
         jugFab = new JugFab();
         vowFab = new VowFab();

@@ -219,6 +219,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
     FlopFab flopFab;
     FlipFab flipFab;
     ClipFab clipFab;
+    CalcFab calcFab;
     SpotFab spotFab;
     PotFab potFab;
     EndFab endFab;
@@ -283,6 +284,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
         flopFab = new FlopFab();
         flipFab = new FlipFab();
         clipFab = new ClipFab();
+        calcFab = new CalcFab();
         spotFab = new SpotFab();
         potFab = new PotFab();
         endFab = new EndFab();
@@ -307,6 +309,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
             flopFab,
             flipFab,
             clipFab,
+            calcFab,
             spotFab,
             potFab,
             endFab,
@@ -368,7 +371,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
 
         col2 = new DSToken("COL2");
         col2Join = new GemJoin(address(vat), "COL2", address(col2));
-        LinearDecrease calc = new LinearDecrease();
+        LinearDecrease calc = calcFab.newLinearDecrease(address(this));
         calc.file(bytes32("tau"), 1 hours);
 
         dssDeploy.deployCollateralClip("COL2", address(col2Join), address(pipCOL2), address(calc));

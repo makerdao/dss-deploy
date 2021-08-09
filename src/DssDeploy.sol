@@ -425,7 +425,6 @@ contract DssDeploy is DSAuth {
         require(ilk != bytes32(""), "Missing ilk name");
         require(join != address(0), "Missing join address");
         require(pip != address(0), "Missing pip address");
-        require(calc != address(0), "Missing calc address");
         require(address(pause) != address(0), "Missing previous step");
 
         // Deploy
@@ -436,6 +435,12 @@ contract DssDeploy is DSAuth {
         // Internal references set up
         dog.file(ilk, "clip", address(ilks[ilk].clip));
         ilks[ilk].clip.file("vow", address(vow));
+
+        // Use calc with safe default if not configured
+        if (calc == address(0)) {
+            calc = address(calcFab.newLinearDecrease(address(this)));
+            LinearDecrease(calc).file(bytes32("tau"), 1 hours);
+        }
         ilks[ilk].clip.file("calc", calc);
         vat.init(ilk);
         jug.init(ilk);

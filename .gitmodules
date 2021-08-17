@@ -14,3 +14,4 @@
 [submodule "lib/esm"]
 	path = lib/esm
 	url = https://github.com/makerdao/esm
+	branch = v1.2

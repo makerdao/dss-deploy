@@ -32,6 +32,9 @@ import {Flapper} from "dss/flap.sol";
 import {Flopper} from "dss/flop.sol";
 import {Flipper} from "dss/flip.sol";
 import {Clipper} from "dss/clip.sol";
+import {LinearDecrease,
+        StairstepExponentialDecrease,
+        ExponentialDecrease} from "dss/abaci.sol";
 import {Dai} from "dss/dai.sol";
 import {End} from "dss/end.sol";
 import {ESM} from "esm/ESM.sol";
@@ -124,6 +127,26 @@ contract ClipFab {
     }
 }
 
+contract CalcFab {
+    function newLinearDecrease(address owner) public returns (LinearDecrease calc) {
+        calc = new LinearDecrease();
+        calc.rely(owner);
+        calc.deny(address(this));
+    }
+
+    function newStairstepExponentialDecrease(address owner) public returns (StairstepExponentialDecrease calc) {
+        calc = new StairstepExponentialDecrease();
+        calc.rely(owner);
+        calc.deny(address(this));
+    }
+
+    function newExponentialDecrease(address owner) public returns (ExponentialDecrease calc) {
+        calc = new ExponentialDecrease();
+        calc.rely(owner);
+        calc.deny(address(this));
+    }
+}
+
 contract SpotFab {
     function newSpotter(address owner, address vat) public returns (Spotter spotter) {
         spotter = new Spotter(vat);
@@ -172,6 +195,7 @@ contract DssDeploy is DSAuth {
     FlopFab    public flopFab;
     FlipFab    public flipFab;
     ClipFab    public clipFab;
+    CalcFab    public calcFab;
     SpotFab    public spotFab;
     PotFab     public potFab;
     EndFab     public endFab;
@@ -229,6 +253,7 @@ contract DssDeploy is DSAuth {
         FlopFab flopFab_,
         FlipFab flipFab_,
         ClipFab clipFab_,
+        CalcFab calcFab_,
         SpotFab spotFab_,
         PotFab potFab_,
         EndFab endFab_,
@@ -240,6 +265,7 @@ contract DssDeploy is DSAuth {
         flopFab = flopFab_;
         flipFab = flipFab_;
         clipFab = clipFab_;
+        calcFab = calcFab_;
         spotFab = spotFab_;
         potFab = potFab_;
         endFab = endFab_;
@@ -399,7 +425,6 @@ contract DssDeploy is DSAuth {
         require(ilk != bytes32(""), "Missing ilk name");
         require(join != address(0), "Missing join address");
         require(pip != address(0), "Missing pip address");
-        require(calc != address(0), "Missing calc address");
         require(address(pause) != address(0), "Missing previous step");
 
         // Deploy
@@ -410,6 +435,12 @@ contract DssDeploy is DSAuth {
         // Internal references set up
         dog.file(ilk, "clip", address(ilks[ilk].clip));
         ilks[ilk].clip.file("vow", address(vow));
+
+        // Use calc with safe default if not configured
+        if (calc == address(0)) {
+            calc = address(calcFab.newLinearDecrease(address(this)));
+            LinearDecrease(calc).file(bytes32("tau"), 1 hours);
+        }
         ilks[ilk].clip.file("calc", calc);
         vat.init(ilk);
         jug.init(ilk);

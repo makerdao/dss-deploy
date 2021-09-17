@@ -1,4 +1,5 @@
 # Multi Collateral Dai Deployment
+![Build Status](https://github.com/makerdao/dss-deploy/actions/workflows/.github/workflows/tests.yaml/badge.svg?branch=v1.2)
 
 This repository contains a smart contract which deploys the core `dss` contracts and sets up the necessary authorisations between them.
 

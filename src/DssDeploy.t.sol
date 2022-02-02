@@ -582,8 +582,8 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(ethFlip.wards(address(pause.proxy())), 1);
         assertEq(col2Clip.wards(address(pause.proxy())), 1);
         esm.fire();
-        esm.deny(address(ethFlip));
-        esm.deny(address(col2Clip));
+        esm.denyProxy(address(ethFlip));
+        esm.denyProxy(address(col2Clip));
         assertEq(vat.wards(address(pause.proxy())), 0);
         assertEq(ethFlip.wards(address(pause.proxy())), 0);
         assertEq(col2Clip.wards(address(pause.proxy())), 0);

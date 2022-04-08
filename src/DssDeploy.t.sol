@@ -425,6 +425,7 @@ contract DssDeployTest is DssDeployTestBase {
         jug.drip("ETH");
         assertEq(vat.dai(address(vow)), rad(10 * 0.05 ether));
         this.file(address(vow), bytes32("bump"), rad(0.05 ether));
+        this.file(address(flap), "lid", rad(0.05 ether));
         batchId = vow.flap();
 
         (,uint lot,,,) = flap.bids(batchId);
@@ -441,7 +442,6 @@ contract DssDeployTest is DssDeployTestBase {
     function testFlap() public {
         deploy();
         uint batchId = _flap();
-
         user1.doTend(address(flap), batchId, rad(0.05 ether), 0.001 ether);
         user2.doTend(address(flap), batchId, rad(0.05 ether), 0.0015 ether);
         user1.doTend(address(flap), batchId, rad(0.05 ether), 0.0016 ether);

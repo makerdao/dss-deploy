@@ -36,6 +36,7 @@ import {LinearDecrease,
         StairstepExponentialDecrease,
         ExponentialDecrease} from "dss/abaci.sol";
 import {Dai} from "dss/dai.sol";
+import {Cure} from "dss/cure.sol";
 import {End} from "dss/end.sol";
 import {ESM} from "esm/ESM.sol";
 import {Pot} from "dss/pot.sol";
@@ -163,6 +164,14 @@ contract PotFab {
     }
 }
 
+contract CureFab {
+    function newCure(address owner) public returns (Cure cure) {
+        cure = new Cure();
+        cure.rely(owner);
+        cure.deny(address(this));
+    }
+}
+
 contract EndFab {
     function newEnd(address owner) public returns (End end) {
         end = new End();
@@ -198,6 +207,7 @@ contract DssDeploy is DSAuth {
     CalcFab    public calcFab;
     SpotFab    public spotFab;
     PotFab     public potFab;
+    CureFab    public cureFab;
     EndFab     public endFab;
     ESMFab     public esmFab;
     PauseFab   public pauseFab;
@@ -213,6 +223,7 @@ contract DssDeploy is DSAuth {
     Flopper public flop;
     Spotter public spotter;
     Pot     public pot;
+    Cure    public cure;
     End     public end;
     ESM     public esm;
     DSPause public pause;
@@ -256,6 +267,7 @@ contract DssDeploy is DSAuth {
         CalcFab calcFab_,
         SpotFab spotFab_,
         PotFab potFab_,
+        CureFab cureFab_,
         EndFab endFab_,
         ESMFab esmFab_,
         PauseFab pauseFab_
@@ -268,6 +280,7 @@ contract DssDeploy is DSAuth {
         calcFab = calcFab_;
         spotFab = spotFab_;
         potFab = potFab_;
+        cureFab = cureFab_;
         endFab = endFab_;
         esmFab = esmFab_;
         pauseFab = pauseFab_;
@@ -350,6 +363,7 @@ contract DssDeploy is DSAuth {
         require(address(cat) != address(0), "Missing previous step");
 
         // Deploy
+        cure = cureFab.newCure(address(this));
         end = endFab.newEnd(address(this));
 
         // Internal references set up
@@ -359,6 +373,7 @@ contract DssDeploy is DSAuth {
         end.file("vow", address(vow));
         end.file("pot", address(pot));
         end.file("spot", address(spotter));
+        end.file("cure", address(cure));
 
         // Internal auth
         vat.rely(address(end));
@@ -367,6 +382,7 @@ contract DssDeploy is DSAuth {
         vow.rely(address(end));
         pot.rely(address(end));
         spotter.rely(address(end));
+        cure.rely(address(end));
     }
 
     function deployPause(uint delay, address authority) public auth {
@@ -384,6 +400,7 @@ contract DssDeploy is DSAuth {
         spotter.rely(address(pause.proxy()));
         flap.rely(address(pause.proxy()));
         flop.rely(address(pause.proxy()));
+        cure.rely(address(pause.proxy()));
         end.rely(address(pause.proxy()));
     }
 
@@ -466,6 +483,7 @@ contract DssDeploy is DSAuth {
         spotter.deny(address(this));
         flap.deny(address(this));
         flop.deny(address(this));
+        cure.deny(address(this));
         end.deny(address(this));
     }
 

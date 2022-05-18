@@ -792,6 +792,11 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(flop.wards(address(vow)), 1);
         assertEq(flop.wards(address(pause.proxy())), 1);
 
+        // cure
+        assertEq(cure.wards(address(dssDeploy)), 1);
+        assertEq(cure.wards(address(end)), 1);
+        assertEq(cure.wards(address(pause.proxy())), 1);
+
         // end
         assertEq(end.wards(address(dssDeploy)), 1);
         assertEq(end.wards(address(esm)), 1);
@@ -835,6 +840,7 @@ contract DssDeployTest is DssDeployTestBase {
         assertEq(spotter.wards(address(dssDeploy)), 0);
         assertEq(flap.wards(address(dssDeploy)), 0);
         assertEq(flop.wards(address(dssDeploy)), 0);
+        assertEq(cure.wards(address(dssDeploy)), 0);
         assertEq(end.wards(address(dssDeploy)), 0);
         assertEq(ethFlip.wards(address(dssDeploy)), 0);
         assertEq(colFlip.wards(address(dssDeploy)), 0);

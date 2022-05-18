@@ -241,6 +241,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
     CalcFab calcFab;
     SpotFab spotFab;
     PotFab potFab;
+    CureFab cureFab;
     EndFab endFab;
     ESMFab esmFab;
     PauseFab pauseFab;
@@ -270,6 +271,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
     DaiJoin daiJoin;
     Spotter spotter;
     Pot pot;
+    Cure cure;
     End end;
     ESM esm;
 
@@ -306,6 +308,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
         calcFab = new CalcFab();
         spotFab = new SpotFab();
         potFab = new PotFab();
+        cureFab = new CureFab();
         endFab = new EndFab();
         esmFab = new ESMFab();
         pauseFab = new PauseFab();
@@ -331,6 +334,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
             calcFab,
             spotFab,
             potFab,
+            cureFab,
             endFab,
             esmFab,
             pauseFab
@@ -375,6 +379,7 @@ contract DssDeployTestBase is DSTest, ProxyActions {
         daiJoin = dssDeploy.daiJoin();
         spotter = dssDeploy.spotter();
         pot = dssDeploy.pot();
+        cure = dssDeploy.cure();
         end = dssDeploy.end();
         esm = dssDeploy.esm();
         pause = dssDeploy.pause();
